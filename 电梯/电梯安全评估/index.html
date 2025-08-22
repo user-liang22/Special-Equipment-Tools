@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>在用电梯安全评估记录 (直梯)</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>在用电梯安全评估记录 (直梯)</h1>
+        
+        <form id="evaluation-form">
+            </form>
+
+        <div id="management-checklist">
+            </div>
+
+        <div class="button-group">
+            <button type="button" id="calculate-btn" class="calculate-btn">计算评估结果</button>
+        </div>
+
+        <div id="results" style="display: none;">
+            <h2>评估结果</h2>
+            <p id="summary"></p>
+            <p id="score"></p>
+            <p id="level"></p>
+            <p id="conclusion-title"><b>安全评估结论:</b></p>
+            <div id="conclusion"></div>
+            
+            <div id="risk-items-section" style="display: none;">
+                <h3>风险项目详情</h3>
+                <div id="risk-items-list"></div>
+            </div>
+            
+            <div id="not-applicable-items-section" style="display: none;">
+                <h3>无此项项目详情</h3>
+                <div id="not-applicable-items-list"></div>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" id="save-result-btn" class="save-result-btn">保存当前结果</button>
+                <button type="button" id="view-history-btn" class="view-history-btn">查看历史记录</button>
+            </div>
+        </div>
+        
+        <div id="history-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>历史评估记录</h2>
+                <div class="history-controls">
+                    <button type="button" id="clear-all-history-btn" class="clear-all-history-btn">清空所有历史记录</button>
+                </div>
+                <div id="history-list"></div>
+            </div>
+        </div>
+        
+        <!-- 使用说明弹窗 -->
+        <div id="instructions-modal" class="modal" style="display: none;">
+            <div class="modal-content instructions-content">
+                <span class="close">&times;</span>
+                <h2>📋 使用说明</h2>
+                <div class="instructions-body">
+                                         <div class="instruction-section">
+                         <h3>🎯 评估流程</h3>
+                         <ol>
+                             <li>点击评估类别标题可展开/折叠详细内容</li>
+                             <li>选择评估项目（符合/不符合/无此项）</li>
+                             <li>选择严重程度等级（1-4级）</li>
+                             <li>选择概率等级（A-F级）</li>
+                             <li>点击"计算评估结果"</li>
+                         </ol>
+                     </div>
+                    
+                                         <div class="instruction-section">
+                         <h3>⚠️ 重要提示</h3>
+                         <ul>
+                             <li><strong>高风险项规则</strong>：当存在风险类别I（高风险项）时，综合安全状况得分(G)自动设为0</li>
+                             <li><strong>风险分类</strong>：根据GBT 42615-2023标准自动计算风险类别</li>
+                         </ul>
+                     </div>
+                     
+                     <div class="instruction-section">
+                         <h3>💾 数据管理</h3>
+                         <ul>
+                             <li><strong>保存当前结果</strong>：评估完成后可保存当前结果到本地存储</li>
+                             <li><strong>查看历史记录</strong>：可查看之前保存的所有评估记录</li>
+                             <li><strong>清空历史</strong>：可一键清空所有历史评估记录</li>
+                         </ul>
+                     </div>
+                    
+                    
+                </div>
+                <div class="instructions-footer">
+                    <button type="button" id="got-it-btn" class="got-it-btn">知道了</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

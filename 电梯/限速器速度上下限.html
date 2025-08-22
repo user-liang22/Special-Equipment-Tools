@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电梯限速器动作速度范围计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c5282, #3182ce);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .form-section {
+            padding: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d3748;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3182ce;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+
+        .input-field.error {
+            border-color: #e53e3e;
+            background: #fed7d7;
+        }
+
+        .select-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .select-field:focus {
+            outline: none;
+            border-color: #3182ce;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(49, 130, 206, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            padding: 0 30px 30px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-card.show {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: #3182ce;
+            font-size: 1.1rem;
+        }
+
+        .result-range {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .result-range .result-label {
+            color: white;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .formula-note {
+            background: #fef5e7;
+            border: 1px solid #f6e05e;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #744210;
+        }
+
+        .formula-note strong {
+            color: #92400e;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 12px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-section {
+                padding: 20px;
+            }
+
+            .result-section {
+                padding: 0 20px 20px;
+            }
+
+            .result-card {
+                padding: 20px;
+            }
+
+            .result-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+            }
+
+            .result-range {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>电梯限速器动作速度范围计算器</h1>
+            <p>根据安全钳类型计算限速器动作速度的有效范围</p>
+        </div>
+
+        <div class="form-section">
+            <div class="input-group">
+                <label for="ratedSpeed">额定速度 (m/s)</label>
+                <input type="number" id="ratedSpeed" class="input-field" min="0.01" step="0.01" placeholder="请输入额定速度">
+                <div class="error-message" id="speedError">额定速度必须大于0</div>
+            </div>
+
+            <div class="input-group">
+                <label for="safetyGearPosition">安全钳位置</label>
+                <select id="safetyGearPosition" class="select-field" onchange="updateSafetyGearOptions()">
+                    <option value="car">轿厢安全钳</option>
+                    <option value="counterweight">对重安全钳</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="safetyGearType">安全钳类型</label>
+                <select id="safetyGearType" class="select-field">
+                    <option value="instant_except_roller">除了不可脱落滚柱式以外的瞬时式安全钳</option>
+                    <option value="instant_roller">不可脱落滚柱式瞬时式安全钳</option>
+                    <option value="progressive">渐进式安全钳</option>
+                </select>
+                <div class="error-message" id="typeError" style="display: none;">当前额定速度下，只能选择渐进式安全钳</div>
+            </div>
+
+            <button class="calculate-btn" onclick="calculateSpeed()">计算限速器动作速度</button>
+        </div>
+
+        <div class="result-section">
+            <div class="result-card" id="resultCard">
+                <div class="result-item">
+                    <span class="result-label">下限值</span>
+                    <span class="result-value" id="lowerLimit">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">上限值</span>
+                    <span class="result-value" id="upperLimit">-</span>
+                </div>
+                <div class="result-item result-range">
+                    <span class="result-label">有效范围</span>
+                    <span class="result-value" id="validRange">-</span>
+                </div>
+                <div class="formula-note" id="formulaNote" style="display: none;">
+                    <strong>计算公式：</strong> 1.25v + 0.25/v
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateSafetyGearOptions() {
+            const ratedSpeed = parseFloat(document.getElementById('ratedSpeed').value);
+            const position = document.getElementById('safetyGearPosition').value;
+            const safetyGearType = document.getElementById('safetyGearType');
+            const typeError = document.getElementById('typeError');
+            
+            if (!ratedSpeed || ratedSpeed <= 0) {
+                return;
+            }
+
+            // 重置错误状态
+            safetyGearType.classList.remove('error');
+            typeError.style.display = 'none';
+
+            // 获取所有选项
+            const options = safetyGearType.querySelectorAll('option');
+            const instantOptions = Array.from(options).filter(opt => 
+                opt.value === 'instant_except_roller' || opt.value === 'instant_roller'
+            );
+            const progressiveOption = Array.from(options).find(opt => opt.value === 'progressive');
+
+            // 根据位置和速度限制选项
+            let canUseInstant = false;
+            
+            if (position === 'car') {
+                // 轿厢安全钳：额定速度 ≤ 0.63m/s 才能选瞬时式
+                canUseInstant = ratedSpeed <= 0.63;
+            } else if (position === 'counterweight') {
+                // 对重安全钳：额定速度 ≤ 1.0m/s 才能选瞬时式
+                canUseInstant = ratedSpeed <= 1.0;
+            }
+
+            // 更新选项可用性
+            instantOptions.forEach(option => {
+                option.disabled = !canUseInstant;
+                option.style.color = canUseInstant ? '' : '#ccc';
+            });
+
+            // 如果当前选择的是瞬时式但不能使用，自动切换到渐进式
+            if (!canUseInstant && (safetyGearType.value === 'instant_except_roller' || safetyGearType.value === 'instant_roller')) {
+                safetyGearType.value = 'progressive';
+                safetyGearType.classList.add('error');
+                typeError.style.display = 'block';
+            }
+        }
+
+        function validateSafetyGearSelection() {
+            const ratedSpeed = parseFloat(document.getElementById('ratedSpeed').value);
+            const position = document.getElementById('safetyGearPosition').value;
+            const safetyGearType = document.getElementById('safetyGearType');
+            const typeError = document.getElementById('typeError');
+
+            if (!ratedSpeed || ratedSpeed <= 0) {
+                return true;
+            }
+
+            let canUseInstant = false;
+            
+            if (position === 'car') {
+                canUseInstant = ratedSpeed <= 0.63;
+            } else if (position === 'counterweight') {
+                canUseInstant = ratedSpeed <= 1.0;
+            }
+
+            const isInstantSelected = safetyGearType.value === 'instant_except_roller' || safetyGearType.value === 'instant_roller';
+
+            if (isInstantSelected && !canUseInstant) {
+                safetyGearType.classList.add('error');
+                typeError.style.display = 'block';
+                return false;
+            } else {
+                safetyGearType.classList.remove('error');
+                typeError.style.display = 'none';
+                return true;
+            }
+        }
+
+        function calculateSpeed() {
+            const ratedSpeed = parseFloat(document.getElementById('ratedSpeed').value);
+            const safetyGearType = document.getElementById('safetyGearType').value;
+            const speedInput = document.getElementById('ratedSpeed');
+            const speedError = document.getElementById('speedError');
+            const resultCard = document.getElementById('resultCard');
+            const formulaNote = document.getElementById('formulaNote');
+
+            // 重置错误状态
+            speedInput.classList.remove('error');
+            speedError.style.display = 'none';
+
+            // 验证输入
+            if (!ratedSpeed || ratedSpeed <= 0) {
+                speedInput.classList.add('error');
+                speedError.style.display = 'block';
+                resultCard.classList.remove('show');
+                return;
+            }
+
+            // 验证安全钳类型选择
+            if (!validateSafetyGearSelection()) {
+                resultCard.classList.remove('show');
+                return;
+            }
+
+            // 计算下限（额定速度的115%）
+            const lowerLimit = ratedSpeed * 1.15;
+
+            // 计算上限
+            let upperLimit;
+            let showFormula = false;
+
+            switch (safetyGearType) {
+                case 'instant_except_roller':
+                    upperLimit = 0.80;
+                    break;
+                case 'instant_roller':
+                    upperLimit = 1.00;
+                    break;
+                case 'progressive':
+                    if (ratedSpeed <= 1.00) {
+                        upperLimit = 1.50;
+                    } else {
+                        upperLimit = 1.25 * ratedSpeed + 0.25 / ratedSpeed;
+                        showFormula = true;
+                    }
+                    break;
+            }
+
+            // 更新结果显示
+            document.getElementById('lowerLimit').textContent = `${lowerLimit.toFixed(2)} m/s（不小于额定速度115%）`;
+            document.getElementById('upperLimit').textContent = `${upperLimit.toFixed(2)} m/s（根据安全钳类型）`;
+            document.getElementById('validRange').textContent = `${lowerLimit.toFixed(2)} ~ ${upperLimit.toFixed(2)} m/s`;
+
+            // 显示公式说明
+            if (showFormula) {
+                formulaNote.style.display = 'block';
+            } else {
+                formulaNote.style.display = 'none';
+            }
+
+            // 显示结果卡片
+            resultCard.classList.add('show');
+        }
+
+        // 回车键触发计算
+        document.getElementById('ratedSpeed').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateSpeed();
+            }
+        });
+
+        // 输入时清除错误状态并更新选项
+        document.getElementById('ratedSpeed').addEventListener('input', function() {
+            this.classList.remove('error');
+            document.getElementById('speedError').style.display = 'none';
+            updateSafetyGearOptions();
+        });
+
+        // 安全钳类型改变时验证
+        document.getElementById('safetyGearType').addEventListener('change', function() {
+            validateSafetyGearSelection();
+        });
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSafetyGearOptions();
+        });
+    </script>
+</body>
+</html>

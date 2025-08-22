@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特种设备小工具合集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #e6f2ff 0%, #cfe8ff 100%);
+            min-height: 100vh;
+            padding: 15px;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 5px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+
+        .header h1 {
+            color: #000000;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            line-height: 1.2;
+        }
+
+        .header p {
+            color: rgba(0,0,0,0.8);
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .modules {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .module {
+            background: #f7fafc;
+            border-radius: 20px;
+            padding: 25px 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+            touch-action: manipulation;
+        }
+
+        .module:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .module h2 {
+            color: #2d3748;
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 3px solid #4a5568;
+            padding-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .tool-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tool-link {
+            display: block;
+            padding: 18px 20px;
+            background: #2563eb !important;
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .tool-link:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            background: #1e40af !important;
+        }
+
+        .tool-link:hover {
+            background: #1e40af !important;
+        }
+
+        .coming-soon {
+            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+            color: #4a5568;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .coming-soon:active {
+            transform: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .elevator-icon {
+            color: #4a5568;
+        }
+
+        .pressure-icon {
+            color: #2d3748;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+                padding: 0 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .modules {
+                gap: 25px;
+            }
+            
+            .module {
+                padding: 30px 25px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 800px;
+            }
+            
+            .modules {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>特种设备小工具合集</h1>
+            <p>专业的特种设备检验检测工具平台</p>
+        </div>
+
+        <div class="modules">
+            <!-- 电梯模块 -->
+            <div class="module">
+                <div class="icon elevator-icon">🏢</div>
+                <h2>电梯工具</h2>
+                <div class="tool-links">
+                    <a href="电梯/电梯安全评估/index.html" class="tool-link">
+                        🔍 电梯安全评估工具
+                    </a>
+                    <a href="电梯/电梯检验年份.html" class="tool-link">
+                        📅 电梯检验年份计算
+                    </a>
+                    <a href="电梯/限速器速度上下限.html" class="tool-link">
+                        ⚡ 限速器速度上下限
+                    </a>
+                </div>
+            </div>
+
+            <!-- 承压模块 -->
+            <div class="module">
+                <div class="icon pressure-icon">🔧</div>
+                <h2>承压设备工具</h2>
+                <div class="tool-links">
+                    <a href="承压/腐蚀防护系统(3).html" class="tool-link">
+                        🛡️ 腐蚀防护系统评估
+                    </a>
+                    <div class="tool-link coming-soon">
+                        📋 敬请期待更多功能
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 添加页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const modules = document.querySelectorAll('.module');
+            modules.forEach((module, index) => {
+                module.style.opacity = '0';
+                module.style.transform = 'translateY(50px)';
+                
+                setTimeout(() => {
+                    module.style.transition = 'all 0.6s ease';
+                    module.style.opacity = '1';
+                    module.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+
+        // 添加触控反馈
+        document.querySelectorAll('.tool-link:not(.coming-soon)').forEach(link => {
+            // 触摸开始
+            link.addEventListener('touchstart', function(e) {
+                this.style.transform = 'scale(0.96)';
+                this.style.transition = 'transform 0.1s ease';
+            }, {passive: true});
+            
+            // 触摸结束
+            link.addEventListener('touchend', function(e) {
+                setTimeout(() => {
+                    this.style.transform = '';
+                    this.style.transition = 'all 0.2s ease';
+                }, 100);
+            }, {passive: true});
+            
+            // 触摸取消
+            link.addEventListener('touchcancel', function(e) {
+                this.style.transform = '';
+                this.style.transition = 'all 0.2s ease';
+            }, {passive: true});
+            
+            // 点击波纹效果
+            link.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                
+                // 使用触摸点位置或鼠标位置
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                const y = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = (x - rect.left - size / 2) + 'px';
+                ripple.style.top = (y - rect.top - size / 2) + 'px';
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255,255,255,0.4)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.5s ease-out';
+                ripple.style.pointerEvents = 'none';
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 500);
+            });
+        });
+        
+        // 防止页面缩放影响体验
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, {passive: false});
+        
+        // 优化滚动性能
+        document.addEventListener('scroll', function() {
+            // 可以在这里添加滚动优化逻辑
+        }, {passive: true});
+    </script>
+
+    <style>
+        @keyframes ripple {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+        
+        /* 确保在移动设备上有更好的性能 */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        /* 优化滚动 */
+        html {
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+</body>
+</html> 

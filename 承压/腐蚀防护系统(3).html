@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>埋地钢质管道腐蚀防护系统质量等级评价</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+            margin: 0; 
+            padding: 10px; 
+            background-color: #f4f7f9; 
+            color: #333; 
+            line-height: 1.6;
+        }
+        
+        .container { 
+            max-width: 100%; 
+            margin: auto; 
+            background: #fff; 
+            padding: 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                max-width: 800px;
+                padding: 25px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            }
+            
+            body {
+                padding: 20px;
+            }
+        }
+        
+        h1, h2 { 
+            text-align: center; 
+            color: #2c3e50; 
+            word-wrap: break-word;
+        }
+        
+        h1 { 
+            font-size: 1.5em; 
+            margin-bottom: 10px; 
+            line-height: 1.3;
+        }
+        
+        h2 { 
+            font-size: 1.2em; 
+            margin-top: 25px; 
+            margin-bottom: 15px; 
+            border-bottom: 2px solid #3498db; 
+            padding-bottom: 8px; 
+        }
+        
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            h2 {
+                font-size: 1.4em;
+                margin-top: 30px;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+            }
+        }
+        
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        
+        label { 
+            display: block; 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            color: #555; 
+            font-size: 0.95em;
+        }
+        
+        @media (min-width: 768px) {
+            label {
+                font-size: 1em;
+            }
+        }
+        
+                 select, input[type="number"], input[type="text"] { 
+             width: 100%; 
+             padding: 12px; 
+             border-radius: 6px; 
+             border: 1px solid #ccc; 
+             box-sizing: border-box; 
+             font-size: 16px;
+             background-color: #fff;
+             -webkit-appearance: none;
+             -moz-appearance: none;
+             appearance: none;
+         }
+        
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+        
+                 select:focus, input[type="number"]:focus, input[type="text"]:focus {
+             outline: none;
+             border-color: #3498db;
+             box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+         }
+        
+                 @media (min-width: 768px) {
+             select, input[type="number"], input[type="text"] {
+                 padding: 10px;
+                 font-size: 1em;
+             }
+         }
+        
+        button { 
+            display: block; 
+            width: 100%; 
+            padding: 15px; 
+            background-color: #3498db; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1.1em; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            margin-top: 25px; 
+            font-weight: 600;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        button:hover, button:active { 
+            background-color: #2980b9; 
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        @media (min-width: 768px) {
+            button {
+                padding: 15px;
+                font-size: 1.2em;
+                margin-top: 30px;
+            }
+        }
+        
+        .result { 
+            margin-top: 25px; 
+            padding: 15px; 
+            border-radius: 8px; 
+            display: none; 
+            background-color: #eaf5ff; 
+            border: 1px solid #b8dfff; 
+        }
+        
+        .result h2 { 
+            border: none; 
+            margin-top: 0; 
+            margin-bottom: 15px;
+        }
+        
+        #final-grade { 
+            font-size: 2em; 
+            font-weight: bold; 
+            text-align: center; 
+            margin: 10px 0; 
+        }
+        
+        #final-score { 
+            font-size: 1.1em; 
+            text-align: center; 
+            color: #555; 
+            margin-bottom: 15px; 
+        }
+        
+        #grade-description { 
+            font-size: 1em; 
+            text-align: justify; 
+            line-height: 1.6; 
+        }
+        
+        @media (min-width: 768px) {
+            .result {
+                margin-top: 30px;
+                padding: 20px;
+            }
+            
+            #final-grade {
+                font-size: 2.5em;
+            }
+            
+            #final-score {
+                font-size: 1.2em;
+            }
+            
+            #grade-description {
+                font-size: 1.1em;
+            }
+        }
+        
+        .info { 
+            font-size: 0.85em; 
+            color: #7f8c8d; 
+            margin-top: 5px; 
+            line-height: 1.4;
+        }
+        
+        /* 土壤腐蚀性详细评价样式 */
+        .soil-detail-form {
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f8fbff;
+            display: none;
+        }
+        
+        .soil-detail-form.show {
+            display: block;
+        }
+        
+        .soil-detail-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: #fff;
+        }
+        
+        .soil-detail-item:hover {
+            border-color: #3498db;
+            background-color: #f8fbff;
+        }
+        
+        .soil-detail-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 0.9em;
+        }
+        
+        .soil-detail-select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            background-color: #fff;
+        }
+        
+        .soil-detail-select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .soil-score-display {
+            background-color: #ecf0f1;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-top: 6px;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+            font-size: 0.85em;
+        }
+        
+        .toggle-soil-detail {
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-soil-detail:hover {
+            background-color: #7f8c8d;
+        }
+        
+
+        
+        @media (min-width: 768px) {
+            .info {
+                font-size: 0.9em;
+            }
+        }
+        
+        /* Styles for intermediate results display */
+        .intermediate-results { 
+            margin-top: 20px; 
+            padding: 12px; 
+            border-radius: 8px; 
+            background-color: #fafafa; 
+            border: 1px solid #ddd;
+            display: none;
+        }
+        
+        .intermediate-results h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            color: #34495e;
+            font-size: 1.1em;
+        }
+        
+        .intermediate-results h4 {
+            margin-top: 12px;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 1em;
+        }
+        
+        pre {
+            background-color: #ecf0f1;
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85em;
+            color: #2c3e50;
+            overflow-x: auto;
+        }
+        
+        #score-details {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+        
+        @media (min-width: 768px) {
+            .intermediate-results {
+                margin-top: 25px;
+                padding: 15px;
+            }
+            
+            .intermediate-results h3 {
+                margin-bottom: 15px;
+                font-size: 1.2em;
+            }
+            
+            .intermediate-results h4 {
+                margin-top: 15px;
+                font-size: 1.1em;
+            }
+            
+            pre {
+                padding: 10px;
+                font-size: 0.95em;
+            }
+            
+            #score-details {
+                font-size: 1.1em;
+                line-height: 1.8;
+            }
+        }
+        
+        /* 移动端优化 */
+        @media (max-width: 767px) {
+            /* 防止iOS Safari中的缩放问题 */
+            input[type="number"] {
+                font-size: 16px !important;
+            }
+            
+                         /* 改善触摸目标大小 */
+             select, input[type="number"], input[type="text"], button {
+                 min-height: 44px;
+             }
+            
+            /* 优化间距 */
+            .form-group {
+                margin-bottom: 18px;
+            }
+            
+            /* 改善可读性 */
+            .container {
+                margin: 5px;
+            }
+        }
+        
+        /* 深色模式支持 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a1a;
+                color: #e0e0e0;
+            }
+            
+            .container {
+                background: #2d2d2d;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            }
+            
+            h1, h2 {
+                color: #ffffff;
+            }
+            
+                         select, input[type="number"], input[type="text"] {
+                 background-color: #3a3a3a;
+                 border-color: #555;
+                 color: #e0e0e0;
+             }
+            
+            .result {
+                background-color: #1e3a5f;
+                border-color: #2c5aa0;
+            }
+            
+            .intermediate-results {
+                background-color: #2a2a2a;
+                border-color: #555;
+            }
+            
+            pre {
+                background-color: #1e1e1e;
+                border-color: #555;
+                color: #e0e0e0;
+            }
+        }
+        
+        /* 表单组聚焦状态 */
+        .form-group.focused label {
+            color: #3498db;
+        }
+        
+        .form-group.focused input,
+        .form-group.focused select {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        /* 移动端优化：改善按钮触摸反馈 */
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        /* 移动端优化：改善选择框样式 */
+        select {
+            cursor: pointer;
+        }
+        
+        /* 移动端优化：改善输入框样式 */
+        input[type="number"] {
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+        }
+        
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* 移动端优化：改善标签可点击性 */
+        label {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+                 /* 移动端优化：改善信息文本样式 */
+         .info {
+             cursor: default;
+         }
+         
+                             /* 土壤腐蚀性等级输入框特殊样式 */
+           #soil-score {
+               background-color: #fff;
+               color: #495057;
+               font-weight: 500;
+               cursor: text;
+           }
+          
+          #soil-score:focus {
+              background-color: #fff;
+              border-color: #3498db;
+              box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+          }
+          
+          #soil-score.error {
+              border-color: #e74c3c;
+              box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3);
+          }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>埋地钢质管道腐蚀防护系统质量等级评价</h1>
+    <p class="info" style="text-align:center;">依据 GB/T 19285-2014  (层次分析法)</p>
+
+    <div id="evaluation-form">
+        <!-- Factor 1 -->
+        <h2>1. 外防腐层状况</h2>
+        <div class="form-group">
+            <label for="coating-type">防腐层类型</label>
+            <select id="coating-type">
+                <option value="asphalt">硬质聚氨酯泡沫防腐保温层和沥青防腐层</option>
+                <option value="3lpe">3LPE</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="coating-defect-density">外防腐层破损点密度 (P) (处/100m)</label>
+            <input type="number" id="coating-defect-density" value="3.6" step="0.1" min="0" inputmode="decimal" pattern="[0-9]*">
+            <p class="info">破损点密度，处/100m，附录K。</p>
+        </div>
+
+        <!-- Factor 2 -->
+        <h2>2. 阴极保护有效性</h2>
+        <div class="form-group">
+            <label for="cp-status">评价结果</label>
+            <select id="cp-status">
+                <option value="qualified">合格</option>
+                <option value="unqualified">不合格</option>
+            </select>
+             <p class="info">-0.85V至-1.2V之内为合格（去掉IR降后管地电位）。</p>
+        </div>
+
+        <!-- Factor 3 -->
+        <h2>3. 土壤腐蚀性 <span id="soil-level-display" style="color: #3498db; font-size: 0.8em; font-weight: normal;">（弱）</span></h2>
+                 <div class="form-group">
+             <label for="soil-score">土壤腐蚀性综合评分 (N)</label>
+                          <input type="number" id="soil-score" value="0" step="0.1" min="0" max="32" inputmode="decimal" pattern="[0-9]*">
+ 
+                         <button type="button" class="toggle-soil-detail" onclick="toggleSoilDetail()">详细计算土壤腐蚀性评分</button>
+             <p class="info" style="margin-top: 8px; margin-bottom: 0;">依据 GB/T 19285-2014 表1/2指标评价土壤腐蚀性分数和等级</p>
+        </div>
+        
+        <!-- 土壤腐蚀性详细评价表单 -->
+        <div class="soil-detail-form" id="soil-detail-form">
+                         <h3 style="margin-top: 0; color: #2c3e50; border-bottom: 1px solid #3498db; padding-bottom: 8px; text-align: center;">土壤腐蚀性单项检测指标评价分数</h3>
+             <p class="info" style="margin-bottom: 15px;">依据 GB/T 19285-2014 表1 土壤腐蚀性单项检测指标评价分数</p>
+            
+            <!-- 1. 土壤电阻率 -->
+            <div class="soil-detail-item">
+                <label class="soil-detail-label" for="soil-resistivity">1. 土壤电阻率 (Ω·m)</label>
+                                 <select class="soil-detail-select" id="soil-resistivity">
+                     <option value="">请选择数值范围</option>
+                     <option value="4.5">&lt;20</option>
+                     <option value="3">≥20~50</option>
+                     <option value="0">&gt;50</option>
+                 </select>
+                <div class="soil-score-display" id="resistivity-score" style="display:none;">得分: <span id="resistivity-value">0</span></div>
+            </div>
+
+            <!-- 2. 管道自然腐蚀电位 -->
+            <div class="soil-detail-item">
+                <label class="soil-detail-label" for="corrosion-potential">2. 管道自然腐蚀电位 vs.CSE (mV)</label>
+                                 <select class="soil-detail-select" id="corrosion-potential">
+                     <option value="">请选择数值范围</option>
+                     <option value="5">&lt;-550</option>
+                     <option value="3">≥-550~-450</option>
+                     <option value="1">&gt;-450~-300</option>
+                     <option value="0">&gt;-300</option>
+                 </select>
+                <div class="soil-score-display" id="potential-score" style="display:none;">得分: <span id="potential-value">0</span></div>
+            </div>
+
+            <!-- 3. 氧化还原电位 -->
+            <div class="soil-detail-item">
+                <label class="soil-detail-label" for="redox-potential">3. 氧化还原电位 vs.SHE (mV)</label>
+                                 <select class="soil-detail-select" id="redox-potential">
+                     <option value="">请选择数值范围</option>
+                     <option value="3.5">&lt;100</option>
+                     <option value="2.5">≥100~200</option>
+                     <option value="1">&gt;200~400</option>
+                     <option value="0">&gt;400</option>
+                 </select>
+                <div class="soil-score-display" id="redox-score" style="display:none;">得分: <span id="redox-value">0</span></div>
+            </div>
+
+            <!-- 4. 土壤pH值 -->
+            <div class="soil-detail-item">
+                <label class="soil-detail-label" for="soil-ph">4. 土壤pH值</label>
+                                 <select class="soil-detail-select" id="soil-ph">
+                     <option value="">请选择数值范围</option>
+                     <option value="6.5">&lt;4.5</option>
+                     <option value="4">≥4.5~5.5</option>
+                     <option value="2">&gt;5.5~7.0</option>
+                     <option value="1">&gt;7.0~8.5</option>
+                     <option value="0">&gt;8.5</option>
+                 </select>
+                <div class="soil-score-display" id="ph-score" style="display:none;">得分: <span id="ph-value">0</span></div>
+            </div>
+
+            <!-- 5. 土壤质地 -->
+            <div class="soil-detail-item">
+                <label class="soil-detail-label" for="soil-texture">5. 土壤质地</label>
+                                 <select class="soil-detail-select" id="soil-texture">
+                     <option value="">请选择土壤类型</option>
+                     <option value="2.5">砂土(强)</option>
+                     <option value="1.5">壤土(轻、中、重壤土)</option>
+                     <option value="0">黏土(轻黏土、黏土)</option>
+                 </select>
+                <div class="soil-score-display" id="texture-score" style="display:none;">得分: <span id="texture-value">0</span></div>
+            </div>
+
+            <!-- 6. 土壤含水量 -->
+            <div class="soil-detail-item">
+                <label class="soil-detail-label" for="water-content">6. 土壤含水量 (%)</label>
+                                 <select class="soil-detail-select" id="water-content">
+                     <option value="">请选择数值范围</option>
+                     <option value="5.5">&gt;12~25</option>
+                     <option value="3.5">&gt;25~30 或 &gt;10~12</option>
+                     <option value="1.5">&gt;30~40 或 ≥7~10</option>
+                     <option value="0">&gt;40 或 ≤7</option>
+                 </select>
+                <div class="soil-score-display" id="water-score" style="display:none;">得分: <span id="water-value">0</span></div>
+            </div>
+
+            <!-- 7. 土壤含盐量 -->
+            <div class="soil-detail-item">
+                <label class="soil-detail-label" for="salinity">7. 土壤含盐量 (%)</label>
+                                 <select class="soil-detail-select" id="salinity">
+                     <option value="">请选择数值范围</option>
+                     <option value="3">&gt;0.75</option>
+                     <option value="2">≥0.15~0.75</option>
+                     <option value="1">&gt;0.05~0.15</option>
+                     <option value="0">≤0.05</option>
+                 </select>
+                <div class="soil-score-display" id="salinity-score" style="display:none;">得分: <span id="salinity-value">0</span></div>
+            </div>
+
+            <!-- 8. 土壤Cl含量 -->
+            <div class="soil-detail-item">
+                <label class="soil-detail-label" for="chloride-content">8. 土壤Cl含量 (%)</label>
+                                 <select class="soil-detail-select" id="chloride-content">
+                     <option value="">请选择数值范围</option>
+                     <option value="1.5">&gt;0.05</option>
+                     <option value="1">&gt;0.01~0.05</option>
+                     <option value="0.5">&gt;0.005~0.01</option>
+                     <option value="0">≤0.005</option>
+                 </select>
+                <div class="soil-score-display" id="chloride-score" style="display:none;">得分: <span id="chloride-value">0</span></div>
+            </div>
+            
+             <button type="button" class="calculate-soil-score-btn" onclick="calculateSoilScoreWithValidation()" style="margin-top: 15px; background-color: #27ae60; color: white; border: none; border-radius: 6px; padding: 12px; font-size: 1em; cursor: pointer; width: 100%;">
+                 计算土壤腐蚀性总分
+             </button>
+        </div>
+
+        <!-- Factor 4: Updated -->
+        <h2>4. 杂散电流干扰</h2>
+        <div class="form-group">
+            <label for="stray-current-fluctuation">管地电位波动值 (mV)</label>
+            <input type="number" id="stray-current-fluctuation" value="45" step="1" min="0" inputmode="numeric" pattern="[0-9]*">
+            <p class="info">按表6的管地电位波动值取测量值，多个时取最大值（mV）。</p>
+        </div>
+
+        <!-- Factor 5 -->
+        <h2>5. 排流保护效果</h2>
+        <div class="form-group">
+            <label for="drainage-status">评价结果</label>
+            <select id="drainage-status">
+                <option value="qualified">合格</option>
+                <option value="unqualified">不合格</option>
+            </select>
+             <p class="info">直流排流保护标准见表14，交流排流保护标准见表15。</p>
+        </div>
+
+        <button onclick="calculateGrade()">计算等级</button>
+    </div>
+
+    <div class="result" id="result-display">
+        <h2>综合评价结果</h2>
+        <div id="final-score"></div>
+        <div id="final-grade"></div>
+        <div id="grade-description"></div>
+    </div>
+    
+    <div class="intermediate-results" id="intermediate-results-display">
+        <h3>详细计算过程</h3>
+        <h4>项目权重向量 (W)</h4>
+        <pre id="weight-vector"></pre>
+        <h4>因素评价矩阵 (R)</h4>
+        <pre id="evaluation-matrix"></pre>
+        <h4>评语得分</h4>
+        <div id="score-details"></div>
+    </div>
+</div>
+
+<script>
+    function calculateMembership(x, x1, x2, x3, lowerIsBetter = true) {
+        // This function calculates the membership degree based on triangular functions.
+        // It determines how much a value 'x' belongs to each of the four grades.
+        let r = [0, 0, 0, 0];
+
+        if (lowerIsBetter) { // For metrics where a lower value is better (e.g., defect density, fluctuation value)
+            const mid12 = (x1 + x2) / 2;
+            const mid23 = (x2 + x3) / 2;
+            r[0] = (x <= x1) ? 1 : ((x1 < x && x <= mid12) ? (mid12 - x) / (mid12 - x1) : 0);
+            r[1] = (x >= x1 && x <= mid12) ? (x - x1) / (mid12 - x1) : (x > mid12 && x <= mid23) ? (x - mid23) / (mid12 - mid23) : 0;
+            r[2] = (x >= mid12 && x <= mid23) ?  (x - mid12) / (mid23 - mid12) : (x > mid23 && x <= x3) ? (x - x3) / (mid23 - x3) : 0;
+            r[3] = (x >= mid23 && x <= x3) ? (x - mid23) / (x3 - mid23) : ((x > x3) ? 1 : 0);
+        } else { // For metrics where a higher value is better
+            // Note: This logic branch is not used with the current set of inputs but is kept for completeness.
+            const mid12 = (x1 + x2) / 2;
+            const mid23 = (x2 + x3) / 2;
+            r[3] = (x <= x1) ? 1 : ((x1 < x && x <= mid12) ? (mid12 - x) / (mid12 - x1) : 0);
+            r[2] = (x >= x1 && x <= mid12) ? (x - x1) / (mid12 - x1) : (x > mid12 && x <= mid23) ? (x - mid23) / (mid12 - mid23) : 0;
+            r[1] = (x >= mid12 && x <= mid23) ?  (x - mid12) / (mid23 - mid12) : (x > mid23 && x <= x3) ? (x - x3) / (mid23 - x3) : 0;
+            r[0] = (x >= mid23 && x <= x3) ? (x - mid23) / (x3 - mid23) : ((x > x3) ? 1 : 0);
+        }
+        return r.map(val => Math.max(0, Math.min(1, isNaN(val) ? 0 : val)));
+    }
+
+
+    function calculateGrade() {
+        // Get handles for all output elements
+        const resultDisplayEl = document.getElementById('result-display');
+        const intermediateDisplayEl = document.getElementById('intermediate-results-display');
+        const weightVectorEl = document.getElementById('weight-vector');
+        const evaluationMatrixEl = document.getElementById('evaluation-matrix');
+        const scoreDetailsEl = document.getElementById('score-details');
+
+                 // --- 1. Get User Inputs ---
+         const coatingType = document.getElementById('coating-type').value;
+         const defectDensity = parseFloat(document.getElementById('coating-defect-density').value);
+         const cpStatus = document.getElementById('cp-status').value;
+                   // 从土壤腐蚀性输入框获取数值
+          const soilScore = parseFloat(document.getElementById('soil-score').value) || 0;
+         const strayFluctuation = parseFloat(document.getElementById('stray-current-fluctuation').value); // Updated
+         const drainageStatus = document.getElementById('drainage-status').value;
+
+        // --- 2. Calculate Evaluation Matrix R (5x4) ---
+        const R = [];
+        
+        // R1: External Coating (Defect Density, lower is better)
+        const defectThresholds = {
+            '3lpe':    { x1: 0.1, x2: 0.5, x3: 1.0 },
+            'asphalt': { x1: 0.2, x2: 1.0, x3: 2.0 }
+        };
+        const p = defectThresholds[coatingType];
+        R.push(calculateMembership(defectDensity, p.x1, p.x2, p.x3, true));
+        
+        // R2: Cathodic Protection (Qualified/Unqualified)
+        R.push((cpStatus === 'qualified') ? [1, 0, 0, 0] : [0, 0, 0, 1]);
+        
+        // R3: Soil Corrosivity (Score N, lower is better)
+        const soil_x1 = 5, soil_x2 = 11, soil_x3 = 19;
+        R.push(calculateMembership(soilScore, soil_x1, soil_x2, soil_x3, true));
+        
+        // R4: Stray Current Interference (Fluctuation Value, lower is better) - UPDATED
+        const stray_x1 = 50, stray_x2 = 200, stray_x3 = 350;
+        R.push(calculateMembership(strayFluctuation, stray_x1, stray_x2, stray_x3, true));
+        
+        // R5: Drainage Protection (Qualified/Unqualified)
+        R.push((drainageStatus === 'qualified') ? [1, 0, 0, 0] : [0, 0, 0, 1]);
+        
+        // --- 3. Define Weight Vector W (1x5) ---
+        const W = [0.401998161, 0.268665446,0.099435008, 0.066454908, 0.163446477];
+
+        // --- 4. Fuzzy Comprehensive Evaluation: A = W * R ---
+        const A = [0, 0, 0, 0];
+        for (let j = 0; j < 4; j++) { // for each grade
+            for (let i = 0; i < 5; i++) { // for each factor
+                A[j] += W[i] * R[i][j];
+            }
+        }
+
+        // --- 5. Calculate Final Score S ---
+        const Ch = [100, 89, 79, 69], Cm = [95, 85, 75, 65], Cl = [90, 80, 70, 60];
+        const sumA = A.reduce((a, b) => a + b, 0);
+        if (sumA === 0) { alert("无法计算。请输入有效数值。"); return; }
+        
+        let sh_num = 0, sm_num = 0, sl_num = 0;
+        A.forEach((val, j) => {
+            sh_num += val * Ch[j];
+            sm_num += val * Cm[j];
+            sl_num += val * Cl[j];
+        });
+        const Sh = sh_num / sumA;
+        const Sm = sm_num / sumA;
+        const Sl = sl_num / sumA;
+        const S = (Sh + Sm + Sl) / 3;
+        
+        // --- 6. Determine Final Grade ---
+        let finalGrade = '', gradeDescription = '';
+        if (S >= 90) {
+            finalGrade = '等级 1';
+            gradeDescription = '腐蚀防护系统功能完好，满足设计要求，在6年的检验周期内能有效使用。';
+            document.getElementById('final-grade').style.color = '#27ae60';
+        } else if (S >= 80) {
+            finalGrade = '等级 2';
+            gradeDescription = '腐蚀防护系统基本完好，但存在一些不影响防护效果的缺陷，能基本满足设计要求，3年~6年的检验周期内能使用。';
+            document.getElementById('final-grade').style.color = '#2980b9';
+        } else if (S >= 70) {
+            finalGrade = '等级 3';
+            gradeDescription = '腐蚀防护系统整体状况较差，存在缺陷，不能完全满足设计要求，在使用单位采取适当措施后，可在1年~3年检验周期内在限定的条件下使用。';
+            document.getElementById('final-grade').style.color = '#f39c12';
+        } else {
+            finalGrade = '等级 4';
+            gradeDescription = '腐蚀防护系统缺陷严重，不能满足设计要求，不能有效防止金属管体腐蚀，使用单位应立即采取重大维修。';
+            document.getElementById('final-grade').style.color = '#c0392b';
+        }
+        
+        // --- 7. Display All Results ---
+        document.getElementById('final-score').innerText = `综合评价得分 (S): ${S.toFixed(3)}`;
+        document.getElementById('final-grade').innerText = finalGrade;
+        document.getElementById('grade-description').innerText = gradeDescription;
+        resultDisplayEl.style.display = 'block';
+
+        weightVectorEl.textContent = `W = [${W.join(', ')}]`;
+        const factorNames = ['外防腐层状况(R1)    ', '阴极保护有效性(R2)  ', '土壤腐蚀性(R3)      ', '杂散电流干扰(R4)    ', '排流保护效果(R5)    '];
+        let rMatrixString = '\n';
+        rMatrixString += 'R = \n';
+        R.forEach((row, index) => {
+            const rowString = row.map(val => val.toFixed(3)).join('  ');
+            rMatrixString += `  [${rowString}]  // ${factorNames[index]}\n`;
+        });
+        rMatrixString += '';
+        evaluationMatrixEl.textContent = rMatrixString;
+        
+        scoreDetailsEl.innerHTML = `
+            Sh = ${Sh.toFixed(3)}<br>
+            Sm = ${Sm.toFixed(3)}<br>
+            Sl = ${Sl.toFixed(3)}
+        `;
+        intermediateDisplayEl.style.display = 'block';
+        
+        // 滚动到结果区域
+        resultDisplayEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // 移动端优化：添加触觉反馈（如果支持）
+        if (navigator.vibrate) {
+            navigator.vibrate(100);
+        }
+    }
+    
+    // 土壤腐蚀性详细评价功能
+    function toggleSoilDetail() {
+        const detailForm = document.getElementById('soil-detail-form');
+        const button = document.querySelector('.toggle-soil-detail');
+        
+        if (detailForm.classList.contains('show')) {
+            detailForm.classList.remove('show');
+            button.textContent = '详细计算土壤腐蚀性评分';
+        } else {
+            detailForm.classList.add('show');
+            button.textContent = '隐藏详细计算';
+        }
+    }
+    
+                   function calculateSoilScore() {
+          let totalScore = 0;
+          
+          // 计算每个指标的得分
+          const indicators = [
+              {id: 'soil-resistivity', name: '土壤电阻率'},
+              {id: 'corrosion-potential', name: '管道自然腐蚀电位'},
+              {id: 'redox-potential', name: '氧化还原电位'},
+              {id: 'soil-ph', name: '土壤pH值'},
+              {id: 'soil-texture', name: '土壤质地'},
+              {id: 'water-content', name: '土壤含水量'},
+              {id: 'salinity', name: '土壤含盐量'},
+              {id: 'chloride-content', name: '土壤Cl含量'}
+          ];
+          
+          indicators.forEach(indicator => {
+              const select = document.getElementById(indicator.id);
+              const score = parseFloat(select.value) || 0;
+              totalScore += score;
+          });
+          
+          // 根据总分N判定等级描述
+          let levelText;
+          if (totalScore > 19 && totalScore <= 32) {
+              levelText = "强";
+          } else if (totalScore > 11 && totalScore <= 19) {
+              levelText = "中";
+          } else if (totalScore > 5 && totalScore <= 11) {
+              levelText = "较弱";
+          } else if (totalScore >= 0 && totalScore <= 5) {
+              levelText = "弱";
+          } else {
+              levelText = "弱";
+          }
+          
+          // 在输入框中显示“总分（等级）”
+          // 在输入框中显示总分
+          document.getElementById('soil-score').value = totalScore.toFixed(1);
+          
+          // 在标题后面显示等级
+          document.getElementById('soil-level-display').textContent = `（${levelText}）`;
+          
+          // 移除错误样式
+          document.getElementById('soil-score').classList.remove('error');
+          
+
+
+          return totalScore;
+      }
+     
+     function calculateSoilScoreWithValidation() {
+         // 检查所有8个指标是否都已选择
+         const indicators = [
+             {id: 'soil-resistivity', name: '土壤电阻率'},
+             {id: 'corrosion-potential', name: '管道自然腐蚀电位'},
+             {id: 'redox-potential', name: '氧化还原电位'},
+             {id: 'soil-ph', name: '土壤pH值'},
+             {id: 'soil-texture', name: '土壤质地'},
+             {id: 'water-content', name: '土壤含水量'},
+             {id: 'salinity', name: '土壤含盐量'},
+             {id: 'chloride-content', name: '土壤Cl含量'}
+         ];
+         
+         let firstUnselected = null;
+         
+         indicators.forEach(indicator => {
+             const select = document.getElementById(indicator.id);
+             if (!firstUnselected && (!select.value || select.value === '')) {
+                 firstUnselected = select;
+             }
+         });
+         
+         if (firstUnselected) {
+             const detailForm = document.getElementById('soil-detail-form');
+             const button = document.querySelector('.toggle-soil-detail');
+             if (detailForm && !detailForm.classList.contains('show')) {
+                 detailForm.classList.add('show');
+                 if (button) button.textContent = '隐藏详细计算';
+             }
+             firstUnselected.scrollIntoView({ behavior: 'smooth', block: 'center' });
+             firstUnselected.focus({ preventScroll: true });
+             firstUnselected.style.borderColor = '#e74c3c';
+             firstUnselected.style.boxShadow = '0 0 0 2px rgba(231, 76, 60, 0.3)';
+             setTimeout(() => {
+                 firstUnselected.style.borderColor = '';
+                 firstUnselected.style.boxShadow = '';
+             }, 1500);
+             return;
+         }
+         
+         // 所有项目都已选择，计算总分
+         const totalScore = calculateSoilScore();
+
+         // 计算后自动跳转到“土壤腐蚀性综合评分 (N)”处
+         const soilScoreInput = document.getElementById('soil-score');
+         if (soilScoreInput) {
+             soilScoreInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+             soilScoreInput.focus({ preventScroll: true });
+             soilScoreInput.style.borderColor = '#3498db';
+             soilScoreInput.style.boxShadow = '0 0 0 2px rgba(52, 152, 219, 0.3)';
+             setTimeout(() => {
+                 soilScoreInput.style.borderColor = '';
+                 soilScoreInput.style.boxShadow = '';
+             }, 1500);
+         }
+     }
+    
+         // 手动输入土壤评分时的验证和等级更新
+     function updateSoilLevelFromInput() {
+         const soilScoreInput = document.getElementById('soil-score');
+         const soilLevelDisplay = document.getElementById('soil-level-display');
+         const score = parseFloat(soilScoreInput.value);
+         
+         // 验证输入范围
+         if (isNaN(score) || score < 0 || score > 32) {
+             soilScoreInput.classList.add('error');
+             soilLevelDisplay.textContent = '（请输入正确的评分）';
+             return false;
+         }
+         
+         // 移除错误样式
+         soilScoreInput.classList.remove('error');
+         
+         // 根据总分N判定等级描述
+         let levelText;
+         if (score > 19 && score <= 32) {
+             levelText = "强";
+         } else if (score > 11 && score <= 19) {
+             levelText = "中";
+         } else if (score > 5 && score <= 11) {
+             levelText = "较弱";
+         } else if (score >= 0 && score <= 5) {
+             levelText = "弱";
+         } else {
+             levelText = "弱";
+         }
+         
+         // 更新等级显示
+         soilLevelDisplay.textContent = `（${levelText}）`;
+         return true;
+     }
+     
+     // 为土壤腐蚀性详细评价的选择框添加事件监听器
+     document.addEventListener('DOMContentLoaded', function() {
+        const soilSelectIds = ['soil-resistivity', 'corrosion-potential', 'redox-potential', 'soil-ph', 'soil-texture', 'water-content', 'salinity', 'chloride-content'];
+        
+                 soilSelectIds.forEach(id => {
+             const select = document.getElementById(id);
+             // 修复ID匹配问题
+             let scoreDisplayId, scoreValueId;
+             
+             if (id === 'soil-resistivity') {
+                 scoreDisplayId = 'resistivity-score';
+                 scoreValueId = 'resistivity-value';
+             } else if (id === 'corrosion-potential') {
+                 scoreDisplayId = 'potential-score';
+                 scoreValueId = 'potential-value';
+             } else if (id === 'redox-potential') {
+                 scoreDisplayId = 'redox-score';
+                 scoreValueId = 'redox-value';
+             } else if (id === 'soil-ph') {
+                 scoreDisplayId = 'ph-score';
+                 scoreValueId = 'ph-value';
+             } else if (id === 'soil-texture') {
+                 scoreDisplayId = 'texture-score';
+                 scoreValueId = 'texture-value';
+             } else if (id === 'water-content') {
+                 scoreDisplayId = 'water-score';
+                 scoreValueId = 'water-value';
+             } else if (id === 'salinity') {
+                 scoreDisplayId = 'salinity-score';
+                 scoreValueId = 'salinity-value';
+             } else if (id === 'chloride-content') {
+                 scoreDisplayId = 'chloride-score';
+                 scoreValueId = 'chloride-value';
+             }
+             
+             const scoreDisplay = document.getElementById(scoreDisplayId);
+             const scoreValue = document.getElementById(scoreValueId);
+             
+                           if (select && scoreDisplay && scoreValue) {
+                                     select.addEventListener('change', function() {
+                       const score = parseFloat(this.value) || 0;
+                       scoreValue.textContent = score;
+                       scoreDisplay.style.display = 'block'; // 始终显示得分，包括0分
+                   });
+                  
+                  // 添加点击事件，隐藏占位符选项
+                  select.addEventListener('mousedown', function() {
+                      const placeholderOption = this.querySelector('option[value=""]');
+                      if (placeholderOption) {
+                          placeholderOption.style.display = 'none';
+                      }
+                  });
+                  
+                  // 添加触摸事件支持（移动端）
+                  select.addEventListener('touchstart', function() {
+                      const placeholderOption = this.querySelector('option[value=""]');
+                      if (placeholderOption) {
+                          placeholderOption.style.display = 'none';
+                      }
+                  });
+              }
+         });
+        
+                 // 为土壤评分输入框添加事件监听器
+         const soilScoreInput = document.getElementById('soil-score');
+         if (soilScoreInput) {
+             // 输入时实时验证和更新等级
+             soilScoreInput.addEventListener('input', updateSoilLevelFromInput);
+             
+             // 失去焦点时验证
+             soilScoreInput.addEventListener('blur', function() {
+                 const score = parseFloat(this.value);
+                 if (isNaN(score) || score < 0 || score > 32) {
+                     alert('请输入正确的评分（0-32范围内）');
+                     this.focus();
+                 }
+             });
+         }
+         
+         // 为所有输入框添加回车键支持
+         const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // 找到下一个输入框
+                    const currentIndex = Array.from(inputs).indexOf(this);
+                    if (currentIndex < inputs.length - 1) {
+                        inputs[currentIndex + 1].focus();
+                    } else {
+                        // 如果是最后一个输入框，触发计算
+                        calculateGrade();
+                    }
+                }
+            });
+        });
+        
+        // 移动端优化：防止双击缩放
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+        
+        // 移动端优化：改善表单体验
+        const formGroups = document.querySelectorAll('.form-group');
+        formGroups.forEach(group => {
+            const input = group.querySelector('input, select');
+            const label = group.querySelector('label');
+            
+            if (input && label) {
+                // 点击标签时聚焦输入框
+                label.addEventListener('click', function() {
+                    input.focus();
+                });
+                
+                // 添加输入框状态样式
+                input.addEventListener('focus', function() {
+                    group.classList.add('focused');
+                });
+                
+                input.addEventListener('blur', function() {
+                    group.classList.remove('focused');
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
