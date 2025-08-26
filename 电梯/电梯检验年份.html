@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电梯检验计划计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .form-group input[type="date"],
+        .form-group input[type="number"],
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result.need-inspection {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .result.self-inspection {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .result.old-rule {
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+            color: white;
+        }
+
+        .inspection-schedule {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            color: #333;
+        }
+
+        .inspection-schedule h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .schedule-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .rules {
+            margin-top: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .rules h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .rules ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .rules li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .rules li:before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 电梯检验计划计算器</h1>
+            <p>智能计算定期检验和125%制动试验计划</p>
+        </div>
+
+        <form id="calculatorForm">
+            <div class="form-group">
+                <label for="supervisionYear">监督检验合格年份:</label>
+                <input type="number" id="supervisionYear" min="1980" max="2030" placeholder="例如：2018" required>
+            </div>
+
+            <div class="form-group">
+                <label for="currentYear">当前年份:</label>
+                <input type="number" id="currentYear" min="2020" max="2050" required>
+            </div>
+
+            <div class="form-group">
+                <label>特殊情况:</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="majorRepair">
+                    <label for="majorRepair">今年进行了重大修理并监督检验合格</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="reactivation">
+                    <label for="reactivation">停用1年以上重新启用</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="lastBrakeTest">上次125%额定载重量制动试验年份（可选）:</label>
+                <input type="number" id="lastBrakeTest" min="1980" max="2030" placeholder="如果不知道可不填">
+                <small style="color: #666; font-size: 0.9em; margin-top: 5px; display: block;">
+                    如不填写，系统将自动计算制动试验时间
+                </small>
+            </div>
+
+            <button type="submit" class="calculate-btn">🔍 计算检验计划</button>
+        </form>
+
+        <div id="result" class="result"></div>
+
+        <div class="rules">
+            <h3>📋 检验规则说明</h3>
+            <ul>
+                <li><strong>年限计算:</strong> 使用年限 = 当前年份 - 监督检验年份</li>
+                <li><strong>2023年前监督检验:</strong> 2023年及之前每年都做定期检验，2024年开始按新规则执行</li>
+                <li><strong>2023年新规则:</strong> 15年以内电梯在第1、4、7、9、11、13、15年进行定期检验</li>
+                <li><strong>超过15年:</strong> 每年进行一次定期检验</li>
+                <li><strong>重大修理:</strong> 当年定期检验不实施，之后按正常规则执行</li>
+                <li><strong>停用重启:</strong> 重新启用前需进行定期检验</li>
+                <li><strong>不做定期检验时:</strong> 需要进行电梯自行检测</li>
+            </ul>
+            
+            <h3 style="margin-top: 20px;">⚡ 125%制动试验规则</h3>
+            <ul>
+                <li><strong>2023年前规则:</strong> 每隔5年做一次125%制动试验</li>
+                <li><strong>规则转换:</strong> 2023年之前最近一次试验，如果+5年>2023年，则改为+6年</li>
+                <li><strong>2024年后规则:</strong> 每隔6年做一次125%制动试验</li>
+                <li><strong>举例:</strong> 2010年监督检验 → 2010、2015、2020、2026年做125%制动试验</li>
+                <li><strong>自定义:</strong> 如果知道上次制动试验具体时间，可填写获得更准确结果</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成');
+            
+            // 设置当前年份
+            document.getElementById('currentYear').value = new Date().getFullYear();
+            
+            // 绑定表单提交事件
+            const form = document.getElementById('calculatorForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('表单提交');
+                    
+                    try {
+                        const supervisionYear = parseInt(document.getElementById('supervisionYear').value);
+                        const currentYear = parseInt(document.getElementById('currentYear').value);
+                        const majorRepair = document.getElementById('majorRepair').checked;
+                        const reactivation = document.getElementById('reactivation').checked;
+                        const lastBrakeTestValue = document.getElementById('lastBrakeTest').value;
+                        const lastBrakeTest = lastBrakeTestValue ? parseInt(lastBrakeTestValue) : null;
+                        
+                        if (!supervisionYear || !currentYear) {
+                            alert('请填写完整信息！');
+                            return;
+                        }
+                        
+                        console.log('开始计算...', {supervisionYear, currentYear, majorRepair, reactivation, lastBrakeTest});
+                        
+                        const inspectionResult = calculateInspectionPlan(supervisionYear, currentYear, majorRepair, reactivation);
+                        console.log('定期检验结果:', inspectionResult);
+                        
+                        const brakeTestResult = calculateBrakeTest(supervisionYear, currentYear, lastBrakeTest);
+                        console.log('制动试验结果:', brakeTestResult);
+                        
+                        displayResult(inspectionResult, brakeTestResult);
+                        console.log('结果显示完成');
+                        
+                    } catch (error) {
+                        console.error('计算出错:', error);
+                        alert('计算出错：' + error.message);
+                    }
+                });
+            } else {
+                console.error('找不到表单元素');
+            }
+        });
+
+        // 计算定期检验计划
+        function calculateInspectionPlan(supervisionYear, currentYear, majorRepair, reactivation) {
+            const elevatorAge = currentYear - supervisionYear;
+            
+            let result = {
+                needInspection: false,
+                reason: '',
+                schedule: [],
+                supervisionYear: supervisionYear,
+                elevatorAge: elevatorAge
+            };
+
+            // 特殊情况处理
+            if (majorRepair) {
+                result.needInspection = false;
+                result.reason = '今年进行了重大修理并监督检验合格，当年的定期检验不再实施。';
+                return result;
+            }
+
+            if (reactivation) {
+                result.needInspection = true;
+                result.reason = '电梯停用1年以上重新启用，需要在启用前进行定期检验。';
+                return result;
+            }
+
+            // 2023年前安装的电梯
+            if (supervisionYear < 2023) {
+                if (currentYear <= 2023) {
+                    // 2023年及之前，每年都要检验
+                    result.needInspection = true;
+                    result.reason = `电梯于${supervisionYear}年监督检验，使用${elevatorAge}年。按照旧规则（2023年及之前）每年都需要进行定期检验。`;
+                } else {
+                    // 2024年开始按新规则，但仍以监督检验年份为基准计算年限
+                    const inspectionYears = [1, 4, 7, 9, 11, 13, 15];
+                    
+                    if (elevatorAge <= 15) {
+                        result.needInspection = inspectionYears.includes(elevatorAge);
+                        if (result.needInspection) {
+                            result.reason = `电梯于${supervisionYear}年监督检验，使用${elevatorAge}年。从2024年开始按新规则执行，第${elevatorAge}年需要进行定期检验。`;
+                        } else {
+                            result.reason = `电梯于${supervisionYear}年监督检验，使用${elevatorAge}年。从2024年开始按新规则执行，第${elevatorAge}年进行自行检测。`;
+                        }
+                        result.schedule = generateScheduleForOldElevator(supervisionYear, currentYear);
+                    } else {
+                        // 超过15年，每年检验
+                        result.needInspection = true;
+                        result.reason = `电梯于${supervisionYear}年监督检验，使用${elevatorAge}年（超过15年）。按新规则需要每年进行定期检验。`;
+                    }
+                }
+            } else {
+                // 2023年及之后安装的电梯，直接按新规则
+                const inspectionYears = [1, 4, 7, 9, 11, 13, 15];
+                
+                if (elevatorAge <= 15) {
+                    result.needInspection = inspectionYears.includes(elevatorAge);
+                    if (result.needInspection) {
+                        result.reason = `电梯于${supervisionYear}年监督检验，使用${elevatorAge}年，按新规则需要进行定期检验。`;
+                    } else {
+                        result.reason = `电梯于${supervisionYear}年监督检验，使用${elevatorAge}年，按新规则今年进行自行检测。`;
+                    }
+                    result.schedule = generateNewRuleSchedule(supervisionYear, inspectionYears, currentYear);
+                } else {
+                    // 超过15年，每年检验
+                    result.needInspection = true;
+                    result.reason = `电梯于${supervisionYear}年监督检验，使用${elevatorAge}年（超过15年），需要每年进行定期检验。`;
+                }
+            }
+
+            return result;
+        }
+
+        // 计算125%制动试验
+        function calculateBrakeTest(supervisionYear, currentYear, lastBrakeTest) {
+            let result = {
+                needBrakeTest: false,
+                reason: '',
+                schedule: [],
+                nextTestYear: null
+            };
+
+            // 如果提供了上次制动试验年份，以此为基准计算
+            if (lastBrakeTest) {
+                // 根据上次试验年份确定间隔
+                let interval;
+                if (lastBrakeTest <= 2023) {
+                    // 2023年或之前的试验，如果+5年超过2023年，则改为+6年
+                    interval = (lastBrakeTest + 5 > 2023) ? 6 : 5;
+                } else {
+                    // 2024年之后的试验，间隔6年
+                    interval = 6;
+                }
+                
+                const nextTest = lastBrakeTest + interval;
+                result.needBrakeTest = (currentYear === nextTest);
+                result.nextTestYear = nextTest;
+                
+                if (result.needBrakeTest) {
+                    result.reason = `上次125%制动试验在${lastBrakeTest}年，按规则间隔${interval}年，今年需要进行125%额定载重量制动试验。`;
+                } else {
+                    result.reason = `上次125%制动试验在${lastBrakeTest}年，下次试验时间为${nextTest}年，今年无需进行125%额定载重量制动试验。`;
+                }
+            } else {
+                // 如果没有提供上次试验年份，自动计算
+                const brakeTestYears = generateBrakeTestSchedule(supervisionYear, currentYear);
+                result.schedule = brakeTestYears;
+                
+                result.needBrakeTest = brakeTestYears.some(test => test.year === currentYear);
+                
+                if (result.needBrakeTest) {
+                    result.reason = '按照制动试验规则，今年需要进行125%额定载重量制动试验。';
+                } else {
+                    const nextTest = brakeTestYears.find(test => test.year > currentYear);
+                    if (nextTest) {
+                        result.nextTestYear = nextTest.year;
+                        result.reason = `按照制动试验规则，下次125%制动试验时间为${nextTest.year}年，今年无需进行125%额定载重量制动试验。`;
+                    } else {
+                        result.reason = '今年无需进行125%额定载重量制动试验。';
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        // 生成制动试验时间表
+        function generateBrakeTestSchedule(supervisionYear, currentYear) {
+            const schedule = [];
+            let testYear = supervisionYear;
+            
+            // 添加第一次（监督检验年份）
+            schedule.push({
+                year: testYear,
+                note: ''
+            });
+            
+            // 2023年之前，每隔5年做一次
+            while (testYear + 5 <= 2023) {
+                testYear += 5;
+                schedule.push({
+                    year: testYear,
+                    note: ''
+                });
+            }
+            
+            // 计算下一次试验：如果testYear+5 > 2023，则改为testYear+6
+            if (testYear < currentYear + 10) {
+                if (testYear + 5 > 2023) {
+                    testYear += 6;
+                } else {
+                    testYear += 5;
+                }
+                
+                // 添加2024年之后的试验（每6年一次）
+                while (testYear <= currentYear + 10) {
+                    schedule.push({
+                        year: testYear,
+                        note: ''
+                    });
+                    testYear += 6;
+                }
+            }
+            
+            return schedule;
+        }
+
+        // 生成旧电梯的检验计划
+        function generateScheduleForOldElevator(supervisionYear, currentYear) {
+            const schedule = [];
+            
+            // 2023年及之前，每年检验
+            for (let year = supervisionYear + 1; year <= 2023; year++) {
+                const age = year - supervisionYear;
+                schedule.push({
+                    year: year,
+                    age: age,
+                    type: '定期检验',
+                    note: '旧规则'
+                });
+            }
+            
+            // 2024年开始按新规则，但年限仍以监督检验年份为基准
+            const inspectionYears = [1, 4, 7, 9, 11, 13, 15];
+            const maxYear = Math.max(currentYear + 3, supervisionYear + 20);
+            
+            for (let year = 2024; year <= maxYear; year++) {
+                const age = year - supervisionYear;
+                const isInspectionYear = age <= 15 ? inspectionYears.includes(age) : true;
+                schedule.push({
+                    year: year,
+                    age: age,
+                    type: isInspectionYear ? '定期检验' : '自行检测',
+                    note: `新规则第${age}年${age > 15 ? '(超15年)' : ''}`
+                });
+            }
+            
+            return schedule;
+        }
+
+        // 生成新规则检验计划
+        function generateNewRuleSchedule(startYear, inspectionYears, currentYear) {
+            const schedule = [];
+            const maxYear = Math.max(currentYear + 3, startYear + 20);
+            
+            for (let age = 1; age <= 20; age++) {
+                const year = startYear + age;
+                if (year > maxYear) break;
+                
+                const isInspectionYear = age <= 15 ? inspectionYears.includes(age) : true;
+                schedule.push({
+                    year: year,
+                    age: age,
+                    type: isInspectionYear ? '定期检验' : '自行检测',
+                    note: age > 15 ? '(超15年)' : ''
+                });
+            }
+            return schedule;
+        }
+
+        // 显示结果
+        function displayResult(inspectionResult, brakeTestResult) {
+            const resultDiv = document.getElementById('result');
+            const currentYear = parseInt(document.getElementById('currentYear').value);
+            
+            // 定期检验结果
+            let inspectionIcon = inspectionResult.needInspection ? '🔍' : '✅';
+            let inspectionText = inspectionResult.needInspection ? '定期检验' : '自行检测';
+            
+            // 制动试验结果
+            let brakeTestIcon = brakeTestResult.needBrakeTest ? '⚡' : '✅';
+            let brakeTestText = brakeTestResult.needBrakeTest ? '125%制动试验' : '无需125%制动试验';
+            
+            // 生成检验计划表
+            let scheduleHtml = '';
+            if (inspectionResult.schedule && inspectionResult.schedule.length > 0) {
+                const relevantSchedule = inspectionResult.schedule.filter(item => 
+                    item.year >= currentYear - 2 && item.year <= currentYear + 8
+                );
+                
+                if (relevantSchedule.length > 0) {
+                    scheduleHtml += '<div class="inspection-schedule"><h3>定期检验计划表（近期）</h3>';
+                    relevantSchedule.forEach(item => {
+                        const isCurrent = item.year === currentYear;
+                        const displayText = item.type || (item.isInspectionYear ? '定期检验' : '自行检测');
+                        const ageText = item.age ? `第${item.age}年` : '';
+                        const note = item.note ? ` ${item.note}` : '';
+                        
+                        scheduleHtml += `<div class="schedule-item">
+                            <span class="${isCurrent ? 'highlight' : ''}">
+                                ${item.year}年 (${ageText}) - ${displayText}${note}
+                                ${isCurrent ? ' ← 当前年份' : ''}
+                            </span>
+                        </div>`;
+                    });
+                    scheduleHtml += '</div>';
+                }
+            }
+            
+            // 生成制动试验计划表
+            if (brakeTestResult.schedule && brakeTestResult.schedule.length > 0) {
+                const relevantBrakeSchedule = brakeTestResult.schedule.filter(item => 
+                    item.year >= currentYear - 2 && item.year <= currentYear + 8
+                );
+                
+                if (relevantBrakeSchedule.length > 0) {
+                    scheduleHtml += '<div class="inspection-schedule" style="margin-top: 15px;"><h3>125%制动试验计划表（近期）</h3>';
+                    relevantBrakeSchedule.forEach(item => {
+                        const isCurrent = item.year === currentYear;
+                        const note = item.note ? ` (${item.note})` : '';
+                        
+                        scheduleHtml += `<div class="schedule-item">
+                            <span class="${isCurrent ? 'highlight' : ''}">
+                                ${item.year}年 - 125%制动试验${note}
+                                ${isCurrent ? ' ← 当前年份' : ''}
+                            </span>
+                        </div>`;
+                    });
+                    scheduleHtml += '</div>';
+                }
+            }
+
+            let className = (inspectionResult.needInspection || brakeTestResult.needBrakeTest) ? 'need-inspection' : 'self-inspection';
+            
+            resultDiv.className = `result ${className} show`;
+            resultDiv.innerHTML = `
+                <div style="font-size: 1.8em; margin-bottom: 20px; text-align: center;">
+                    <div style="margin-bottom: 10px;">
+                        ${inspectionIcon} <strong>${currentYear}年定期检验：${inspectionText}</strong>
+                    </div>
+                    <div>
+                        ${brakeTestIcon} <strong>${currentYear}年制动试验：${brakeTestText}</strong>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.95); padding: 20px; border-radius: 10px; margin-bottom: 20px; color: #333;">
+                    <h3 style="color: #333; margin-bottom: 15px;">📝 详细说明</h3>
+                    <div style="margin-bottom: 10px; color: #444;"><strong>定期检验：</strong> ${inspectionResult.reason}</div>
+                    <div style="color: #444;"><strong>125%制动试验：</strong> ${brakeTestResult.reason}</div>
+                </div>
+                
+                ${scheduleHtml}
+            `;
+        }
+    </script>
+</body>
+</html>
