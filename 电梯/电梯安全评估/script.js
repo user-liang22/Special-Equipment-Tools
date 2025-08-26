@@ -950,12 +950,8 @@ function calculateResults() {
         }
     });
     
-    // 统计C、D项
+    // 统计C、D项（包含C.1和D.1）
     checklistData.forEach(cat => {
-        // 跳过C.1和D.1部分，不参与风险计算
-        if (cat.category.startsWith('C.1') || cat.category.startsWith('D.1')) {
-            return;
-        }
         
         let categoryNotApplicable = true;
         const categoryNotApplicableItems = [];
@@ -1010,8 +1006,8 @@ function calculateResults() {
                         }
                     } else {
                         // C、D项通常都有C级和D级选项，所以需要用户选择
-                        // 只检查非C.1和D.1部分的不完整项目
-                        if (!incompleteItem && !cat.category.startsWith('C.1') && !cat.category.startsWith('D.1')) {
+                        // 检查所有不完整项目（包含C.1和D.1）
+                        if (!incompleteItem) {
                             incompleteItem = item;
                         }
                     }
