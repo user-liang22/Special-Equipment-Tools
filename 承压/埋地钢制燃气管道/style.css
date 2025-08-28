@@ -1,0 +1,3047 @@
+/* ================== 埋地钢制燃气管道风险评估系统 - 移动端优化蓝白风格 ================== */
+
+/* ================== 全局文本强调样式 ================== */
+/* 确保strong标签在所有环境下都能正确显示加黑效果 */
+strong {
+    font-weight: bold !important;
+    color: inherit;
+}
+
+/* ================== 移动端视口和触摸优化 ================== */
+/* 确保移动端正确显示 */
+@viewport {
+    width: device-width;
+    initial-scale: 1.0;
+    maximum-scale: 5.0;
+    minimum-scale: 0.1;
+}
+
+/* ================== 失效可能性S=100说明文字样式 ================== */
+.direct-s100-explanation {
+    background: #fef3c7 !important;
+    border: 1px solid #f59e0b !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    margin: 16px 0 !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    color: #92400e !important;
+}
+
+.direct-s100-explanation strong {
+    color: #78350f !important;
+}
+
+@media (max-width: 767px) {
+    .direct-s100-explanation {
+        font-size: 13px !important;
+        padding: 10px !important;
+        margin: 12px 0 !important;
+    }
+}
+
+/* ================== 禁用选项样式 ================== */
+.option-select:disabled {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    border-color: #dee2e6 !important;
+    cursor: not-allowed !important;
+}
+
+.option-select:disabled option {
+    color: #6c757d !important;
+    background-color: #f8f9fa !important;
+}
+
+/* ================== 固定选项样式 ================== */
+.option-select[data-fixed="true"] {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    border-color: #d1d5db !important;
+    cursor: pointer !important;
+    user-select: none !important;
+}
+
+.option-select[data-fixed="true"]:hover {
+    background-color: #f9fafb !important;
+    border-color: #9ca3af !important;
+}
+
+.option-select[data-fixed="true"]:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25) !important;
+}
+
+/* ================== 输入框描述信息样式 ================== */
+.item-description {
+    font-size: 12px !important;
+    color: #6b7280 !important;
+    margin-top: 6px !important;
+    line-height: 1.4 !important;
+    padding: 8px 12px !important;
+    background-color: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    border-left: 3px solid #3b82f6 !important;
+}
+
+.item-description:hover {
+    background-color: #f3f4f6 !important;
+    border-color: #d1d5db !important;
+}
+
+@media (max-width: 767px) {
+    .item-description {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+        margin-top: 4px !important;
+    }
+}
+
+.disabled-notice {
+    font-size: 12px !important;
+    color: #6c757d !important;
+    margin-top: 4px !important;
+    font-style: italic !important;
+    padding: 4px 8px !important;
+    background-color: #f8f9fa !important;
+    border-radius: 4px !important;
+    border-left: 3px solid #6c757d !important;
+}
+
+
+
+/* 移动端触摸优化 */
+* {
+    -webkit-tap-highlight-color: rgba(37, 99, 235, 0.2); /* 添加轻微的点击反馈 */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* 移动端触摸反馈优化 */
+@media (max-width: 767px) {
+    /* 按钮和可交互元素的触摸反馈 */
+    button,
+    .nav-link,
+    .section-title,
+    .option-select,
+    .option-input,
+    .calculate-btn,
+    .section-reset-btn {
+        -webkit-tap-highlight-color: rgba(37, 99, 235, 0.15) !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    /* 触摸时的视觉反馈 */
+    button:active,
+    .nav-link:active,
+    .section-title:active {
+        transform: scale(0.98) !important;
+        opacity: 0.9 !important;
+    }
+    
+    /* 确保所有可交互元素有足够的触摸目标 */
+    button,
+    select,
+    input,
+    .nav-link,
+    .section-title,
+    .section-reset-btn,
+    .section-score {
+        min-height: 44px !important; /* Apple推荐的最小触摸目标 */
+        min-width: 44px !important;
+    }
+    
+    /* 改善焦点可见性 */
+    *:focus {
+        outline: 3px solid rgba(37, 99, 235, 0.5) !important;
+        outline-offset: 2px !important;
+    }
+}
+
+/* 允许文本选择 */
+p, h1, h2, h3, h4, h5, h6, span, div, li {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* 允许输入框选择 */
+input, textarea, select {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* ================== CSS变量定义 ================== */
+/* 修复变量作用域选择器 */
+:root {
+    /* z-index层级管理 */
+    --z-sticky: 100; /* 粘性导航 */
+    --z-fixed: 1000; /* 固定按钮 */
+    --z-modal-backdrop: 9000; /* 模态框背景 */
+    --z-modal: 9500; /* 一般模态框 */
+    --z-calculator: 9600; /* 计算器 */
+    --z-notification: 9700; /* 通知 */
+    --z-tooltip: 9800; /* 工具提示 */
+    --z-focus: 9900; /* 焦点元素 */
+    
+    /* 主色调 - 蓝白配色 */
+    --primary-blue: #2563eb;
+    --primary-blue-dark: #1d4ed8;
+    --primary-blue-light: #3b82f6;
+    --secondary-blue: #60a5fa;
+    --light-blue: #dbeafe;
+    --pale-blue: #eff6ff;
+    
+    /* 中性色 */
+    --white: #ffffff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    /* 功能色 */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    
+    /* 阴影 */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    
+    /* 圆角 */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    
+    /* 间距 - 移动端优化 */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    
+    /* 字体大小 - 移动端优化 */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+}
+
+/* ================== 默认选项提示框样式 ================== */
+.default-notice-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9990; /* 统一z-index值 */
+    padding: 16px;
+    box-sizing: border-box;
+    animation: noticeFadeIn 0.2s ease-out;
+}
+
+@keyframes noticeFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.default-notice-modal {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    max-width: 90%;
+    width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: noticeSlideIn 0.3s ease-out;
+}
+
+@keyframes noticeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.default-notice-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.default-notice-header i {
+    color: var(--primary-blue);
+    font-size: 24px;
+}
+
+.default-notice-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.default-notice-content {
+    padding: 20px 24px;
+}
+
+.notice-main-text {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--gray-800);
+    font-weight: 500;
+}
+
+/* 强化提示框中的加黑效果 */
+.default-notice-content .notice-main-text strong,
+.default-notice-content .notice-sub-text strong,
+.default-notice strong,
+.notification-dialog strong {
+    font-weight: bold !important;
+    color: var(--gray-900) !important;
+    font-family: inherit !important;
+}
+
+.notice-sub-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--gray-500);
+    font-weight: 400;
+}
+
+.default-notice-footer {
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--gray-200);
+    text-align: center;
+}
+
+.notice-close-btn {
+    background: var(--primary-blue);
+    color: var(--white);
+    border: none;
+    padding: 12px 32px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+}
+
+.notice-close-btn:hover {
+    background: var(--primary-blue-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.notice-close-btn:active {
+    transform: translateY(0);
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+    .default-notice-modal {
+        width: 95%;
+        max-width: 95%;
+    }
+    
+    .default-notice-header,
+    .default-notice-content,
+    .default-notice-footer {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    
+    .default-notice-header h3 {
+        font-size: 16px;
+    }
+    
+    .notice-main-text {
+        font-size: 15px;
+    }
+    
+    .notice-sub-text {
+        font-size: 13px;
+    }
+    
+    /* 移动端强化加黑效果 */
+    .default-notice-content .notice-main-text strong,
+    .default-notice-content .notice-sub-text strong,
+    .default-notice strong,
+    .notification-dialog strong {
+        font-weight: 900 !important; /* 更粗的字体 */
+        color: var(--primary-blue-dark) !important; /* 深蓝色突出显示 */
+        text-shadow: 0 0 1px rgba(29, 78, 216, 0.3) !important; /* 轻微阴影增强可见性 */
+    }
+    
+    .notice-close-btn {
+        padding: 10px 24px;
+        font-size: 15px;
+        min-width: 100px;
+    }
+}
+
+/* ================== 自定义确认对话框样式 ================== */
+.confirm-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* 改为常驻布局，避免 display 切换造成闪烁 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9991; /* 统一z-index值 */
+    padding: 16px;
+    box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease-out, visibility 0.2s ease-out;
+}
+
+.confirm-dialog-overlay.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.confirm-dialog-modal {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    max-width: 90%;
+    width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
+    /* 由父级 overlay 的 flex 居中，不再使用 fixed+transform */
+    opacity: 0;
+    transition: opacity 0.15s ease-out;
+}
+
+/* confirmSlideIn 动画已移除，使用可见类控制过渡 */
+.confirm-dialog-modal.visible {
+    opacity: 1;
+}
+
+.confirm-dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.confirm-dialog-header i {
+    color: var(--warning);
+    font-size: 24px;
+}
+
+.confirm-dialog-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.confirm-dialog-content {
+    padding: 20px 24px;
+}
+
+.confirm-dialog-text {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--gray-800);
+    text-align: center;
+}
+
+.confirm-dialog-footer {
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.confirm-dialog-btn {
+    padding: 10px 24px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
+    border: none;
+}
+
+.confirm-dialog-btn.confirm {
+    background: var(--primary-blue);
+    color: var(--white);
+}
+
+.confirm-dialog-btn.confirm:hover {
+    background: var(--primary-blue-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.confirm-dialog-btn.cancel {
+    background: var(--gray-300);
+    color: var(--gray-700);
+}
+
+.confirm-dialog-btn.cancel:hover {
+    background: var(--gray-400);
+    transform: translateY(-1px);
+}
+
+.confirm-dialog-btn:active {
+    transform: translateY(0);
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+    .confirm-dialog-modal {
+        width: 95%;
+        max-width: 95%;
+    }
+    
+    .confirm-dialog-header,
+    .confirm-dialog-content,
+    .confirm-dialog-footer {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    
+    .confirm-dialog-header h3 {
+        font-size: 16px;
+    }
+    
+    .confirm-dialog-text {
+        font-size: 15px;
+    }
+    
+    .confirm-dialog-footer {
+        flex-direction: column;
+    }
+    
+    .confirm-dialog-btn {
+        width: 100%;
+        padding: 12px 24px;
+        font-size: 15px;
+    }
+}
+
+/* ================== 全局基础样式 ================== */
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--gray-800);
+    background: linear-gradient(135deg, var(--pale-blue) 0%, var(--white) 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 16px; /* 基础字体大小，避免移动端缩放 */
+}
+
+/* 移动端优化基础样式 */
+@media (max-width: 767px) {
+    body {
+        font-size: 18px; /* 移动端增大基础字体 */
+        line-height: 1.7; /* 增加行间距提高可读性 */
+        -webkit-text-size-adjust: 100%; /* 防止iOS字体自动调整 */
+        -ms-text-size-adjust: 100%;
+    }
+}
+
+/* ================== 容器布局 ================== */
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    background: var(--white);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    min-height: 100vh;
+}
+
+/* ================== 页面头部 ================== */
+.page-header {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+    color: var(--white);
+    padding: var(--spacing-lg) var(--spacing-md);
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    box-shadow: var(--shadow-md);
+}
+
+.page-header h1 {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+    letter-spacing: -0.02em;
+}
+
+.page-header p {
+    font-size: var(--text-sm);
+    opacity: 0.8;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* 移动端页面头部优化 */
+@media (max-width: 767px) {
+    .page-header {
+        padding: 1.25rem 1rem; /* 增加垂直padding */
+        position: sticky;
+        top: 0;
+    }
+    
+    .page-header h1 {
+        font-size: 1.5rem; /* 增大标题字体 */
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+    
+    .page-header p {
+        font-size: 0.95rem; /* 增大描述文字 */
+        line-height: 1.5;
+        opacity: 0.9;
+    }
+}
+
+/* ================== 导航菜单 - 移动端优化 ================== */
+.nav-menu {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    position: sticky;
+    top: 60px;
+    z-index: var(--z-sticky);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.nav-menu::-webkit-scrollbar {
+    display: none;
+}
+
+.nav-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: fit-content;
+    gap: 0;
+}
+
+.nav-item {
+    flex: 0 0 auto;
+    min-width: 80px;
+}
+
+.nav-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-xs);
+    color: var(--gray-600);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    white-space: nowrap;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: var(--text-sm);
+    min-height: 44px; /* iOS推荐的最小触摸目标 */
+    justify-content: center;
+}
+
+/* 移动端导航链接优化 */
+@media (max-width: 767px) {
+    .nav-link {
+        min-height: 48px; /* 增大触摸目标 */
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .nav-link i {
+        font-size: 1.75rem; /* 增大图标 */
+        margin-bottom: 0.375rem;
+    }
+    
+    .nav-link span {
+        font-size: 0.8rem; /* 适度增大文字 */
+        line-height: 1.3;
+    }
+}
+
+/* 导航项内容容器 */
+.nav-link-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 3px;
+}
+
+.nav-link i {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+    color: var(--gray-400);
+    transition: all 0.3s ease;
+}
+
+.nav-link span {
+    font-size: var(--text-xs);
+    text-align: center;
+    line-height: 1.2;
+}
+
+
+
+/* 导航栏分数显示样式 */
+.nav-score {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--primary-blue);
+    background: var(--white);
+    border: 1px solid var(--primary-blue);
+    border-radius: var(--radius-sm);
+    padding: 1px 4px;
+    margin-left: 4px;
+    text-align: center;
+    min-width: 36px;
+    line-height: 1.2;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.nav-link.active {
+    color: var(--primary-blue);
+}
+
+.nav-link.active i {
+    color: var(--primary-blue);
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: var(--primary-blue);
+    border-radius: 3px 3px 0 0;
+}
+
+/* 移动端导航优化 */
+@media (max-width: 767px) {
+    /* 容器优化 */
+    .container {
+        margin: 0;
+        border-radius: 0;
+        padding-bottom: 120px !important; /* 为底部按钮和内容留更多空间 */
+        min-height: 100vh;
+    }
+    
+    /* 小屏下取消头部吸顶，避免与导航双吸顶产生重叠 */
+    .page-header {
+        position: static;
+        top: auto;
+        background: var(--white);
+        color: var(--gray-900);
+        box-shadow: none;
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .page-header h1 {
+        color: var(--gray-900);
+    }
+    
+    .page-header p {
+        color: rgba(17, 24, 39, 0.85);
+    }
+
+    /* 导航吸顶贴顶 */
+    .nav-menu {
+        top: 0;
+    }
+
+    .nav-link {
+        padding: var(--spacing-xs) var(--spacing-xs);
+        min-width: 50px;
+    }
+    
+    .nav-link i {
+        font-size: 1.25rem;
+        margin-bottom: 0.125rem;
+    }
+    
+    .nav-link span {
+        font-size: 0.625rem;
+    }
+    
+    .nav-score {
+        font-size: 0.5rem;
+        padding: 1px 3px;
+        min-width: 32px;
+        margin-left: 2px;
+    }
+    
+    /* 模块内容区域优化 */
+    .content-module {
+        padding: 1rem;
+    }
+    
+    .module-header {
+        margin-bottom: 1.5rem;
+        padding: 1rem 0;
+    }
+    
+    .module-header h2 {
+        font-size: 1.375rem; /* 增大模块标题 */
+        line-height: 1.3;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .module-header p {
+        font-size: 1rem; /* 增大模块描述 */
+        line-height: 1.6;
+        color: var(--gray-600);
+    }
+    
+    /* 移动端通用文字大小优化 */
+    h1, h2, h3, h4, h5, h6 {
+        line-height: 1.3 !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    p, span, div:not(.icon) {
+        line-height: 1.6 !important;
+    }
+    
+    /* 重置按钮移动端优化 */
+    .reset-btn {
+        min-height: 44px !important;
+        font-size: 0.875rem !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 8px !important;
+    }
+}
+
+/* ================== 内容模块 ================== */
+.content-module {
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+    position: relative;
+}
+
+.content-module.active {
+    display: block;
+}
+
+.module-header {
+    background: linear-gradient(135deg, var(--pale-blue) 0%, var(--white) 100%);
+    padding: var(--spacing-md);
+    border-bottom: 2px solid var(--primary-blue);
+}
+
+.module-header h2 {
+    font-size: var(--text-lg);
+    color: var(--primary-blue);
+    margin-bottom: var(--spacing-xs);
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.module-header h2 i {
+    margin-right: var(--spacing-sm);
+    font-size: var(--text-xl);
+}
+
+.module-header p {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    line-height: 1.5;
+}
+
+.module-content {
+    padding: var(--spacing-md);
+    background: var(--white);
+    position: relative;
+    min-height: 400px;
+}
+
+/* 移动端模块内容优化 */
+@media (max-width: 767px) {
+    .module-content {
+        min-height: auto !important; /* 移除最小高度限制 */
+        max-height: none !important; /* 移除最大高度限制 */
+        overflow-y: visible !important; /* 确保内容可见 */
+        padding: 1rem !important;
+    }
+    
+    /* 确保钢管壁厚计算器不会被遮挡 */
+    #module-wall-thickness .module-content {
+        padding-bottom: 2rem !important; /* 增加底部间距 */
+    }
+}
+
+/* ================== 评分系统 - 移动端优化 ================== */
+.scoring-system {
+    max-width: 100%;
+}
+
+.scoring-section {
+    margin-bottom: var(--spacing-md);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.scoring-section:active { transform: none; }
+
+.section-title {
+    width: 100%;
+    padding: var(--spacing-md);
+    background: linear-gradient(135deg, var(--pale-blue) 0%, var(--white) 100%);
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: var(--text-base);
+    color: var(--gray-700);
+    font-weight: 600;
+    text-align: left;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 44px;
+}
+
+.section-title:active { transform: none; }
+
+.section-title i {
+    color: var(--primary-blue);
+    margin-right: var(--spacing-sm);
+    transition: transform 0.3s ease;
+    font-size: var(--text-sm);
+    flex-shrink: 0;
+}
+
+.section-title.expanded i {
+    transform: rotate(90deg);
+}
+
+.section-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.section-reset-btn {
+    background: var(--primary-blue);
+    color: var(--white);
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    min-width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+    border: none;
+    cursor: pointer;
+    margin-right: 0;
+    transition: all 0.2s ease;
+    line-height: 1.2;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.section-reset-btn:hover {
+    background: var(--primary-blue-dark);
+    transform: translateY(-1px);
+}
+
+.section-reset-btn:active {
+    transform: translateY(0);
+}
+
+.section-score {
+    background: var(--primary-blue);
+    color: var(--white);
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    min-width: 45px;
+    text-align: center;
+    flex-shrink: 0;
+    line-height: 1.2;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.section-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: var(--white);
+}
+
+.section-content.expanded {
+    max-height: none;
+    overflow: visible;
+    padding: var(--spacing-md);
+}
+
+/* 移动端评分系统优化 */
+@media (max-width: 767px) {
+    .scoring-section {
+        margin-bottom: 1rem; /* 增大间距 */
+        margin-left: 0.5rem; /* 增加左边距 */
+        margin-right: 0.5rem; /* 增加右边距 */
+        border-radius: var(--radius-lg);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 增强阴影 */
+    }
+    
+    .section-title {
+        padding: 1rem 1rem 1rem 0.75rem; /* 恢复左padding给标题框留白 */
+        font-size: 1rem;
+        min-height: 56px;
+        line-height: 1.4;
+    }
+    
+    .section-title i {
+        font-size: 1.25rem;
+        margin-right: 0.1rem; /* 最小右边距 */
+        margin-left: 0; /* 左边紧贴边缘 */
+    }
+    
+    .section-buttons {
+        gap: 0.2rem; /* 进一步减少按钮间距，让按钮更紧凑 */
+    }
+    
+    .section-reset-btn {
+        font-size: 0.6rem !important; /* 再次增大字体 */
+        min-width: 38px !important; /* 再次增大宽度 */
+        max-width: 38px !important;
+        width: 38px !important;
+        min-height: 20px !important; /* 再次增大高度 */
+        max-height: 20px !important;
+        height: 20px !important;
+        padding: 0 4px !important; /* 增大内边距 */
+        margin: 0 !important;
+        line-height: 1 !important;
+        border-radius: 10px !important; /* 对应调整圆角 */
+        font-weight: 600;
+        box-shadow: none !important;
+        transition: all 0.15s ease;
+        touch-action: manipulation;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+    
+    .section-score {
+        font-size: 0.6rem !important; /* 再次增大字体 */
+        min-width: 42px !important; /* 再次增大宽度给数字留空间 */
+        max-width: 42px !important;
+        width: 42px !important;
+        min-height: 20px !important; /* 再次增大高度 */
+        max-height: 20px !important;
+        height: 20px !important;
+        padding: 0 4px !important; /* 增大内边距 */
+        margin: 0 !important;
+        line-height: 1 !important;
+        border-radius: 10px !important; /* 对应调整圆角 */
+        font-weight: 600;
+        box-shadow: none !important;
+        transition: all 0.15s ease;
+        touch-action: manipulation;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+    
+    .section-content.expanded {
+        padding: 1rem; /* 增大内容区域padding */
+    }
+}
+
+/* ================== 子项样式 - 移动端优化 ================== */
+.subitem {
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+}
+
+.subitem-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.4;
+}
+
+/* ================== 评分项 - 移动端优化 ================== */
+.scoring-item {
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background: var(--white);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.item-header {
+    margin-bottom: var(--spacing-sm);
+}
+
+.item-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gray-700);
+    line-height: 1.4;
+}
+
+/* 移动端子项和评分项优化 */
+@media (max-width: 767px) {
+    .subitem {
+        margin-bottom: 1.25rem; /* 增大间距 */
+        padding: 1rem; /* 增大padding */
+        border-radius: 8px; /* 增大圆角 */
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+    }
+    
+    .subitem-title {
+        font-size: 1.125rem; /* 增大子项标题 */
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        line-height: 1.4;
+        color: var(--gray-800);
+    }
+    
+    .scoring-item {
+        margin-bottom: 1rem; /* 增大间距 */
+        padding: 1rem; /* 增大padding */
+        border-radius: 8px;
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+    }
+    
+    .item-header {
+        margin-bottom: 0.75rem; /* 增大间距 */
+    }
+    
+    .item-title {
+        font-size: 1rem; /* 增大评分项标题 */
+        line-height: 1.5; /* 增加行高 */
+        font-weight: 500;
+        color: var(--gray-800);
+        margin-bottom: 0.5rem;
+    }
+    
+    /* 移动端描述文字优化 */
+    .item-description {
+        font-size: 0.9rem !important;
+        padding: 0.75rem 1rem !important;
+        margin-top: 0.75rem !important;
+        line-height: 1.6 !important;
+        border-radius: 8px !important;
+    }
+    
+    /* 移动端选项文字优化 */
+    .option-select option {
+        font-size: 1rem !important;
+        padding: 0.5rem !important;
+        line-height: 1.4 !important;
+    }
+    
+    /* 移动端标签文字优化 */
+    label {
+        font-size: 1rem !important;
+        line-height: 1.5 !important;
+        font-weight: 500 !important;
+        margin-bottom: 0.5rem !important;
+    }
+}
+
+/* ================== 选择器 - 移动端优化 ================== */
+.options-container {
+    margin-top: var(--spacing-sm);
+}
+
+.option-select {
+    width: 100%;
+    padding: 0.375rem 0.625rem; /* 恢复原来尺寸 */
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    background: var(--white);
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right var(--spacing-sm) center;
+    background-size: 16px;
+    padding-right: 24px;
+    /* 确保所有选项框的跳动效果一致 */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    min-height: 40px;
+    height: 40px; /* 恢复原来高度 */
+}
+
+.option-select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.option-select:disabled {
+    background-color: var(--gray-100);
+    color: var(--gray-400);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 输入框样式 */
+.option-input {
+    width: 100%;
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    background: var(--white);
+    color: var(--gray-700);
+    transition: all 0.3s ease;
+    min-height: 40px;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+/* 计算器内 d1 下拉框样式复用输入框风格 */
+#d1-input {
+    width: 100%;
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    background: var(--white);
+    color: var(--gray-700);
+    min-height: 40px;
+    height: 40px;
+}
+
+#d1-input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.option-input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* 取消通用的 :invalid 红框，避免合法小数值因step或min触发变红 */
+.option-input:invalid {
+    border-color: var(--gray-300);
+    box-shadow: none;
+}
+
+/* 移动端输入框优化 */
+@media (max-width: 767px) {
+    .option-input {
+        font-size: 0.875rem; /* 缩小字体大小 */
+        padding: 0.5rem 0.625rem; /* 缩小padding */
+        min-height: 38px; /* 缩小高度 */
+        height: 38px;
+        border-width: 1px; /* 恢复边框粗细 */
+        border-radius: 6px; /* 缩小圆角 */
+    }
+    
+    .option-input:focus {
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); /* 增大焦点阴影 */
+        border-color: var(--primary-blue);
+    }
+    
+    .option-input:hover {
+        border-color: var(--gray-400);
+    }
+}
+
+/* 移动端选择器优化 */
+@media (max-width: 767px) {
+    .option-select {
+        font-size: 0.875rem; /* 缩小字体大小 */
+        padding: 0.5rem 0.625rem; /* 缩小padding */
+        min-height: 38px; /* 缩小高度 */
+        height: 38px;
+        border-width: 1px; /* 恢复边框粗细 */
+        border-radius: 6px; /* 缩小圆角 */
+        background-size: 16px; /* 缩小下拉箭头 */
+        padding-right: 26px; /* 缩小箭头空间 */
+    }
+    
+    .option-select:focus {
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); /* 增大焦点阴影 */
+        border-color: var(--primary-blue);
+    }
+    
+    .option-select:hover {
+        border-color: var(--gray-400);
+    }
+}
+
+/* ================== 按钮组 - 移动端优化 ================== */
+.button-group {
+    position: sticky;
+    bottom: 0;
+    background: var(--white);
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--gray-200);
+    box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+    z-index: var(--z-sticky);
+}
+
+.calculate-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+    color: var(--white);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+}
+
+.calculate-btn:active { transform: none; box-shadow: none; }
+
+/* 移动端按钮优化 */
+@media (max-width: 767px) {
+    .button-group {
+        padding: var(--spacing-sm);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: var(--z-fixed);
+    }
+    
+    .calculate-btn {
+        padding: var(--spacing-md);
+        font-size: var(--text-base);
+        min-height: 52px;
+        border-radius: var(--radius-md);
+    }
+    
+    /* 为底部按钮留出空间 */
+    .container {
+        padding-bottom: 80px;
+    }
+}
+
+/* ================== 控制按钮 ================== */
+.controls {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md) 0;
+}
+
+.btn {
+    flex: 1;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: var(--primary-blue);
+    color: var(--white);
+}
+
+.btn-success {
+    background: var(--success);
+    color: var(--white);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: var(--white);
+}
+
+.btn:active { transform: none; }
+
+/* ================== 结果展示 - 移动端优化 ================== */
+.results-section {
+    background: linear-gradient(135deg, var(--pale-blue) 0%, var(--white) 100%);
+    margin: var(--spacing-md);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    display: none;
+}
+
+.results-section.show {
+    display: block;
+    animation: slideUp 0.5s ease-out;
+}
+
+.results-header h2 {
+    color: var(--primary-blue);
+    font-size: var(--text-xl);
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+    font-weight: 700;
+}
+
+.score-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-md) 0;
+}
+
+.score-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--white);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-sm);
+    box-shadow: var(--shadow-sm);
+}
+
+.result-item-label {
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: var(--text-sm);
+}
+
+.result-item-value {
+    background: var(--primary-blue);
+    color: var(--white);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: var(--text-sm);
+}
+
+.final-score {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    margin-top: var(--spacing-lg);
+}
+
+.final-score div:first-child {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: var(--spacing-sm);
+}
+
+.final-score div:last-child {
+    font-size: var(--text-base);
+    color: var(--gray-600);
+}
+
+/* 移动端结果展示优化 */
+@media (max-width: 767px) {
+    .results-section {
+        margin: var(--spacing-sm);
+        padding: var(--spacing-md);
+        border-radius: var(--radius-md);
+    }
+    
+    .results-header h2 {
+        font-size: var(--text-lg);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .score-list {
+        margin: var(--spacing-sm) 0;
+    }
+    
+    .score-list li {
+        padding: var(--spacing-sm);
+        margin-bottom: var(--spacing-xs);
+        border-radius: var(--radius-sm);
+    }
+    
+    .result-item-label {
+        font-size: var(--text-xs);
+    }
+    
+    .result-item-value {
+        font-size: var(--text-xs);
+        padding: 0.125rem 0.5rem;
+    }
+    
+    .final-score {
+        padding: var(--spacing-md);
+        border-radius: var(--radius-md);
+        margin-top: var(--spacing-md);
+    }
+    
+    .final-score div:first-child {
+        font-size: var(--text-xl);
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .final-score div:last-child {
+        font-size: var(--text-sm);
+    }
+}
+
+/* ================== 弹窗 - 移动端优化 ================== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1000;
+    padding: 0;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--white);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    width: 100%;
+    max-width: 360px;
+    max-height: 70vh;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+    color: var(--white);
+    padding: var(--spacing-lg) var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: var(--white);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: var(--text-xl);
+    transition: all 0.3s ease;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+.modal-close:active { transform: none; }
+
+.modal-body {
+    padding: var(--spacing-xl) var(--spacing-md);
+    text-align: center;
+}
+
+.score-display {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin: var(--spacing-md) 0;
+}
+
+/* 移动端弹窗优化 */
+@media (max-width: 767px) {
+    .modal {
+        align-items: flex-end;
+    }
+    
+    .modal-content {
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        max-height: 70vh;
+        width: 85%;
+    }
+    
+    .modal-header {
+        padding: var(--spacing-md);
+    }
+    
+    .modal-header h3 {
+        font-size: var(--text-base);
+    }
+    
+    .modal-close {
+        width: 36px;
+        height: 36px;
+        min-height: 48px;
+        min-width: 48px;
+    }
+    
+    .modal-body {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .score-display {
+        font-size: var(--text-2xl);
+        margin: var(--spacing-sm) 0;
+    }
+}
+
+/* ================== 通知提示 - 移动端优化 ================== */
+.notification {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: 999px;
+    color: var(--white);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    z-index: 10006;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.3s ease-out;
+    max-width: 90%;
+    text-align: center;
+}
+
+.notification.success {
+    background: var(--success);
+}
+
+.notification.error {
+    background: var(--danger);
+}
+
+.notification.info {
+    background: var(--info);
+}
+
+/* 移动端通知优化 */
+@media (max-width: 767px) {
+    .notification {
+        bottom: 100px;
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--text-xs);
+        max-width: 95%;
+        border-radius: var(--radius-md);
+    }
+}
+
+/* ================== 动画效果 ================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* ================== 加载动画 ================== */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--gray-300);
+    border-radius: 50%;
+    border-top-color: var(--primary-blue);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ================== 响应式设计 ================== */
+
+/* 小屏幕手机优化 (320px - 480px) */
+@media (max-width: 480px) {
+    .container {
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .page-header {
+        padding: var(--spacing-md);
+    }
+    
+    .page-header h1 {
+        font-size: var(--text-lg);
+    }
+    
+    .page-header p {
+        font-size: var(--text-sm);
+        color: rgba(17, 24, 39, 0.85);
+    }
+    
+    .nav-link {
+        padding: var(--spacing-sm) var(--spacing-xs);
+        font-size: var(--text-xs);
+    }
+    
+    .nav-link i {
+        font-size: 1.25rem;
+    }
+    
+    .module-content {
+        padding: var(--spacing-sm);
+    }
+    
+    .scoring-section {
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .section-title {
+        padding: var(--spacing-sm);
+        font-size: var(--text-sm);
+    }
+    
+    .subitem {
+        padding: var(--spacing-sm);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .scoring-item {
+        padding: var(--spacing-xs);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .button-group {
+        padding: var(--spacing-sm);
+    }
+    
+    .calculate-btn {
+        padding: var(--spacing-md);
+        font-size: var(--text-base);
+    }
+    
+    .results-section {
+        margin: var(--spacing-sm);
+        padding: var(--spacing-md);
+    }
+}
+
+/* 中等屏幕手机优化 (481px - 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+    .container {
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .page-header {
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+    
+    .page-header p {
+        color: rgba(17, 24, 39, 0.85);
+    }
+    
+    .nav-link {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .module-content {
+        padding: var(--spacing-md);
+    }
+    
+    .button-group {
+        padding: var(--spacing-md);
+    }
+}
+
+/* 平板端适配 */
+@media (min-width: 768px) {
+    .container {
+        max-width: 768px;
+        margin: 20px auto;
+        border-radius: var(--radius-xl);
+    }
+    
+    .page-header {
+        padding: var(--spacing-xl) var(--spacing-lg);
+        position: static;
+    }
+    
+    .page-header h1 {
+        font-size: var(--text-2xl);
+    }
+    
+    .page-header p {
+        font-size: var(--text-base);
+        color: rgba(255, 255, 255, 0.85);
+    }
+    
+    .nav-menu {
+        position: static;
+    }
+    
+    .nav-list {
+        justify-content: center;
+    }
+    
+    .nav-link {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .nav-link i {
+        font-size: 2rem;
+    }
+    
+    .nav-link span {
+        font-size: var(--text-sm);
+    }
+    
+    .nav-link-content {
+        gap: 4px;
+    }
+    
+    .nav-score {
+        font-size: var(--text-xs);
+        padding: 2px 6px;
+        min-width: 44px;
+        margin-left: 6px;
+    }
+    
+    .module-content {
+        padding: var(--spacing-lg);
+    }
+    
+    .button-group {
+        position: static;
+        padding: var(--spacing-lg);
+        border-top: none;
+        box-shadow: none;
+    }
+    
+    .calculate-btn {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .modal-content {
+        border-radius: var(--radius-xl);
+        margin: auto;
+    }
+    
+    .notification {
+        bottom: 40px;
+    }
+}
+
+/* 桌面端适配 */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1024px;
+    }
+    
+    .nav-list {
+        justify-content: space-around;
+    }
+    
+    .controls {
+        justify-content: center;
+        gap: var(--spacing-md);
+    }
+    
+    .btn {
+        max-width: 200px;
+    }
+    
+    .scoring-section:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-blue);
+    }
+    
+    .section-title:hover {
+        background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+    }
+    
+    .option-select:hover {
+        border-color: var(--primary-blue-light);
+    }
+    
+    .calculate-btn:hover {
+        background: linear-gradient(135deg, var(--primary-blue-dark) 0%, var(--primary-blue) 100%);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .modal-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* 大屏幕适配 */
+@media (min-width: 1280px) {
+    .container {
+        max-width: 1200px;
+    }
+    
+    .page-header p {
+        color: rgba(255, 255, 255, 0.85);
+    }
+    
+    .nav-link-content {
+        gap: 6px;
+    }
+    
+    .nav-score {
+        font-size: var(--text-sm);
+        padding: 3px 8px;
+        min-width: 52px;
+        margin-left: 8px;
+    }
+}
+
+/* ================== 打印样式 ================== */
+@media print {
+    body {
+        background: var(--white);
+    }
+    
+    .nav-menu,
+    .button-group,
+    .controls {
+        display: none;
+    }
+    
+    .container {
+        box-shadow: none;
+    }
+    
+    .section-content {
+        max-height: none !important;
+        display: block !important;
+    }
+}
+
+/* ================== 可访问性增强 ================== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-blue: #0040ff;
+        --gray-800: #000000;
+        --gray-100: #ffffff;
+    }
+}
+
+/* 暗色模式支持（可选） */
+@media (prefers-color-scheme: dark) {
+    /* 可以根据需要添加暗色模式样式 */
+}
+
+/* ================== 触摸优化 ================== */
+@media (hover: none) and (pointer: coarse) {
+    .option-select,
+    .btn,
+    .calculate-btn,
+    .nav-link {
+        min-height: 30px; /* iOS推荐的最小触摸目标尺寸 */
+    }
+    
+    /* 确保所有可点击元素都有足够的触摸区域 */
+    .section-title,
+    .nav-link,
+    .btn,
+    .calculate-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* 增加触摸反馈 */
+    .option-select:active,
+    .btn:active,
+    .calculate-btn:active,
+    .nav-link:active { transform: none; }
+    
+    /* 优化触摸滚动 */
+    .nav-menu,
+    .module-content {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+}
+
+/* ================== 未完成警告模态框 ================== */
+.incomplete-warning-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+/* ================== 通用通知模态（置中） ================== */
+.notification-modal { position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9992; backdrop-filter: blur(4px); }
+.notification-dialog { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); max-width: 400px; width: 90%; }
+
+.incomplete-warning-modal .modal-content {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    /* 移除动画 */
+}
+
+
+
+.incomplete-warning-modal .modal-body {
+    padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
+    background: var(--white);
+}
+
+.incomplete-warning-modal .modal-body p {
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--gray-700);
+    line-height: 1.6;
+}
+
+.incomplete-warning-modal .incomplete-details {
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.incomplete-warning-modal .incomplete-details p {
+    margin: 0 0 var(--spacing-sm) 0;
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.incomplete-warning-modal .incomplete-details ul {
+    margin: 0;
+    padding-left: var(--spacing-lg);
+    color: var(--gray-700);
+}
+
+.incomplete-warning-modal .incomplete-details li {
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--text-sm);
+    line-height: 1.4;
+}
+
+.incomplete-warning-modal .modal-footer {
+    padding: var(--spacing-lg);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    background: var(--white);
+}
+
+    .incomplete-warning-modal .btn {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: var(--text-base);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+
+/* ================== 通知动画样式 ================== */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* 修复缺失的样式 */
+.min-width-80 {
+    min-width: 80px;
+}
+
+.incomplete-warning-modal .btn-primary {
+    background: var(--primary-blue);
+    color: var(--white);
+}
+
+.incomplete-warning-modal .btn-primary:hover {
+    background: var(--primary-blue-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.incomplete-warning-modal .btn-secondary {
+    background: var(--gray-300);
+    color: var(--gray-700);
+}
+
+.incomplete-warning-modal .btn-secondary:hover {
+    background: var(--gray-400);
+    transform: translateY(-2px);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .incomplete-warning-modal .modal-content {
+        width: 95%;
+        margin: var(--spacing-md);
+    }
+    
+    .incomplete-warning-modal .modal-footer {
+        flex-direction: column;
+    }
+    
+    .incomplete-warning-modal .btn {
+        width: 100%;
+    }
+}
+
+/* ================== 简化后的提示框样式 ================== */
+
+/* ================== 移动端安全区域优化 (刘海屏等) ================== */
+@media (max-width: 767px) {
+    /* 为有刘海屏/动态岛的设备提供安全区域支持 */
+    .page-header {
+        padding-top: max(1.25rem, env(safe-area-inset-top) + 1rem) !important;
+        padding-left: max(1rem, env(safe-area-inset-left)) !important;
+        padding-right: max(1rem, env(safe-area-inset-right)) !important;
+    }
+    
+    .nav-menu {
+        padding-left: max(0, env(safe-area-inset-left)) !important;
+        padding-right: max(0, env(safe-area-inset-right)) !important;
+    }
+    
+    .container {
+        padding-left: max(0, env(safe-area-inset-left)) !important;
+        padding-right: max(0, env(safe-area-inset-right)) !important;
+        padding-bottom: max(100px, env(safe-area-inset-bottom) + 100px) !important;
+    }
+    
+    .button-group {
+        padding-left: max(var(--spacing-sm), env(safe-area-inset-left) + var(--spacing-sm)) !important;
+        padding-right: max(var(--spacing-sm), env(safe-area-inset-right) + var(--spacing-sm)) !important;
+        padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom) + var(--spacing-sm)) !important;
+    }
+    
+    /* 弹窗安全区域适配 */
+    .leakage-calculator-content,
+    .depth-calculator,
+    .default-notice-modal,
+    .confirm-dialog-modal {
+        margin-left: max(1rem, env(safe-area-inset-left)) !important;
+        margin-right: max(1rem, env(safe-area-inset-right)) !important;
+        margin-top: max(1rem, env(safe-area-inset-top)) !important;
+        margin-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+    }
+}
+
+/* ================== 移动端内容溢出控制 ================== */
+@media (max-width: 767px) {
+    /* 防止内容超出边框 */
+    html, body {
+        overflow-x: hidden !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+    }
+    
+    .container {
+        overflow-x: hidden !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    
+    /* 确保所有子元素不超出容器 */
+    .container > *,
+    .module-content > *,
+    .section-content > *,
+    .subitem > *,
+    .scoring-item > * {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-wrap: break-word !important;
+        word-wrap: break-word !important;
+    }
+    
+    /* 特殊处理可能超出的元素 */
+    .nav-menu,
+    .nav-list,
+    .section-title,
+    .item-title,
+    .option-select,
+    .option-input {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* 计算器内容溢出控制 */
+    .leakage-calc-container,
+    .calculator-content,
+    .leakage-calc-input-group,
+    .input-group {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    .leakage-calc-input-group input,
+    .leakage-calc-input-group select,
+    .input-group input,
+    .input-group select {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+}
+
+/* ================== 移动端性能优化 ================== */
+@media (max-width: 767px) {
+    /* GPU加速优化 */
+    .nav-link,
+    .section-title,
+    .calculate-btn,
+    .option-select,
+    .option-input,
+    .scoring-section {
+        will-change: transform, opacity !important;
+        transform: translateZ(0) !important; /* 强制硬件加速 */
+    }
+    
+    /* 滚动性能优化 */
+    .content-module,
+    .section-content,
+    .leakage-calculator-content,
+    .depth-calculator {
+        -webkit-overflow-scrolling: touch !important;
+        scroll-behavior: smooth !important;
+    }
+    
+    /* 字体渲染优化 */
+    body, 
+    * {
+        -webkit-font-smoothing: antialiased !important;
+        -moz-osx-font-smoothing: grayscale !important;
+        text-rendering: optimizeSpeed !important; /* 优先性能而非质量 */
+    }
+}
+
+/* ================== 计算器移动端优化 ================== */
+/* 埋地段计算器移动端优化 */
+@media (max-width: 767px) {
+    .depth-calculator {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        height: 85vh !important; /* 固定高度确保可滚动 */
+        max-height: 90vh !important;
+        min-height: 500px !important; /* 最小高度保证滚动区域 */
+        overflow: hidden !important; /* 外层隐藏溢出 */
+        z-index: 9600 !important; /* 计算器层级 */
+        position: fixed !important;
+        top: 5vh !important;
+        left: 2.5vw !important;
+        transform: none !important;
+        margin: 0 !important;
+        border-radius: 12px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    /* 强制所有动态创建的计算器使用flex布局 */
+    #depth-calculator,
+    #safety-margin-calculator, 
+    #strength-calculator {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 85vh !important; /* 固定高度确保始终可滚动 */
+        max-height: 90vh !important;
+        min-height: 500px !important; /* 最小高度保证滚动区域 */
+    }
+    
+    .calculator-header {
+        padding: 1rem !important;
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    .calculator-header h3 {
+        font-size: 1.125rem !important;
+        line-height: 1.4 !important;
+    }
+    
+    .close-btn {
+        font-size: 1.75rem !important;
+        padding: 0.5rem !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+    }
+    
+    .calculator-content {
+        padding: 1.5rem 1rem !important;
+        flex: 1 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        max-height: none !important; /* 移除高度限制，让flex布局处理 */
+    }
+    
+    /* 强制所有动态创建的计算器内容区域可滚动 */
+    #depth-calculator .calculator-content,
+    #safety-margin-calculator .calculator-content,
+    #strength-calculator .calculator-content {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 1.5rem 1rem !important;
+    }
+    
+    .input-group {
+        margin-bottom: 1.25rem !important;
+    }
+    
+    .input-group label {
+        font-size: 1rem !important;
+        margin-bottom: 0.5rem !important;
+        line-height: 1.4 !important;
+    }
+    
+    .input-group input {
+        font-size: 1rem !important; /* 16px避免缩放 */
+        padding: 0.875rem !important;
+        min-height: 48px !important;
+        border-radius: 8px !important;
+        border-width: 2px !important;
+    }
+    
+    .button-group {
+        padding: 1rem !important;
+        gap: 0.75rem !important;
+    }
+    
+    .button-group button {
+        min-height: 48px !important;
+        font-size: 1rem !important;
+        padding: 0.75rem 1rem !important;
+        border-radius: 8px !important;
+    }
+}
+
+/* 钢管泄漏量计算器移动端优化 */
+@media (max-width: 767px) {
+    .leakage-calculator-modal {
+        padding: 0 !important;
+        z-index: 9500 !important; /* 模态框层级 */
+        display: flex !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        padding-top: 5vh !important;
+    }
+    
+    .leakage-calculator-content {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        height: 85vh !important; /* 固定高度确保可滚动 */
+        max-height: 90vh !important;
+        min-height: 500px !important; /* 最小高度保证滚动区域 */
+        margin: 0 !important;
+        border-radius: 12px !important;
+        overflow: hidden !important; /* 外层隐藏溢出 */
+        transform: none !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        z-index: inherit !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    /* 强制动态创建的泄漏量计算器使用flex布局 */
+    #leakage-calculator-modal .leakage-calculator-content {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 85vh !important; /* 固定高度确保始终可滚动 */
+        max-height: 90vh !important;
+        min-height: 500px !important; /* 最小高度保证滚动区域 */
+    }
+    
+    .leakage-calc-container {
+        padding: 1.5rem 1rem !important;
+        flex: 1 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        max-height: none !important; /* 让flex布局处理高度 */
+    }
+    
+    /* 强制动态创建的泄漏量计算器内容区域可滚动 */
+    #leakage-calculator-modal .leakage-calc-container {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 1.5rem 1rem !important;
+    }
+    
+    .leakage-calc-title {
+        font-size: 1.25rem !important;
+        margin-bottom: 1.5rem !important;
+        line-height: 1.4 !important;
+    }
+    
+    .leakage-calc-input-group {
+        margin-bottom: 1.25rem !important;
+    }
+    
+    .leakage-calc-input-group label {
+        font-size: 1rem !important;
+        margin-bottom: 0.5rem !important;
+        line-height: 1.4 !important;
+    }
+    
+    .leakage-calc-input-group input,
+    .leakage-calc-input-group select {
+        font-size: 1rem !important; /* 16px避免缩放 */
+        padding: 0.875rem !important;
+        min-height: 48px !important;
+        border-radius: 8px !important;
+        border-width: 2px !important;
+    }
+    
+    .leakage-calc-btn {
+        font-size: 1rem !important;
+        padding: 0.875rem 1.5rem !important;
+        min-height: 48px !important;
+        border-radius: 8px !important;
+        margin-top: 1rem !important;
+    }
+    
+    .leakage-calc-result {
+        margin-top: 1.5rem !important;
+        padding: 1.25rem !important;
+        border-radius: 8px !important;
+    }
+    
+    .leakage-calc-result-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+    
+    .leakage-calc-result-item {
+        padding: 0.75rem !important;
+        border-radius: 8px !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.25rem !important;
+    }
+    
+    .leakage-calc-result-label {
+        font-size: 0.875rem !important;
+        line-height: 1.4 !important;
+    }
+    
+    .leakage-calc-result-value {
+        font-size: 1.125rem !important;
+        line-height: 1.2 !important;
+    }
+}
+
+/* 通用计算器按钮移动端优化 */
+@media (max-width: 767px) {
+    /* 确保所有计算器按钮都有适当的触摸目标 */
+    .calculator-header button,
+    .leakage-calc-container button,
+    .depth-calculator button {
+        min-height: 44px !important;
+        min-width: 44px !important;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* 改善移动端滚动体验 */
+    .leakage-calculator-content,
+    .depth-calculator {
+        -webkit-overflow-scrolling: touch !important;
+    }
+}
+
+/* ================== 自定义滚动条 - 移动端隐藏 ================== */
+@media (max-width: 767px) {
+    ::-webkit-scrollbar {
+        display: none;
+    }
+    
+    * {
+        scrollbar-width: none;
+    }
+}
+
+@media (min-width: 768px) {
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: var(--gray-100);
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary-blue-light);
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-blue);
+    }
+}
+
+/* ================== 移动端特定优化 ================== */
+
+/* iOS安全区域支持 */
+@supports (padding: max(0px)) {
+    .container {
+        padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+        padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+    }
+    
+    .button-group {
+        padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+        padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+        padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom));
+    }
+}
+
+/* 移动端触摸手势优化 */
+@media (hover: none) and (pointer: coarse) {
+    /* 禁用移动端的hover效果 */
+    .scoring-section:hover,
+    .section-title:hover,
+    .option-select:hover,
+    .calculate-btn:hover,
+    .btn:hover,
+    .nav-link:hover {
+        transform: none;
+        box-shadow: inherit;
+    }
+    
+    /* 优化触摸反馈 */
+    .scoring-section:active,
+    .section-title:active,
+    .option-select:active,
+    .calculate-btn:active,
+    .btn:active,
+    .nav-link:active { transform: none; box-shadow: none; }
+}
+
+/* 移动端性能优化 */
+@media (max-width: 767px) {
+    /* 减少阴影复杂度 */
+    .scoring-section,
+    .scoring-item,
+    .subitem {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* 优化渐变（仅按钮保留蓝底） */
+    .calculate-btn {
+        background: var(--primary-blue);
+    }
+
+    /* 小屏标题框白底黑字 */
+    .section-title {
+        background: var(--white);
+        color: var(--gray-900);
+    }
+    
+    /* 减少动画复杂度 */
+    .scoring-section,
+    .scoring-item {
+        transition: transform 0.2s ease;
+    }
+}
+
+/* 移动端字体渲染优化 */
+@media (max-width: 767px) {
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+    
+    /* 确保小字体清晰 */
+    .text-xs,
+    .text-sm {
+        font-weight: 500;
+    }
+}
+
+/* 移动端滚动优化 */
+@media (max-width: 767px) {
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    /* 优化触摸滚动 */
+    .nav-menu,
+    .module-content,
+    .modal-body {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+}
+
+/* ================== 禁用部分样式 ================== */
+.disabled-section {
+    opacity: 0.5 !important;
+    pointer-events: none !important;
+    position: relative !important;
+}
+
+.disabled-section::after {
+    content: "已禁用" !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: rgba(108, 117, 125, 0.9) !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    z-index: 10 !important;
+    pointer-events: none !important;
+}
+
+.disabled-subitem {
+    opacity: 0.5 !important;
+    pointer-events: none !important;
+    position: relative !important;
+}
+
+.disabled-subitem::after {
+    content: "已禁用" !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: rgba(108, 117, 125, 0.9) !important;
+    color: white !important;
+    padding: 6px 12px !important;
+    border-radius: 16px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    z-index: 10 !important;
+    pointer-events: none !important;
+}
+
+/* ================== 选项卡样式 ================== */
+.tabs-container {
+    width: 100%;
+    margin: 16px 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tabs-header {
+    display: flex;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-bottom: 2px solid #3b82f6;
+}
+
+.tab-button {
+    background: transparent;
+    border: none;
+    padding: 16px 24px;
+    margin: 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+    justify-content: center;
+}
+
+.tab-button:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1e40af;
+}
+
+.tab-button.active {
+    background: #ffffff;
+    color: #1e40af;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #3b82f6;
+    border-radius: 2px 2px 0 0;
+}
+
+.tab-icon {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.tab-button.active .tab-icon {
+    opacity: 1;
+}
+
+.tabs-content {
+    background: #ffffff;
+    padding: 24px;
+    min-height: 200px;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 选项卡切换确认对话框样式 */
+.tab-confirm-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    padding: 24px;
+    z-index: 1000;
+    max-width: 400px;
+    width: 90%;
+}
+
+.tab-confirm-dialog h3 {
+    margin: 0 0 16px 0;
+    color: #1f2937;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.tab-confirm-dialog p {
+    margin: 0 0 24px 0;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.tab-confirm-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.tab-confirm-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-confirm-cancel {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.tab-confirm-cancel:hover {
+    background: #e5e7eb;
+}
+
+.tab-confirm-ok {
+    background: #3b82f6;
+    color: #ffffff;
+}
+
+.tab-confirm-ok:hover {
+    background: #2563eb;
+}
+
+/* 移动端选项卡优化 */
+@media (max-width: 767px) {
+    .tabs-header {
+        flex-direction: row; /* 改为并排显示 */
+        border-bottom: 2px solid #3b82f6;
+        border-right: none;
+        flex-wrap: wrap; /* 允许换行 */
+    }
+    
+    .tab-button {
+        border-radius: 0;
+        min-width: auto;
+        justify-content: center; /* 居中对齐 */
+        padding: 12px 16px; /* 缩小padding */
+        border-bottom: none;
+        flex: 1; /* 等分宽度 */
+        border-right: 1px solid #e5e7eb; /* 右边框分隔 */
+    }
+    
+    .tab-button:last-child {
+        border-right: none; /* 最后一个按钮无右边框 */
+    }
+    
+    .tab-button.active::after {
+        bottom: -2px; /* 恢复底部指示器 */
+        left: 0;
+        right: 0;
+        width: auto;
+        height: 3px;
+        top: auto;
+        border-radius: 2px 2px 0 0;
+    }
+    
+    .tabs-content {
+        padding: 16px;
+    }
+    
+    .tab-confirm-dialog {
+        margin: 20px;
+        width: calc(100% - 40px);
+        max-width: none;
+    }
+    
+    .tab-confirm-buttons {
+        flex-direction: column;
+    }
+    
+    .tab-confirm-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* 选项卡状态指示器 */
+.tab-status-indicator {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+

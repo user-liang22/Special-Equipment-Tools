@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>埋地钢制燃气管道风险评估</title>
+	<style>
+		/* 移动端兜底样式（当外链CSS无法加载时生效） */
+		html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+		body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; line-height: 1.6; color: #ffffff; }
+		.container { padding: 16px; }
+		.page-header { text-align: center; padding: 16px 12px; }
+		.page-header h1 { font-size: 22px; margin: 8px 0; color: #ffffff; }
+		.page-header p { font-size: 14px; margin: 0; color: #ffffff; }
+		.nav-menu { overflow-x: auto; border-bottom: 1px solid #e5e7eb; }
+		.nav-list { display: flex; gap: 8px; list-style: none; padding: 8px 0; margin: 0; }
+		.nav-link { display: flex; align-items: center; gap: 6px; font-size: 14px; text-decoration: none; color: #ffffff; }
+		.module-header { padding: 12px 0; }
+		.module-header h2 { margin: 0 0 8px; font-size: 18px; display: flex; align-items: center; gap: 8px; color: #ffffff; }
+		.module-header p { margin: 0; font-size: 14px; color: #ffffff; }
+		.module-content { padding: 8px 0; }
+		.button-group { position: sticky; bottom: 0; background: #fff; padding: 12px; border-top: 1px solid #e5e7eb; }
+		.calculate-btn { width: 100%; padding: 12px 16px; font-size: 16px; border-radius: 10px; border: 0; background: #2563eb; color: #fff; }
+		.results-section { margin: 12px 0; padding: 12px; border: 1px solid #e5e7eb; border-radius: 10px; display: none; }
+		
+		/* 埋地段计算器样式 */
+		.depth-calculator {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%) scale(0.9);
+			background: white;
+			border: 1px solid #e5e7eb;
+			border-radius: 12px;
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+			z-index: 9600;
+			width: 90%;
+			max-width: 500px;
+			opacity: 0;
+			visibility: hidden;
+			transition: all 0.3s ease;
+		}
+		
+		/* 移动端优化 */
+		@media (max-width: 767px) {
+			.depth-calculator {
+				width: 95vw !important;
+				max-width: 95vw !important;
+				height: 85vh !important;
+				max-height: 90vh !important;
+				min-height: 500px !important;
+				top: 5vh !important;
+				left: 2.5vw !important;
+				transform: scale(0.9) !important;
+				overflow: hidden !important;
+				box-sizing: border-box !important;
+				display: flex !important;
+				flex-direction: column !important;
+			}
+			
+			.depth-calculator.show {
+				transform: scale(1) !important;
+			}
+			
+			/* 确保计算器内容可滚动 */
+			.depth-calculator .calculator-content {
+				flex: 1 !important;
+				overflow-y: auto !important;
+				-webkit-overflow-scrolling: touch !important;
+			}
+		}
+		
+		.depth-calculator.show {
+			opacity: 1;
+			visibility: visible;
+			transform: translate(-50%, -50%) scale(1);
+		}
+		
+		.calculator-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 20px 24px;
+			border-bottom: 1px solid #e5e7eb;
+			background: #f9fafb;
+			border-radius: 12px 12px 0 0;
+		}
+		
+		.calculator-header h3 {
+			margin: 0;
+			font-size: 18px;
+			color: #111827;
+		}
+		
+		.close-btn {
+			background: none;
+			border: none;
+			font-size: 24px;
+			color: #6b7280;
+			cursor: pointer;
+			padding: 4px;
+			border-radius: 4px;
+			transition: all 0.2s ease;
+		}
+		
+		.close-btn:hover {
+			background: #f3f4f6;
+			color: #374151;
+		}
+		
+		.calculator-content {
+			padding: 24px;
+		}
+		
+		.input-group {
+			margin-bottom: 20px;
+		}
+		
+		.input-group label {
+			display: block;
+			margin-bottom: 8px;
+			font-weight: 500;
+			color: #374151;
+			font-size: 14px;
+		}
+		
+		.input-group input {
+			width: 100%;
+			padding: 12px 16px;
+			border: 1px solid #d1d5db;
+			border-radius: 8px;
+			font-size: 14px;
+			transition: border-color 0.2s ease;
+			box-sizing: border-box;
+		}
+		
+		.input-group input:focus {
+			outline: none;
+			border-color: #2563eb;
+			box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+		}
+		
+		.formula-info {
+			margin-bottom: 20px;
+		}
+		
+		.formula-info > div {
+			background: #f8fafc;
+			border: 1px solid #e2e8f0;
+			border-left: 4px solid #2563eb;
+		}
+		
+		.result-group {
+			margin-bottom: 24px;
+		}
+		
+		.result-group label {
+			display: block;
+			margin-bottom: 8px;
+			font-weight: 500;
+			color: #374151;
+			font-size: 14px;
+		}
+		
+		.result-display {
+			padding: 16px;
+			border: 1px solid #d1d5db;
+			border-radius: 8px;
+			background: #f9fafb;
+			font-size: 16px;
+			text-align: center;
+			min-height: 20px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		
+		.result-display.success {
+			background: #d1fae5;
+			border-color: #10b981;
+			color: #065f46;
+		}
+		
+		.result-display.error {
+			background: #fee2e2;
+			border-color: #ef4444;
+			color: #991b1b;
+		}
+		
+		.button-group {
+			display: flex;
+			gap: 12px;
+		}
+		
+		.calculate-btn, .apply-btn {
+			flex: 1;
+			padding: 12px 16px;
+			border: none;
+			border-radius: 8px;
+			font-size: 14px;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+		
+		.calculate-btn {
+			background: #2563eb;
+			color: white;
+		}
+		
+		.calculate-btn:hover {
+			background: #1d4ed8;
+		}
+		
+		.apply-btn {
+			background: #10b981;
+			color: white;
+		}
+		
+		.apply-btn:hover:not(:disabled) {
+			background: #059669;
+		}
+		
+		.apply-btn:disabled {
+			background: #9ca3af;
+			cursor: not-allowed;
+		}
+		
+		/* 移动端适配 */
+		@media (max-width: 768px) {
+			.depth-calculator {
+				width: 95%;
+				margin: 20px;
+			}
+			
+			.calculator-content {
+				padding: 20px;
+			}
+			
+			.button-group {
+				flex-direction: column;
+			}
+		}
+		
+		/* 钢管壁厚计算模块样式 */
+		.wall-thickness-calculator {
+			padding: 20px;
+			background: #f9fafb;
+			border-radius: 12px;
+			border: 1px solid #e5e7eb;
+			max-height: none; /* 允许自适应高度 */
+			overflow: visible; /* 确保内容可见 */
+		}
+		
+		/* 移动端钢管壁厚计算器优化 */
+		@media (max-width: 767px) {
+			.wall-thickness-calculator {
+				padding: 1rem;
+				margin: 0.5rem 0;
+				max-height: none !important;
+				overflow: visible !important;
+			}
+			
+			/* 确保模块内容区域可滚动 */
+			#module-wall-thickness .module-content {
+				max-height: none !important;
+				overflow-y: visible !important;
+				padding: 1rem !important;
+			}
+		}
+		
+		.wall-thickness-calculator .input-group {
+			margin-bottom: 20px;
+		}
+		
+		.wall-thickness-calculator .input-label {
+			display: block;
+			font-size: 14px;
+			font-weight: 500;
+			color: #374151;
+			margin-bottom: 8px;
+			line-height: 1.4;
+		}
+		
+		.wall-thickness-calculator .input-field {
+			width: 100%;
+			padding: 12px 16px;
+			border: 1px solid #d1d5db;
+			border-radius: 8px;
+			font-size: 14px;
+			background: white;
+			color: #374151;
+			transition: all 0.2s ease;
+			box-sizing: border-box;
+		}
+		
+		.wall-thickness-calculator .input-field:focus {
+			outline: none;
+			border-color: #2563eb;
+			box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+		}
+		
+		.wall-thickness-calculator .input-field:disabled {
+			background-color: #f3f4f6;
+			color: #6b7280;
+			cursor: not-allowed;
+		}
+		
+		.wall-thickness-calculator .result-section {
+			margin: 20px 0;
+			min-height: 60px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0;
+		}
+		
+		.wall-thickness-calculator .result-placeholder {
+			color: #9ca3af;
+			font-size: 14px;
+			padding: 15px;
+			background: #f9fafb;
+			border: 1px solid #e5e7eb;
+			border-radius: 8px;
+			width: 100%;
+			text-align: center;
+		}
+		
+		.wall-thickness-calculator .result-content {
+			width: 100%;
+			display: none;
+		}
+		
+		.wall-thickness-calculator .result-content.show {
+			display: block;
+			background: #d1fae5;
+			border-radius: 8px;
+			padding: 15px;
+			margin: 10px 0;
+			word-wrap: break-word;
+			overflow-wrap: break-word;
+		}
+		
+		.wall-thickness-calculator .result-title {
+			font-size: 16px;
+			font-weight: 600;
+			color: #065f46;
+			margin-bottom: 8px;
+		}
+		
+		.wall-thickness-calculator .result-formula {
+			font-size: 13px;
+			color: #047857;
+			line-height: 1.5;
+			word-break: break-all;
+		}
+		
+		.wall-thickness-calculator .action-button {
+			width: 100%;
+			border: none;
+			padding: 12px 20px;
+			border-radius: 8px;
+			font-size: 15px;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+		
+		.wall-thickness-calculator .action-button.disabled {
+			background: #9ca3af;
+			color: white;
+			cursor: not-allowed;
+		}
+		
+		.wall-thickness-calculator .action-button.enabled {
+			background: #10b981;
+			color: white;
+		}
+		
+		.wall-thickness-calculator .action-button.enabled:hover {
+			background: #059669;
+		}
+		
+		.wall-thickness-calculator .action-button.enabled:active {
+			background: #047857;
+		}
+		
+		/* 钢管泄漏量计算器集成样式 */
+		.leakage-calculator-modal {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.5);
+			z-index: 9500;
+			opacity: 0;
+			visibility: hidden;
+			transition: all 0.3s ease;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		
+		.leakage-calculator-modal.show {
+			opacity: 1;
+			visibility: visible;
+		}
+		
+		.leakage-calculator-content {
+			position: relative;
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+			width: 90%;
+			max-width: 800px;
+			max-height: 90vh;
+			overflow-y: auto;
+			box-sizing: border-box;
+		}
+		
+		/* 移动端优化 */
+		@media (max-width: 767px) {
+			.leakage-calculator-modal {
+				align-items: flex-start !important;
+				padding-top: 5vh !important;
+			}
+			
+			.leakage-calculator-content {
+				width: 95vw !important;
+				max-width: 95vw !important;
+				height: 85vh !important;
+				max-height: 90vh !important;
+				min-height: 500px !important;
+				margin: 0 !important;
+				display: flex !important;
+				flex-direction: column !important;
+				overflow: hidden !important;
+			}
+			
+			/* 确保泄漏量计算器内容可滚动 */
+			.leakage-calculator-content .leakage-calc-container {
+				flex: 1 !important;
+				overflow-y: auto !important;
+				-webkit-overflow-scrolling: touch !important;
+			}
+			
+			/* 输入框焦点时的处理 */
+			.leakage-calc-input-group input:focus,
+			.input-group input:focus {
+				position: relative;
+				z-index: 10000;
+			}
+			
+			/* 键盘打开时的样式调整 */
+			body.keyboard-open .depth-calculator,
+			body.keyboard-open .leakage-calculator-content {
+				max-height: 60vh !important; /* 适度调整高度，保证滚动空间 */
+				top: 0 !important;
+			}
+			
+			body.keyboard-open .leakage-calculator-modal {
+				align-items: flex-start !important;
+				padding-top: 0 !important;
+			}
+		}
+		
+		.leakage-calc-container {
+			padding: 24px;
+		}
+		
+		.leakage-calc-title {
+			color: #374151;
+			font-size: 18px;
+			font-weight: 700;
+			margin: 0 0 20px 0;
+			text-align: center;
+			padding-bottom: 16px;
+			border-bottom: 1px solid #e5e7eb;
+		}
+		
+		.leakage-calc-input-group {
+			margin-bottom: 16px;
+			text-align: left;
+		}
+		
+		.leakage-calc-input-group label {
+			display: block;
+			font-weight: 600;
+			color: #495057;
+			margin-bottom: 8px;
+		}
+		
+		.leakage-calc-input-group input,
+		.leakage-calc-input-group select {
+			width: 100%;
+			max-width: 100%;
+			box-sizing: border-box;
+			padding: 12px;
+			border: 2px solid #e9ecef;
+			border-radius: 8px;
+			font-size: 14px;
+			transition: border-color 0.2s;
+		}
+		
+		.leakage-calc-input-group input:focus,
+		.leakage-calc-input-group select:focus {
+			outline: none;
+			border-color: #3498db;
+			box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+		}
+		
+		.leakage-calc-btn {
+			background: linear-gradient(135deg, #10b981, #059669);
+			color: #fff;
+			border: none;
+			padding: 12px 24px;
+			border-radius: 8px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+			width: 100%;
+		}
+		
+		.leakage-calc-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(16,185,129,0.4);
+		}
+		
+		.leakage-calc-result {
+			margin-top: 16px;
+			padding: 16px;
+			background: #fff;
+			border-radius: 8px;
+			box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+			border: 1px solid #e5e7eb;
+		}
+		
+		.leakage-calc-result-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 12px;
+		}
+		
+		.leakage-calc-result-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 8px 12px;
+			background: #f8f9fa;
+			border-radius: 6px;
+		}
+		
+		.leakage-calc-result-label {
+			font-weight: 600;
+			color: #495057;
+		}
+		
+		.leakage-calc-result-value {
+			font-weight: 700;
+			color: #1e40af;
+			font-size: 18px;
+		}
+		
+		/* 响应式设计 */
+		@media (max-width: 768px) {
+			.leakage-calculator-content {
+				width: 95%;
+				margin: 20px;
+			}
+			
+			.leakage-calc-container {
+				padding: 20px;
+			}
+			
+			.leakage-calc-result-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+		
+		@media (max-width: 480px) {
+			.leakage-calc-container {
+				padding: 16px;
+			}
+			
+			.leakage-calc-input-group input,
+			.leakage-calc-input-group select {
+				padding: 10px;
+				font-size: 16px;
+			}
+		}
+	</style>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+		<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<!-- 默认选项提示框 -->
+	<div id="default-options-notice" class="default-notice-overlay">
+		<div class="default-notice-modal">
+			<div class="default-notice-header">
+				<i class="fas fa-info-circle"></i>
+				<h3>重要提示</h3>
+			</div>
+			<div class="default-notice-content">
+				<p class="notice-main-text">当前<strong>第三方破坏</strong>，<strong>腐蚀</strong>，<strong>设备及操作</strong>，<strong>管道本质安全</strong>模块所有默认选项均为「<strong>最高值选项</strong>」，<strong>失效后果评分</strong>模块所有默认选项均为「<strong>最低值选项</strong>」，请您根据实际需求核对调整，避免影响使用效果。</p>
+				<p class="notice-sub-text">补充说明：若存在多个选项默认均显示为<strong>最低值</strong>/<strong>最高值</strong>的情况，系统将自动取其中一个<strong>最低值</strong>/<strong>最高值</strong>生效，建议您手动确认最终生效选项是否符合预期。</p>
+			</div>
+			<div class="default-notice-footer">
+				<button type="button" class="notice-close-btn" onclick="closeDefaultNotice()">我知道了</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 自定义确认对话框 -->
+	<div id="confirm-dialog" class="confirm-dialog-overlay">
+		<div class="confirm-dialog-modal">
+			<div class="confirm-dialog-header">
+				<i class="fas fa-exclamation-triangle"></i>
+				<h3>确认选择</h3>
+			</div>
+			<div class="confirm-dialog-content">
+				<p class="confirm-dialog-text" id="confirm-dialog-text"></p>
+			</div>
+			<div class="confirm-dialog-footer">
+				<button type="button" class="confirm-dialog-btn confirm" onclick="confirmDialogAction()">确定</button>
+				<button type="button" class="confirm-dialog-btn cancel" onclick="closeConfirmDialog()">取消</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<!-- 页面标题 -->
+		<header class="page-header">
+			<h1>埋地钢制燃气管道风险评估 (RBI)</h1>
+			<p>基于风险评估标准的综合评分系统，包含第三方破坏、腐蚀、设备及操作、管道本质安全、失效后果等五个评估模块</p>
+		</header>
+
+		<!-- 导航菜单 -->
+		<nav class="nav-menu">
+			<ul class="nav-list">
+				<!-- 导航项将通过JavaScript动态生成 -->
+			</ul>
+		</nav>
+
+		<!-- 第三方破坏模块 -->
+		<section id="module-third_party" class="content-module active">
+			<div class="module-header">
+				<h2><i class="fas fa-users-cog"></i> 第三方破坏评估</h2>
+				<p>评估管道第三方破坏风险，包括地面活动水平、埋深、地面装置保护、占压、管道标识、巡线、公众教育等方面</p>
+			</div>
+			
+			<div class="module-content">
+				<!-- 评分内容将通过JavaScript动态生成 -->
+			</div>
+		</section>
+
+		<!-- 腐蚀模块 -->
+		<section id="module-corrosion" class="content-module">
+			<div class="module-header">
+				<h2><i class="fas fa-vial"></i> 腐蚀评估</h2>
+				<p>评估管道腐蚀风险，包括大气腐蚀、内腐蚀、土壤腐蚀等方面</p>
+			</div>
+			<div class="module-content">
+				<!-- 评分内容将通过JavaScript动态生成 -->
+			</div>
+		</section>
+
+		<!-- 设备及操作模块 -->
+		<section id="module-equipment" class="content-module">
+			<div class="module-header">
+				<h2><i class="fas fa-cogs"></i> 设备及操作评估</h2>
+				<p>评估设备运行状态和操作规范性</p>
+			</div>
+			<div class="module-content">
+				<!-- 评分内容将通过JavaScript动态生成 -->
+			</div>
+		</section>
+
+		<!-- 管道本质安全模块 -->
+		<section id="module-safety" class="content-module">
+			<div class="module-header">
+				<h2><i class="fas fa-shield-alt"></i> 管道本质安全评估</h2>
+				<p>评估管道本质安全设计和管理水平</p>
+			</div>
+			<div class="module-content">
+				<!-- 评分内容将通过JavaScript动态生成 -->
+			</div>
+		</section>
+
+		<!-- 失效后果模块 -->
+		<section id="module-consequence" class="content-module">
+			<div class="module-header">
+				<h2><i class="fas fa-exclamation-triangle"></i> 失效后果评估</h2>
+				<p>评估管道失效可能造成的影响和后果</p>
+			</div>
+			<div class="module-content">
+				<!-- 评分内容将通过JavaScript动态生成 -->
+			</div>
+		</section>
+
+		<!-- 钢管壁厚计算模块 -->
+		<section id="module-wall-thickness" class="content-module">
+			<div class="module-header">
+				<h2><i class="fas fa-ruler-combined"></i> 钢管壁厚计算</h2>
+				<p>根据设计压力、钢管外径、屈服强度等参数计算所需壁厚</p>
+			</div>
+			<div class="module-content">
+				<div class="wall-thickness-calculator">
+					<!-- P（设计压力） -->
+					<div class="input-group">
+						<label class="input-label">P（设计压力，MPa）</label>
+						<input type="number" id="pressure" class="input-field" placeholder="请输入P" step="0.1" min="0">
+					</div>
+
+					<!-- D（钢管外径） -->
+					<div class="input-group">
+						<label class="input-label">D（钢管外径，mm）</label>
+						<input type="number" id="diameter" class="input-field" placeholder="请输入D" step="0.1" min="0">
+					</div>
+
+					<!-- σs（屈服强度） -->
+					<div class="input-group">
+						<label class="input-label">σs（钢管的最低屈服强度，MPa）</label>
+						<input type="number" id="yield-strength" class="input-field" placeholder="请输入σs" step="1" min="0">
+					</div>
+
+					<!-- F（强度设计系数） -->
+					<div class="input-group">
+						<label class="input-label">F（强度设计系数）</label>
+						<input type="number" id="design-factor" class="input-field" placeholder="请输入F" step="0.1" min="0">
+					</div>
+
+					<!-- Φ（焊缝设计系数） -->
+					<div class="input-group">
+						<label class="input-label">Φ（焊缝设计系数）</label>
+						<input type="number" id="weld-factor" class="input-field" value="1" disabled>
+					</div>
+
+					<!-- 计算结果标题 -->
+					<div style="margin: 20px 0 8px 0; font-size: 14px; font-weight: 500; color: #374151;">
+						计算结果
+					</div>
+
+					<!-- 计算结果区域 -->
+					<div class="result-section" id="result-section">
+						<div class="result-placeholder" id="result-placeholder">请输入有效数值</div>
+						<div class="result-content" id="result-content">
+							<div class="result-title" id="result-title"></div>
+							<div class="result-formula" id="result-formula"></div>
+						</div>
+					</div>
+
+					<!-- 计算按钮 -->
+					<button class="action-button disabled" id="calculate-wall-thickness-btn">
+						计算壁厚
+					</button>
+				</div>
+			</div>
+		</section>
+
+		<!-- 计算按钮 -->
+		<div class="button-group">
+			<button type="button" class="calculate-btn">计算最终风险</button>
+		</div>
+
+		<!-- 结果展示 -->
+		<section class="results-section">
+			<div class="results-header">
+				<h2>评估结果汇总</h2>
+			</div>
+			<ul class="score-list">
+				<!-- 各模块分数将通过JavaScript动态生成 -->
+			</ul>
+			<div class="final-score">
+				<!-- 最终风险值将通过JavaScript动态生成 -->
+			</div>
+		</section>
+	</div>
+
+	<script src="script.js"></script>
+	<script>
+		// 关闭默认选项提示框的函数
+		function closeDefaultNotice() {
+			const notice = document.getElementById('default-options-notice');
+			if (notice) {
+				notice.style.display = 'none';
+			}
+		}
+		
+		// 确认对话框相关变量
+		let confirmDialogCallback = null;
+		
+		// 显示确认对话框
+		function showConfirmDialog(message, callback) {
+			const dialog = document.getElementById('confirm-dialog');
+			const text = document.getElementById('confirm-dialog-text');
+			if (dialog && text) {
+				text.textContent = message;
+				confirmDialogCallback = callback;
+				// 使用类名控制淡入，避免 display 切换导致闪烁
+				dialog.classList.add('show');
+				const modal = dialog.querySelector('.confirm-dialog-modal');
+				if (modal) {
+					modal.classList.remove('visible');
+					requestAnimationFrame(() => {
+						modal.classList.add('visible');
+					});
+				}
+			}
+		}
+		
+		// 关闭确认对话框
+		function closeConfirmDialog() {
+			const dialog = document.getElementById('confirm-dialog');
+			if (dialog) {
+				const modal = dialog.querySelector('.confirm-dialog-modal');
+				if (modal) modal.classList.remove('visible');
+				
+				// 清空回调
+				confirmDialogCallback = null;
+				
+				// 等待过渡结束再移除展示类
+				setTimeout(() => { 
+					dialog.classList.remove('show'); 
+				}, 150);
+			}
+		}
+		
+		// 确认对话框操作
+		function confirmDialogAction() {
+			// 保存回调但先不执行
+			const callback = confirmDialogCallback;
+			const dialog = document.getElementById('confirm-dialog');
+			
+			if (dialog) {
+				const modal = dialog.querySelector('.confirm-dialog-modal');
+				if (modal) modal.classList.remove('visible');
+				
+				// 清空回调避免重复调用
+				confirmDialogCallback = null;
+				
+				// 等待动画完成后执行回调和清理
+				setTimeout(() => {
+					dialog.classList.remove('show');
+					if (callback) {
+						// 使用 requestAnimationFrame 确保 DOM 更新完成后再执行回调
+						requestAnimationFrame(() => {
+							callback(true);
+						});
+					}
+				}, 150);
+			}
+		}
+		
+		// 移动端键盘处理
+		function handleMobileKeyboard() {
+			if (window.innerWidth <= 767) {
+				// 监听输入框焦点事件
+				document.addEventListener('focusin', function(e) {
+					if (e.target.matches('input, select, textarea')) {
+						setTimeout(() => {
+							e.target.scrollIntoView({
+								behavior: 'smooth',
+								block: 'center',
+								inline: 'nearest'
+							});
+						}, 300); // 等待键盘动画完成
+					}
+				});
+				
+				// 监听窗口大小变化
+				let initialHeight = window.innerHeight;
+				window.addEventListener('resize', function() {
+					const currentHeight = window.innerHeight;
+					const heightDiff = initialHeight - currentHeight;
+					
+					// 如果高度减少超过150px，认为是键盘弹出
+					if (heightDiff > 150) {
+						document.body.classList.add('keyboard-open');
+					} else {
+						document.body.classList.remove('keyboard-open');
+					}
+				});
+			}
+		}
+		
+		// 页面加载完成后设置事件监听器
+		document.addEventListener('DOMContentLoaded', function() {
+			// 初始化键盘处理
+			handleMobileKeyboard();
+			const notice = document.getElementById('default-options-notice');
+			if (notice) {
+				// 点击遮罩层关闭提示框
+				notice.addEventListener('click', function(e) {
+					if (e.target === notice) {
+						closeDefaultNotice();
+					}
+				});
+				
+				// ESC键关闭提示框
+				document.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape' && notice.style.display !== 'none') {
+						closeDefaultNotice();
+					}
+				});
+			}
+			
+			// 确认对话框事件监听器
+			const confirmDialog = document.getElementById('confirm-dialog');
+			if (confirmDialog) {
+				// 点击遮罩层关闭确认对话框
+				confirmDialog.addEventListener('click', function(e) {
+					if (e.target === confirmDialog) {
+						closeConfirmDialog();
+					}
+				});
+				
+				// ESC键关闭确认对话框
+				document.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape' && confirmDialog.classList.contains('show')) {
+						closeConfirmDialog();
+					}
+				});
+			}
+			
+			// 初始化钢管壁厚计算器
+			initWallThicknessCalculator();
+		});
+		
+		// 钢管壁厚计算器相关函数
+		function initWallThicknessCalculator() {
+			// 为所有输入字段添加监听器
+			const inputs = [
+				'pressure',
+				'diameter',
+				'yield-strength',
+				'design-factor'
+			];
+
+			inputs.forEach(id => {
+				const element = document.getElementById(id);
+				if (element) {
+					element.addEventListener('input', updateWallThicknessUI);
+					element.addEventListener('change', updateWallThicknessUI);
+				}
+			});
+			
+			// 为计算按钮添加事件监听器
+			const calculateBtn = document.getElementById('calculate-wall-thickness-btn');
+			if (calculateBtn) {
+				calculateBtn.addEventListener('click', calculateWallThickness);
+			}
+			
+			// 初始化UI状态
+			updateWallThicknessUI();
+		}
+		
+		// 检查所有输入是否有效
+		function checkWallThicknessInputsValid() {
+			const P = parseFloat(document.getElementById('pressure').value);
+			const D = parseFloat(document.getElementById('diameter').value);
+			const sigmaS = parseFloat(document.getElementById('yield-strength').value);
+			const F = parseFloat(document.getElementById('design-factor').value);
+
+			// 检查所有值是否有效
+			const isValid = !isNaN(P) && P > 0 && 
+						   !isNaN(D) && D > 0 && 
+						   !isNaN(sigmaS) && sigmaS > 0 && 
+						   !isNaN(F) && F > 0;
+
+			return { isValid, P, D, sigmaS, F };
+		}
+		
+		// 更新钢管壁厚计算器UI
+		function updateWallThicknessUI() {
+			const { isValid } = checkWallThicknessInputsValid();
+			const calculateBtn = document.getElementById('calculate-wall-thickness-btn');
+			
+			if (calculateBtn) {
+				if (isValid) {
+					calculateBtn.className = 'action-button enabled';
+				} else {
+					calculateBtn.className = 'action-button disabled';
+				}
+			}
+		}
+		
+		// 计算钢管壁厚
+		function calculateWallThickness() {
+			const { isValid, P, D, sigmaS, F } = checkWallThicknessInputsValid();
+			
+			if (!isValid) {
+				alert('请确保所有输入值都有效且大于0');
+				return;
+			}
+			
+			// 计算壁厚
+			const phi = 1; // 焊缝设计系数
+			const delta = (P * D) / (2 * sigmaS * F * phi);
+
+			// 显示结果
+			const resultTitle = document.getElementById('result-title');
+			const resultFormula = document.getElementById('result-formula');
+			const resultPlaceholder = document.getElementById('result-placeholder');
+			const resultContent = document.getElementById('result-content');
+			
+			if (resultTitle && resultFormula && resultPlaceholder && resultContent) {
+				resultTitle.textContent = `计算壁厚: ${delta.toFixed(6)} mm`;
+				
+				// 计算分母的值
+				const denominator = 2 * sigmaS * F * phi;
+				const numerator = P * D;
+				
+				resultFormula.textContent = `计算公式: δ = ${P} × ${D} / (2 × ${sigmaS} × ${F} × ${phi}) = ${numerator} / ${denominator} = ${delta.toFixed(6)} mm`;
+				
+				resultPlaceholder.style.display = 'none';
+				resultContent.classList.add('show');
+				
+				// 移动端自动滚动到结果区域
+				if (window.innerWidth <= 767) {
+					setTimeout(() => {
+						resultContent.scrollIntoView({
+							behavior: 'smooth',
+							block: 'nearest'
+						});
+					}, 300);
+				}
+			}
+		}
+	</script>
+</body>
+</html>
+
