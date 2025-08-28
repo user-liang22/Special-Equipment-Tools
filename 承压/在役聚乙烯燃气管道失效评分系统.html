@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>在役聚乙烯燃气管道失效评分系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+		:root { --primary:#2563eb; --bg:#f5f7fa; --radius:8px; --shadow:0 2px 6px rgba(0,0,0,.1); --transition:all .25s ease; }
+		* { box-sizing:border-box; }
+		html, body { height:100%; }
+		body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:var(--bg); color:#333; display:flex; flex-direction:column; }
+		.header { background:linear-gradient(135deg,#2c3e50 0%,var(--primary) 100%); color:#fff; padding:16px 20px; }
+		.title { margin:0; font-size:20px; }
+		.tabs { display:flex; gap:12px; padding:20px; background:linear-gradient(135deg,#f8f9fa,#e9ecef); border-radius:var(--radius); margin:20px 0; box-shadow:var(--shadow); justify-content:space-between; }
+		.tab-btn { appearance:none; border:2px solid #e5e7eb; background:#fff; color:#374151; padding:14px 28px; border-radius:12px; cursor:pointer; font-size:18px; font-weight:600; transition:all 0.3s ease; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+		/* Spread nav buttons to reduce side emptiness */
+		.tabs .tab-btn { flex:1 1 0; text-align:center; }
+		.tab-btn:hover { transform:translateY(-2px); box-shadow:0 4px 8px rgba(0,0,0,0.15); }
+		.tab-btn.active { background:linear-gradient(135deg,var(--primary),#1d4ed8); border-color:var(--primary); color:#fff; box-shadow:0 4px 12px rgba(37,99,235,0.3); }
+		.tab-btn .total-score { background:rgba(255,255,255,0.2); color:inherit; padding:3px 10px; border-radius:14px; font-size:16px; font-weight:700; margin-left:8px; }
+		
+
+		.apps { position:relative; flex:1 1 auto; min-height:0; }
+		.app { display:none; position:relative; overflow:auto; padding:16px; height:100%; }
+		.app.active { display:block; }
+		/* 通用块样式 */
+		.app .wrap { max-width:1200px; margin:0 auto; background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+		.app header { background:linear-gradient(135deg, #2c3e50, #3498db); color:#fff; padding:22px; text-align:center; }
+		.app h1 { margin:0 0 8px; font-size:24px; }
+		
+
+		.app .description { opacity:.9; font-size:14px; }
+		.app .content { padding:16px; padding-top:0; }
+		.app .main { max-width:1000px; margin:0 auto; }
+		.app .accordion { margin-bottom:16px; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+		.app .accordion-header { background:linear-gradient(135deg,#eff6ff,#ffffff); color:#4b5563; padding:14px 16px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:all 0.3s ease; border-bottom:2px solid #3b82f6; }
+		
+
+		.app .accordion-header:hover { background:linear-gradient(135deg,#dbeafe,#eff6ff); color:#1f2937; }
+		.app .accordion-header.active { background:linear-gradient(135deg,#dbeafe,#eff6ff); color:#1f2937; border-bottom-color:#2563eb; }
+		.app .accordion-title { font-weight:700; font-size:16px; display:flex; align-items:center; gap:10px; }
+		/* 统一所有得分框尺寸与样式 */
+		.app .accordion-score { 
+			background:rgba(37,99,235,0.1); 
+			color:#2563eb; 
+			border-radius:999px; 
+			font-size:14px; 
+			display:inline-flex; 
+			align-items:center; 
+			justify-content:center; 
+			min-width: 96px; 
+			height: 28px; 
+			padding: 0 12px; 
+			box-sizing: border-box; 
+		}
+		
+		/* 移动端得分背景框左右空白优化 */
+		@media (max-width: 768px) {
+			.app .accordion-score { 
+				padding: 0 4px; 
+				min-width: 90px; 
+				height: 28px; 
+				transform: translateX(10px); 
+			}
+		}
+		.app .accordion-content { background:#f9f9f9; display:none; }
+		.app .accordion-content-inner { padding:16px; }
+		/* Likelihood app 细节（保留二级标题） */
+		#likelihood-app .scoring-item { margin-bottom:12px; border:1px solid #e0e0e0; border-radius:var(--radius); background:#fff; box-shadow:0 2px 4px rgba(0,0,0,.05); overflow:hidden; }
+		#likelihood-app .item-header { background:linear-gradient(135deg,#fff,#fff); padding:12px; cursor:pointer; display:flex; align-items:center; font-weight:600; color:#3b82f6; border-bottom:1px solid #e5e7eb; transition:all 0.3s ease; }
+		
+
+		#likelihood-app .item-header:hover { background:#f8f9fa; color:#2563eb; }
+		#likelihood-app .item-header.active { background:#f8f9fa; color:#2563eb; border-bottom-color:#3b82f6; }
+		#likelihood-app .item-title { display:flex; align-items:center; gap:8px; font-size:15px; }
+		#likelihood-app .item-icon { font-size:12px; color:#3b82f6; transition:transform 0.3s ease; }
+		#likelihood-app .item-header.active .item-icon { transform:rotate(90deg); color:#2563eb; }
+		#likelihood-app .item-content { display:none; background:#fafafa; margin-bottom:0; }
+		#likelihood-app .item-content-inner { padding:12px; padding-bottom:16px; }
+		#likelihood-app .option-group { margin-bottom:12px; padding:12px; background:#fff; border-radius:8px; border:1px solid #e9ecef; }
+		#likelihood-app .option-question { font-weight:600; color:#495057; margin-bottom:10px; font-size:14px; }
+		#likelihood-app .options-container { display:block; }
+		#likelihood-app .option-select { width:100%; padding:8px 12px; background:#fff; border:2px solid #e9ecef; border-radius:8px; font-size:14px; color:#495057; cursor:pointer; transition:border-color 0.2s; }
+		#likelihood-app .option-select:focus { outline:none; border-color:#3498db; box-shadow:0 0 0 3px rgba(52,152,219,0.1); }
+		#likelihood-app .option-select:disabled { background-color:#f5f5f5; color:#999; cursor:not-allowed; opacity:0.7; }
+		#likelihood-app .option-select option { padding:8px; }
+		#likelihood-app .item-header { display:flex; }
+		/* S4类别的内容直接显示，不需要展开/折叠 */
+		#likelihood-app #item-content-S4-0 { display:block !important; background:#fafafa; }
+		
+		/* S7类别的内容直接显示，不需要展开/折叠 */
+		#likelihood-app #item-content-S7-0 { display:block !important; background:#fafafa; }
+		
+		/* S4和S7内容区域样式，参考C1 */
+		#likelihood-app #item-content-S4-0 .item-content-inner,
+		#likelihood-app #item-content-S7-0 .item-content-inner { 
+			padding: 8px 8px 0 8px; 
+		}
+		
+		/* S4类别去掉容器边框，参考C1样式 */
+		#likelihood-app .scoring-item:has(#item-content-S4-0) { 
+			margin-bottom: 4px; 
+			background: #fff; 
+			overflow: hidden; 
+			border: none; 
+			box-shadow: none; 
+		}
+		/* 兼容性方案：直接针对S4容器 */
+		#likelihood-app .scoring-item[data-s4="true"] { 
+			margin-bottom: 0; 
+			background: #fff; 
+			overflow: hidden; 
+			border: none; 
+			box-shadow: none; 
+		}
+		
+
+		
+		/* S7类别去掉容器边框 */
+		#likelihood-app .scoring-item[data-s7="true"] { 
+			margin-bottom: 0; 
+			background: #fff; 
+			overflow: hidden; 
+			border: none; 
+			box-shadow: none; 
+		}
+		
+
+
+		/* Consequence app 细节（统一样式） */
+		#consequence-app .scoring-item { margin-bottom:4px; background:#fff; overflow:hidden; }
+		#consequence-app .item-header { display:none; }
+		#consequence-app .item-content { max-height:none; overflow:visible; transition:none; background:#fafafa; }
+		#consequence-app .item-content-inner { padding:8px; }
+		
+
+		#consequence-app .option-group { margin-bottom:6px; padding:8px; background:#fff; border-radius:8px; border:1px solid #e9ecef; }
+		#consequence-app .option-question { font-weight:600; color:#495057; margin-bottom:6px; font-size:14px; }
+		#consequence-app .options-container { display:block; }
+		#consequence-app .option-select { width:100%; padding:8px 12px; background:#fff; border:2px solid #e9ecef; border-radius:8px; font-size:14px; color:#495057; cursor:pointer; transition:border-color 0.2s; }
+		#consequence-app .option-select:focus { outline:none; border-color:#3498db; box-shadow:0 0 0 3px rgba(52,152,219,0.1); }
+		#consequence-app .option-select:disabled { background-color:#f5f5f5; color:#999; cursor:not-allowed; opacity:0.7; }
+		#consequence-app .option-select option { padding:8px; }
+		
+		/* 风险计算器样式 */
+		.risk-calculator { 
+			margin-top: 20px; 
+			padding: 20px; 
+			background: linear-gradient(135deg, #f8f9fa, #e9ecef); 
+			border-radius: var(--radius); 
+			text-align: center; 
+		}
+		.calculate-risk-btn { 
+			background: linear-gradient(135deg, var(--primary), #1d4ed8); 
+			color: #fff; 
+			border: none; 
+			padding: 12px 24px; 
+			border-radius: 8px; 
+			font-size: 16px; 
+			font-weight: 600; 
+			cursor: pointer; 
+			transition: all 0.3s ease; 
+			box-shadow: 0 2px 8px rgba(37,99,235,0.3); 
+		}
+		.calculate-risk-btn:hover { 
+			transform: translateY(-2px); 
+			box-shadow: 0 4px 12px rgba(37,99,235,0.4); 
+		}
+		.risk-result { 
+			margin-top: 16px; 
+			padding: 16px; 
+			background: #fff; 
+			border-radius: 8px; 
+			box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+		}
+		.risk-info { 
+			display: grid; 
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+			gap: 12px; 
+		}
+		.risk-item { 
+			display: flex; 
+			justify-content: space-between; 
+			align-items: center; 
+			padding: 8px 12px; 
+			background: #f8f9fa; 
+			border-radius: 6px; 
+		}
+		.risk-label { 
+			font-weight: 600; 
+			color: #495057; 
+		}
+		.risk-value { 
+			font-weight: 700; 
+			color: var(--primary); 
+			font-size: 18px; 
+		}
+		.risk-level { 
+			font-weight: 700; 
+			font-size: 18px; 
+			padding: 4px 12px; 
+			border-radius: 20px; 
+		}
+		.risk-level.low { 
+			background: #d4edda; 
+			color: #155724; 
+		}
+		.risk-level.medium { 
+			background: #fff3cd; 
+			color: #856404; 
+		}
+		.risk-level.higher { 
+			background: #f8d7da; 
+			color: #721c24; 
+		}
+		.risk-level.high { 
+			background: #f5c6cb; 
+			color: #721c24; 
+		}
+		/* 隐藏数字输入框的增减按钮 */
+		#thickness::-webkit-outer-spin-button,
+		#thickness::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
+		#thickness[type=number] {
+			-moz-appearance: textfield;
+		}
+		
+		/* 隐藏所有数字输入框的增减按钮 */
+		input[type=number]::-webkit-outer-spin-button,
+		input[type=number]::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
+		input[type=number] {
+			-moz-appearance: textfield;
+		}
+		
+		/* PE管减薄压力计算页面样式 */
+		.input-group { 
+			margin-bottom: 16px; 
+			text-align: left; 
+		}
+		.input-group label { 
+			display: block; 
+			font-weight: 600; 
+			color: #495057; 
+			margin-bottom: 8px; 
+		}
+		.input-group input, 
+		.input-group select { 
+			width: 100%; 
+			padding: 12px; 
+			border: 2px solid #e9ecef; 
+			border-radius: 8px; 
+			font-size: 14px; 
+			transition: border-color 0.2s; 
+		}
+		.input-group input:focus, 
+		.input-group select:focus { 
+			outline: none; 
+			border-color: #3498db; 
+			box-shadow: 0 0 0 3px rgba(52,152,219,0.1); 
+		}
+		/* ===== Safe modal for PE管最大泄漏量计算 (isolated) ===== */
+		#pe-leak-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index: 9999; }
+		/* 禁止点击遮罩关闭：屏蔽遮罩层指针事件，仅允许模态内元素响应 */
+		#pe-leak-modal-overlay { pointer-events: none; }
+		#pe-leak-modal { pointer-events: auto; }
+		#pe-leak-modal { width: 25vw; max-height: 90vh; background:#fff; border-radius: var(--radius); box-shadow: var(--shadow); display:flex; flex-direction:column; overflow:auto; }
+		
+
+		#pe-leak-modal header { background:linear-gradient(135deg, #2c3e50, #3498db); color:#fff; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; position:relative; }
+		#pe-leak-modal header h2 { margin:0; font-size:20px; position:absolute; left:50%; transform:translateX(-50%); text-align:center; }
+		#pe-leak-modal .close-btn { appearance:none; border:none; background:transparent; color:#fff; font-size:20px; cursor:pointer; }
+		/* Enhance close button visibility */
+		#pe-leak-modal .close-btn { 
+			width: 32px; height: 32px; border-radius: 50%; 
+			background: rgba(255,255,255,0.18); 
+			border: 2px solid rgba(255,255,255,0.85); 
+			color:#fff; font-weight: 800; 
+			display:flex; align-items:center; justify-content:center; 
+			box-shadow: 0 2px 6px rgba(0,0,0,.25); 
+			transition: transform .15s ease, background .15s ease; 
+		}
+		#pe-leak-modal .close-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.06); }
+		#pe-leak-modal .body { padding:16px; }
+		#pe-leak-modal .calculator { max-width: 760px; margin: 0 auto; }
+		#pe-leak-modal .calculate-risk-btn { display:block; margin:16px auto; }
+		#pe-leak-modal .tip { text-align:center; color:#2563eb; font-weight:600; margin:8px 0 12px; }
+		
+		/* ===== 移动端适配样式 ===== */
+		@media (max-width: 768px) {
+			/* 导航栏优化 */
+			.tabs { 
+				flex-direction: row; 
+				gap: 8px; 
+				padding: 12px; 
+			}
+			.tab-btn { 
+				flex: 1; 
+				padding: 10px 8px; 
+				font-size: 14px; 
+				display: flex; 
+				flex-direction: column; 
+				align-items: center; 
+				gap: 2px; 
+				min-width: 0; 
+			}
+			.tab-btn .total-score { 
+				margin-left: 0; 
+				margin-top: 2px; 
+				font-size: 12px; 
+				padding: 1px 6px; 
+			}
+			
+			/* 标题优化 */
+			.app h1 { 
+				font-size: 20px; 
+				line-height: 1.3; 
+				word-break: keep-all; 
+				white-space: nowrap; 
+				text-align: center; 
+				margin-left: -7px; 
+			}
+			
+			/* S1-S8标题背景框高度优化 */
+			.app .accordion-header { 
+				padding: 8px 12px; 
+			}
+			
+			/* 二级标题背景框大小优化 */
+			#likelihood-app .item-header { 
+				padding: 8px 10px; 
+			}
+			
+			/* S4和S7容器边框优化 */
+			#likelihood-app .scoring-item[data-s4="true"],
+			#likelihood-app .scoring-item[data-s7="true"] { 
+				margin-bottom: 0; 
+				background: #fff; 
+				overflow: hidden; 
+				border: none; 
+				box-shadow: none; 
+			}
+			
+			/* C1-C12内容区域下方空白优化 */
+			#consequence-app .item-content-inner { 
+				padding: 8px 8px 0 8px; 
+			}
+			
+			/* PE管最大泄漏量计算弹窗适配 */
+			#pe-leak-modal { 
+				width: 95vw; 
+				max-height: 95vh; 
+				margin: 10px; 
+			}
+			#pe-leak-modal header { 
+				padding: 12px 16px; 
+			}
+			#pe-leak-modal header h2 { 
+				font-size: 18px; 
+			}
+			#pe-leak-modal .body { 
+				padding: 12px; 
+			}
+			#pe-leak-modal .input-group { 
+				margin-bottom: 12px; 
+			}
+			#pe-leak-modal .input-group label { 
+				font-size: 14px; 
+				margin-bottom: 6px; 
+			}
+			#pe-leak-modal .input-group input, 
+			#pe-leak-modal .input-group select { 
+				padding: 10px; 
+				font-size: 14px; 
+			}
+			#pe-leak-modal .calculate-risk-btn { 
+				padding: 10px 16px; 
+				font-size: 14px; 
+			}
+			
+			/* 去掉移动端按钮点击效果 */
+			.calculate-leakage-btn {
+				-webkit-tap-highlight-color: transparent;
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+				user-select: none;
+			}
+		}
+    </style>
+</head>
+<body>
+	<div class="apps">
+		<section id="likelihood-app" class="app active">
+			<div class="wrap">
+        <header>
+            <h1>在役聚乙烯燃气管道失效评分系统</h1>
+            <p class="description">根据T/CASEI 006-2022《在役聚乙烯燃气管道检验与评价》制定</p>
+        </header>
+				<div class="tabs">
+					<button id="tab-l" class="tab-btn active">失效可能性评分 <span class="total-score l-total-score" ></span></button>
+					<button id="tab-c" class="tab-btn">失效后果评分 <span class="total-score c-total-score" ></span></button>
+				</div>
+				<div class="content"><div class="main" data-role="l-accordionContainer"></div></div>
+				<div class="risk-calculator">
+					<button id="calculate-risk-btn" class="calculate-risk-btn">计算风险等级</button>
+					<div id="risk-result" class="risk-result" style="display:none;">
+						<div class="risk-info">
+							<div class="risk-item">
+								<span class="risk-label">失效可能性得分 (S):</span>
+								<span id="likelihood-score" class="risk-value">0</span>
+							</div>
+							<div class="risk-item">
+								<span class="risk-label">失效后果得分 (C):</span>
+								<span id="consequence-score" class="risk-value">0</span>
+							</div>
+							<div class="risk-item">
+								<span class="risk-label">风险值 (R = S × C):</span>
+								<span id="risk-value" class="risk-value">0</span>
+							</div>
+							<div class="risk-item">
+								<span class="risk-label">风险等级:</span>
+								<span id="risk-level" class="risk-level">低风险</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section id="consequence-app" class="app">
+			<div class="wrap">
+				<header>
+					<h1>在役聚乙烯燃气管道失效评分系统</h1>
+					<p class="description">根据T/CASEI 006-2022《在役聚乙烯燃气管道检验与评价》制定</p>
+				</header>
+				<div class="tabs">
+					<button id="tab-l" class="tab-btn">失效可能性评分 <span class="total-score l-total-score" ></span></button>
+					<button id="tab-c" class="tab-btn active">失效后果评分 <span class="total-score c-total-score" ></span></button>
+				</div>
+				<div class="content"><div class="main" data-role="c-accordionContainer"></div></div>
+				<div class="risk-calculator">
+					<button id="calculate-risk-btn-c" class="calculate-risk-btn">计算风险等级</button>
+					<div id="risk-result-c" class="risk-result" style="display:none;">
+						<div class="risk-info">
+							<div class="risk-item">
+								<span class="risk-label">失效可能性得分 (S):</span>
+								<span id="likelihood-score-c" class="risk-value">0</span>
+							</div>
+							<div class="risk-item">
+								<span class="risk-label">失效后果得分 (C):</span>
+								<span id="consequence-score-c" class="risk-value">0</span>
+							</div>
+							<div class="risk-item">
+								<span class="risk-label">风险值 (R = S × C):</span>
+								<span id="risk-value-c" class="risk-value">0</span>
+							</div>
+							<div class="risk-item">
+								<span class="risk-label">风险等级:</span>
+								<span id="risk-level-c" class="risk-level">低风险</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	<script>
+		// 全局变量，跟踪是否已经计算过风险等级
+		window.hasCalculatedRisk = false;
+		// 提前定义多个位置会用到的文本更新工具，确保初始化阶段可用
+		if (typeof window.setTextAll !== 'function') {
+			function setTextAll(selector, text) {
+				var nodes = document.querySelectorAll(selector);
+				for (var i = 0; i < nodes.length; i++) {
+					nodes[i].textContent = text;
+				}
+			}
+		}
+		
+		// 通用：强制正数（禁止输入 <= 0），用于数值输入框的 oninput
+		function enforcePositive(input){
+			if(!input) return;
+			var raw = String(input.value || '');
+			// 允许中间态：''、'0'、'0.'，便于继续输入 0.1
+			if(raw === '' || raw === '0' || raw === '0.') return;
+			// 去掉前导负号
+			if(raw.startsWith('-')){ input.value = raw.replace('-', ''); return; }
+			var v = parseFloat(raw);
+			if(isNaN(v) || v < 0){ input.value = ''; }
+		}
+		
+		// Tab switching
+		function activateApp(which){
+			const appL=document.getElementById('likelihood-app');
+			const appC=document.getElementById('consequence-app');
+			const allTabL=document.querySelectorAll('#tab-l');
+			const allTabC=document.querySelectorAll('#tab-c');
+			// 隐藏所有页面（做空值保护）
+			if(appL) appL.classList.remove('active');
+			if(appC) appC.classList.remove('active');
+			// 移除所有按钮的active状态
+			allTabL.forEach(tab=>tab.classList.remove('active'));
+			allTabC.forEach(tab=>tab.classList.remove('active'));
+			if(which==='l'){
+				if(appL) appL.classList.add('active');
+				allTabL.forEach(tab=>tab.classList.add('active'));
+				collapseAllTitles('likelihood-app');
+				// 如果已经计算过风险等级，则同步显示风险结果
+				if(window.hasCalculatedRisk) {
+					syncRiskResultsWithoutDisplay();
+				}
+			} else if(which==='c'){
+				if(appC) appC.classList.add('active');
+				allTabC.forEach(tab=>tab.classList.add('active'));
+				collapseAllTitles('consequence-app');
+				// 如果已经计算过风险等级，则同步显示风险结果
+				if(window.hasCalculatedRisk) {
+					syncRiskResultsWithoutDisplay();
+				}
+			}
+		}
+		
+		// 折叠所有标题的函数
+		function collapseAllTitles(appId){
+			const app = document.getElementById(appId);
+			
+			// 折叠所有一级标题
+			app.querySelectorAll('.accordion-header').forEach(header => {
+				header.classList.remove('active');
+				const categoryId = header.getAttribute('data-category');
+				const content = app.querySelector(`#content-${categoryId}`);
+				if(content) {
+					content.style.display = 'none';
+				}
+			});
+			
+			// 折叠所有二级标题
+			app.querySelectorAll('.item-header').forEach(itemHeader => {
+				itemHeader.classList.remove('active');
+				const categoryId = itemHeader.getAttribute('data-category');
+				const itemIndex = itemHeader.getAttribute('data-item');
+				const itemContent = app.querySelector(`#item-content-${categoryId}-${itemIndex}`);
+				if(itemContent) {
+					itemContent.classList.remove('expanded');
+					itemContent.style.display = 'none';
+				}
+			});
+			
+			// 确保S4内容在第一个页面仍然可见
+			if(appId === 'likelihood-app') {
+				const s4Content = app.querySelector('#item-content-S4-0');
+				if(s4Content) {
+					s4Content.style.display = 'block';
+				}
+			}
+		}
+		
+		// 为所有导航按钮添加事件监听器
+		document.addEventListener('DOMContentLoaded', function() {
+			document.querySelectorAll('#tab-l').forEach(tab=>tab.addEventListener('click',()=>activateApp('l')));
+			document.querySelectorAll('#tab-c').forEach(tab=>tab.addEventListener('click',()=>activateApp('c')));
+			
+			// 添加风险计算按钮事件监听器
+			const calculateRiskBtn = document.getElementById('calculate-risk-btn');
+			if(calculateRiskBtn) {
+				calculateRiskBtn.addEventListener('click', calculateRiskLevel);
+			}
+			
+			// 添加第二个页面的风险计算按钮事件监听器
+			const calculateRiskBtnC = document.getElementById('calculate-risk-btn-c');
+			if(calculateRiskBtnC) {
+				calculateRiskBtnC.addEventListener('click', calculateRiskLevelC);
+			}
+			
+			// 添加泄漏量计算按钮事件监听器
+			const calculateLeakageBtn = document.getElementById('calculate-leakage-btn');
+			if(calculateLeakageBtn) {
+				calculateLeakageBtn.addEventListener('click', calculateMaxLeakage);
+			}
+			
+			// 为泄漏量调整值相关的下拉选择框添加事件监听器
+			const monitoringSystem = document.getElementById('monitoring-system');
+			const cutoffSystem = document.getElementById('cutoff-system');
+			const fireSystem = document.getElementById('fire-system');
+			const emergencyPlan = document.getElementById('emergency-plan');
+			
+			if(monitoringSystem) monitoringSystem.addEventListener('change', updateAdjustmentDisplay);
+			if(cutoffSystem) cutoffSystem.addEventListener('change', updateAdjustmentDisplay);
+			if(fireSystem) fireSystem.addEventListener('change', updateAdjustmentDisplay);
+			if(emergencyPlan) emergencyPlan.addEventListener('change', updateAdjustmentDisplay);
+			
+			// 初始化显示
+			updateAdjustmentDisplay();
+		});
+		
+		// 计算失效可能性总分
+		function calculateLikelihoodTotalScore() {
+			const appL = document.getElementById('likelihood-app');
+			if (!appL || !window.l_userSelections) return 0;
+			
+			let total = 0;
+			for(const cat in window.l_userSelections){
+				for(const i in window.l_userSelections[cat]){
+					for(const j in window.l_userSelections[cat][i]){
+						total += window.l_userSelections[cat][i][j].score;
+					}
+				}
+			}
+			return total;
+		}
+		
+		// 计算失效后果总分
+		function calculateConsequenceTotalScore() {
+			const appC = document.getElementById('consequence-app');
+			if (!appC || !window.c_userSelections) return 0;
+			
+			let total = 0;
+			for(const cat in window.c_userSelections){
+				for(const i in window.c_userSelections[cat]){
+					for(const j in window.c_userSelections[cat][i]){
+						total += window.c_userSelections[cat][i][j].score;
+					}
+				}
+			}
+			return total;
+		}
+		
+		// 同步风险结果显示（不显示结果区域）
+		function syncRiskResultsWithoutDisplay() {
+			const likelihoodScore = calculateLikelihoodTotalScore();
+			const consequenceScore = calculateConsequenceTotalScore();
+			const riskValue = likelihoodScore * consequenceScore;
+			
+			// 根据风险值确定风险等级
+			let riskLevel = '';
+			let riskClass = '';
+			
+			if(riskValue >= 0 && riskValue < 3600) {
+				riskLevel = '低风险';
+				riskClass = 'low';
+			} else if(riskValue >= 3600 && riskValue < 7800) {
+				riskLevel = '中风险';
+				riskClass = 'medium';
+			} else if(riskValue >= 7800 && riskValue < 12600) {
+				riskLevel = '较高风险';
+				riskClass = 'higher';
+			} else if(riskValue >= 12600 && riskValue <= 15000) {
+				riskLevel = '高风险';
+				riskClass = 'high';
+			} else {
+				riskLevel = '超出范围';
+				riskClass = 'high';
+			}
+			
+			// 更新失效可能性评分页面的风险结果
+			const likelihoodScoreElement = document.getElementById('likelihood-score');
+			const consequenceScoreElement = document.getElementById('consequence-score');
+			const riskValueElement = document.getElementById('risk-value');
+			const riskLevelElement = document.getElementById('risk-level');
+			
+			if(likelihoodScoreElement) likelihoodScoreElement.textContent = likelihoodScore;
+			if(consequenceScoreElement) consequenceScoreElement.textContent = consequenceScore;
+			if(riskValueElement) riskValueElement.textContent = riskValue;
+			if(riskLevelElement) {
+				riskLevelElement.textContent = riskLevel;
+				riskLevelElement.className = `risk-level ${riskClass}`;
+			}
+			
+			// 更新失效后果评分页面的风险结果
+			const likelihoodScoreCElement = document.getElementById('likelihood-score-c');
+			const consequenceScoreCElement = document.getElementById('consequence-score-c');
+			const riskValueCElement = document.getElementById('risk-value-c');
+			const riskLevelCElement = document.getElementById('risk-level-c');
+			
+			if(likelihoodScoreCElement) likelihoodScoreCElement.textContent = likelihoodScore;
+			if(consequenceScoreCElement) consequenceScoreCElement.textContent = consequenceScore;
+			if(riskValueCElement) riskValueCElement.textContent = riskValue;
+			if(riskLevelCElement) {
+				riskLevelCElement.textContent = riskLevel;
+				riskLevelCElement.className = `risk-level ${riskClass}`;
+			}
+		}
+		
+		// 同步风险结果显示
+		function syncRiskResults() {
+			const likelihoodScore = calculateLikelihoodTotalScore();
+			const consequenceScore = calculateConsequenceTotalScore();
+			const riskValue = likelihoodScore * consequenceScore;
+			
+			// 更新导航栏得分显示
+			setTextAll('.l-total-score', likelihoodScore);
+			setTextAll('.c-total-score', consequenceScore);
+			
+			// 根据风险值确定风险等级
+			let riskLevel = '';
+			let riskClass = '';
+			
+			if(riskValue >= 0 && riskValue < 3600) {
+				riskLevel = '低风险';
+				riskClass = 'low';
+			} else if(riskValue >= 3600 && riskValue < 7800) {
+				riskLevel = '中风险';
+				riskClass = 'medium';
+			} else if(riskValue >= 7800 && riskValue < 12600) {
+				riskLevel = '较高风险';
+				riskClass = 'higher';
+			} else if(riskValue >= 12600 && riskValue <= 15000) {
+				riskLevel = '高风险';
+				riskClass = 'high';
+			} else {
+				riskLevel = '超出范围';
+				riskClass = 'high';
+			}
+			
+			// 更新失效可能性评分页面的风险结果
+			const likelihoodScoreElement = document.getElementById('likelihood-score');
+			const consequenceScoreElement = document.getElementById('consequence-score');
+			const riskValueElement = document.getElementById('risk-value');
+			const riskLevelElement = document.getElementById('risk-level');
+			const riskResultElement = document.getElementById('risk-result');
+			
+			if(likelihoodScoreElement) likelihoodScoreElement.textContent = likelihoodScore;
+			if(consequenceScoreElement) consequenceScoreElement.textContent = consequenceScore;
+			if(riskValueElement) riskValueElement.textContent = riskValue;
+			if(riskLevelElement) {
+				riskLevelElement.textContent = riskLevel;
+				riskLevelElement.className = `risk-level ${riskClass}`;
+			}
+			
+			// 更新失效后果评分页面的风险结果
+			const likelihoodScoreCElement = document.getElementById('likelihood-score-c');
+			const consequenceScoreCElement = document.getElementById('consequence-score-c');
+			const riskValueCElement = document.getElementById('risk-value-c');
+			const riskLevelCElement = document.getElementById('risk-level-c');
+			const riskResultCElement = document.getElementById('risk-result-c');
+			
+			if(likelihoodScoreCElement) likelihoodScoreCElement.textContent = likelihoodScore;
+			if(consequenceScoreCElement) consequenceScoreCElement.textContent = consequenceScore;
+			if(riskValueCElement) riskValueElement.textContent = riskValue;
+			if(riskLevelCElement) {
+				riskLevelCElement.textContent = riskLevel;
+				riskLevelCElement.className = `risk-level ${riskClass}`;
+			}
+			
+			// 显示风险结果（如果已经计算过）
+			if(riskResultElement) {
+				riskResultElement.style.display = 'block';
+			}
+			if(riskResultCElement) {
+				riskResultCElement.style.display = 'block';
+			}
+		}
+		
+		// 风险等级计算函数
+		function calculateRiskLevel() {
+			// 设置已计算标志
+			window.hasCalculatedRisk = true;
+			
+			// 同步显示风险结果
+			syncRiskResults();
+			
+			// 显示失效可能性评分页面的风险结果
+			const riskResultElement = document.getElementById('risk-result');
+			if(riskResultElement) riskResultElement.style.display = 'block';
+		}
+		
+		// 第二个页面的风险等级计算函数
+		function calculateRiskLevelC() {
+			// 设置已计算标志
+			window.hasCalculatedRisk = true;
+			
+			// 同步显示风险结果
+			syncRiskResults();
+			
+			// 显示失效后果评分页面的风险结果
+			const riskResultCElement = document.getElementById('risk-result-c');
+			if(riskResultCElement) riskResultCElement.style.display = 'block';
+		}
+		
+		// 显示红色边框并跳转到元素
+		function showRedBorder(elementId) {
+			const element = document.getElementById(elementId);
+			if(element) {
+				// 设置红色边框
+				element.style.border = '2px solid #ef4444';
+				element.style.boxShadow = '0 0 0 1px #ef4444';
+				
+				// 跳转到元素
+				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				
+				// 聚焦到元素
+				element.focus();
+			}
+		}
+		
+		// 清除所有红色边框
+		function clearAllRedBorders() {
+			const elements = [
+				'pipe-pressure-m',
+				'medium-temperature-m', 
+				'pipe-outer-diameter-m',
+				'pipe-wall-thickness-m',
+				'monitoring-system-m',
+				'cutoff-system-m',
+				'fire-system-m',
+				'emergency-plan-m'
+			];
+			
+			elements.forEach(id => {
+				const element = document.getElementById(id);
+				if(element) {
+					element.style.border = '';
+					element.style.boxShadow = '';
+				}
+			});
+		}
+		
+		// SDR验证函数
+		function validateSDR(input) {
+			// 限制小数点后两位
+			if(input.value.includes('.') && input.value.split('.')[1].length > 2) {
+				input.value = input.value.slice(0, input.value.indexOf('.') + 3);
+			}
+			
+			// 验证SDR范围
+			const errorElement = document.getElementById('wall-thickness-error-m');
+			
+			// 如果输入为空，隐藏错误信息
+			if (!input.value || input.value === '') {
+				errorElement.style.display = 'none';
+				return;
+			}
+			
+			const sdr = parseFloat(input.value);
+			
+			// 检查是否为有效数字
+			if (isNaN(sdr)) {
+				errorElement.style.display = 'none';
+				return;
+			}
+			
+			if (sdr < 6 || sdr > 41) {
+				errorElement.style.display = 'inline';
+			} else {
+				errorElement.style.display = 'none';
+			}
+		}
+		
+		// 厚度验证函数
+		function validateThickness(input) {
+			// 限制小数点后两位
+			if(input.value.includes('.') && input.value.split('.')[1].length > 2) {
+				input.value = input.value.slice(0, input.value.indexOf('.') + 3);
+			}
+			
+			// 验证厚度范围
+			const errorElement = document.getElementById('thickness-error');
+			
+			// 如果输入为空，隐藏错误信息
+			if (!input.value || input.value === '') {
+				errorElement.style.display = 'none';
+				return;
+			}
+			
+			const thickness = parseFloat(input.value);
+			
+			// 检查是否为有效数字
+			if (isNaN(thickness)) {
+				errorElement.style.display = 'none';
+				return;
+			}
+			
+			if (thickness < 2.3 || thickness > 57.3) {
+				errorElement.style.display = 'inline';
+			} else {
+				errorElement.style.display = 'none';
+			}
+		}
+		
+		// 显示厚度错误信息
+		function showThicknessError() {
+			const errorElement = document.getElementById('thickness-error');
+			errorElement.style.display = 'inline';
+		}
+		
+		// 自动更新最高工作压力选项
+		function updateMaxPressureOption(calculatedPressure) {
+			// 找到所有最高工作压力的下拉框
+			const maxPressureSelects = document.querySelectorAll('.option-select[data-category="C3"]');
+			
+			let selectedOption = '';
+			if (calculatedPressure < 0.1) {
+				selectedOption = '<0.1 MPa';
+			} else if (calculatedPressure >= 0.1 && calculatedPressure <= 0.4) {
+				selectedOption = '0.1 MPa≤最高工作压力≤0.4MPa';
+			} else if (calculatedPressure > 0.4 && calculatedPressure <= 0.8) {
+				selectedOption = '0.4 MPa<最高工作压力≤0.8 Mpa';
+			} else {
+				selectedOption = '0.4 MPa<最高工作压力≤0.8 Mpa'; // 超出范围时选择最高分选项
+			}
+			
+			// 更新所有相关的下拉框
+			maxPressureSelects.forEach(select => {
+				for (let i = 0; i < select.options.length; i++) {
+					if (select.options[i].value === selectedOption) {
+						select.selectedIndex = i;
+						// 触发change事件以更新用户选择数据
+						select.dispatchEvent(new Event('change'));
+						break;
+					}
+				}
+			});
+		}
+		
+		// 自动更新介质最大泄漏量选项
+		function updateMaxLeakageOption(calculatedLeakage) {
+			// 找到所有介质最大泄漏量的下拉框
+			const maxLeakageSelects = document.querySelectorAll('.option-select[data-category="C4"]');
+			
+			let selectedOption = '';
+			if (calculatedLeakage <= 1) {
+				selectedOption = '≤1m³';
+			} else if (calculatedLeakage > 1 && calculatedLeakage <= 10) {
+				selectedOption = 'Є(1m³,10m³]';
+			} else if (calculatedLeakage > 10 && calculatedLeakage <= 100) {
+				selectedOption = 'Є(10 m³，100m³]';
+			} else if (calculatedLeakage > 100 && calculatedLeakage <= 500) {
+				selectedOption = 'Є(100m³，500m³]';
+			} else if (calculatedLeakage > 500) {
+				selectedOption = '>500m³';
+			} else {
+				selectedOption = '>500m³'; // 超出范围时选择最高分选项
+			}
+			
+			// 更新所有相关的下拉框
+			maxLeakageSelects.forEach(select => {
+				for (let i = 0; i < select.options.length; i++) {
+					if (select.options[i].value === selectedOption) {
+						select.selectedIndex = i;
+						// 触发change事件以更新用户选择数据
+						select.dispatchEvent(new Event('change'));
+						break;
+					}
+				}
+			});
+		}
+		
+		// 最大泄漏量计算函数
+		function calculateMaxLeakage() {
+			// 获取输入值
+			const pipePressure = parseFloat(document.getElementById('pipe-pressure').value);
+			const celsiusTemperature = parseFloat(document.getElementById('medium-temperature').value);
+			const pipeOuterDiameter = parseFloat(document.getElementById('pipe-outer-diameter').value);
+			const pipeWallThickness = parseFloat(document.getElementById('pipe-wall-thickness').value);
+			const monitoringSystem = document.getElementById('monitoring-system').value;
+			const cutoffSystem = document.getElementById('cutoff-system').value;
+			const fireSystem = document.getElementById('fire-system').value;
+			const emergencyPlan = document.getElementById('emergency-plan').value;
+			
+			// 验证输入
+			if (!pipePressure || !celsiusTemperature || !pipeOuterDiameter || !pipeWallThickness || !monitoringSystem || !cutoffSystem || !fireSystem || !emergencyPlan) {
+				// 如果管道壁厚为空，显示错误信息
+				if (!pipeWallThickness) {
+					showWallThicknessError();
+				}
+				// 如果管道内介质压力为空或为负数，显示错误信息
+				if (!pipePressure || pipePressure < 0) {
+					const errorElement = document.getElementById('pipe-pressure-error');
+					errorElement.textContent = '压力值不能为负数';
+					errorElement.style.display = 'inline';
+				}
+				return;
+			}
+			
+			// 验证管道壁厚范围
+			if (pipeWallThickness < 2.3 || pipeWallThickness > 57.3) {
+				return;
+			}
+			
+			// 将摄氏度转换为开尔文温度：K = °C + 273.15
+			const mediumTemperature = celsiusTemperature + 273.15;
+			
+			// 根据监测系统类型和切断系统类型计算泄漏时间（较大规模泄漏：泄漏面积>500mm²）
+			let leakTime = 0;
+			// 根据泄漏时间估算表格的较大规模泄漏值
+			if (monitoringSystem === 'A' && cutoffSystem === 'A') {
+				leakTime = 300; // 300秒
+			} else if (monitoringSystem === 'A' && cutoffSystem === 'B') {
+				leakTime = 600; // 600秒
+			} else if (monitoringSystem === 'A' && cutoffSystem === 'C') {
+				leakTime = 1200; // 1200秒
+			} else if (monitoringSystem === 'B' && (cutoffSystem === 'A' || cutoffSystem === 'B')) {
+				leakTime = 1200; // 1200秒
+			} else if (monitoringSystem === 'B' && cutoffSystem === 'C') {
+				leakTime = 1200; // 1200秒
+			} else if (monitoringSystem === 'C' && (cutoffSystem === 'A' || cutoffSystem === 'B' || cutoffSystem === 'C')) {
+				leakTime = 1200; // 1200秒
+			}
+			
+			// 计算泄漏量调整值
+			let adjustmentPercentage = 0;
+			
+			// 1. 按照监测与切断系统调整泄漏量（表E.4）
+			let monitoringCutoffAdjustment = 0;
+			if (monitoringSystem === 'A' && cutoffSystem === 'A') {
+				monitoringCutoffAdjustment = 25; // 减小25%
+			} else if (monitoringSystem === 'A' && cutoffSystem === 'B') {
+				monitoringCutoffAdjustment = 20; // 减小20%
+			} else if ((monitoringSystem === 'A' || monitoringSystem === 'B') && cutoffSystem === 'C') {
+				monitoringCutoffAdjustment = 10; // 减小10%
+			} else if (monitoringSystem === 'B' && cutoffSystem === 'C') {
+				monitoringCutoffAdjustment = 15; // 减小15%
+			} else if (monitoringSystem === 'C' && cutoffSystem === 'C') {
+				monitoringCutoffAdjustment = 0; // 不调整
+			}
+			
+			// 2. 按照消防系统调整泄漏量（表E.5）
+			let fireSystemAdjustment = 0;
+			if (fireSystem === 'emergency') {
+				fireSystemAdjustment = 25; // 减小25%
+			} else if (fireSystem === 'sprinkler') {
+				fireSystemAdjustment = 20; // 减小20%
+			} else if (fireSystem === 'foam') {
+				fireSystemAdjustment = 15; // 减小15%
+			} else if (fireSystem === 'water-monitor') {
+				fireSystemAdjustment = 5; // 减小5%
+			}
+			
+			// 3. 按照应急预案调整泄漏量（表E.6）
+			let emergencyPlanAdjustment = 0;
+			if (emergencyPlan === 'complete') {
+				emergencyPlanAdjustment = 20; // 减小20%
+			} else if (emergencyPlan === 'incomplete') {
+				emergencyPlanAdjustment = 10; // 减小10%
+			} else if (emergencyPlan === 'none') {
+				emergencyPlanAdjustment = 0; // 不调整
+			}
+			
+			// 计算总调整百分比（取三个部分的最大值）
+			adjustmentPercentage = Math.max(monitoringCutoffAdjustment, fireSystemAdjustment, emergencyPlanAdjustment);
+			
+			// 更新最终调整值显示
+			document.getElementById('final-adjustment-display').textContent = adjustmentPercentage + '%';
+			
+			// 计算最大泄漏量
+			// 1. 计算介质泄露速率 Wg
+			let wg = 0;
+			if (pipePressure < 0.183848188) {
+				// 计算管道内径 D = De - 2T
+				const pipeInnerDiameter = pipeOuterDiameter - 2 * pipeWallThickness;
+				
+				// 计算泄露面积 Sk = (D/2) × 3.14
+				const leakArea = (pipeInnerDiameter / 2) * 3.14;
+				
+				// 计算 W2 = 0.00476 × Sk × P
+				const w2 = 0.00476 * leakArea * pipePressure;
+				
+				// 计算 X3 = 0.1 / P
+				const x3 = 0.1 / pipePressure;
+				
+				// 计算 Y3 = 1 - X3^((E2-1)/E2)，其中 E2 = 1.31
+				const e2 = 1.31;
+				const y3 = 1 - Math.pow(x3, (e2 - 1) / e2);
+				
+				// 计算 W3 = (X3^(2/E2)) × E2 × K2 × 2 × E2 / (J2 × C × (E2-1))
+				// 其中 K2 = 32.2, J2 = 8.314, C = 介质温度(开尔文)
+				const k2 = 32.2;
+				const j2 = 8.314;
+				const w3 = Math.pow(x3, 2 / e2) * e2 * k2 * 2 * e2 / (j2 * mediumTemperature * (e2 - 1));
+				
+				// 计算 Wg = W2 × √(W3 × Y3)
+				wg = w2 * Math.sqrt(w3 * y3);
+			} else {
+				// 计算管道内径 D = De - 2T
+				const pipeInnerDiameter = pipeOuterDiameter - 2 * pipeWallThickness;
+				
+				// 计算泄露面积 Sk = (D/2) × 3.14
+				const leakArea = (pipeInnerDiameter / 2) * 3.14;
+				
+				// 计算 W2 = 0.00476 × Sk × P
+				const w2 = 0.00476 * leakArea * pipePressure;
+				
+				// 计算 X2 = 1.31 × 20 × 32.2 / (8.314 × C)
+				const x2 = 1.31 * 20 * 32.2 / (8.314 * mediumTemperature);
+				
+				// 计算 Y2 = (2/(1.31+1))^((1.31+1)/(1.31-1))
+				const e2 = 1.31;
+				const y2 = Math.pow(2 / (e2 + 1), (e2 + 1) / (e2 - 1));
+				
+				// 计算 Wg = W2 × √(X2 × Y2)
+				wg = w2 * Math.sqrt(x2 * y2);
+			}
+			
+			// 2. 计算泄漏量 Q = Wg × t
+			const q = wg * leakTime;
+			
+			// 3. 计算可能的介质最大泄漏量 V = Q × (1 - m%) / 0.714
+			const maxLeakage = q * (1 - adjustmentPercentage / 100) / 0.714;
+			
+			// 仅显示结果
+			const leakageResult = document.getElementById('leakage-result');
+			leakageResult.innerHTML = `
+				<div class="risk-info">
+					<div class="risk-item">
+						<span class="risk-label">最大泄漏量 (m³):</span>
+						<span id="max-leakage" class="risk-value">${maxLeakage.toFixed(4)}</span>
+					</div>
+				</div>
+			`;
+			
+			// 显示结果
+			document.getElementById('leakage-result').style.display = 'block';
+			
+			// 自动更新失效后果评分页面的介质最大泄漏量选项
+			updateMaxLeakageOption(maxLeakage);
+		}
+
+		// ========== Likelihood app (index1) ==========
+		(function(){
+			const root = document.getElementById('likelihood-app');
+			const container = root.querySelector('[data-role="l-accordionContainer"]');
+			const l_userSelections = {};
+			// 将用户选择数据设置为全局变量
+			window.l_userSelections = l_userSelections;
+			const l_scoringData = [
+				{"id":"S1","name":"资料审查","maxScore":8,"items":[
+					{"name":"安全管理资料","maxScore":4,"options":[
+						{"text":"有无使用登记证","score":{"无":2,"有":0}},
+						{"text":"有无安全管理规章制度与安全操作规则","score":{"有":0,"无":2}}
+					]},
+					{"name":"技术档案及运行状况资料","maxScore":4,"options":[
+						{"text":"作业人员是否持证上岗","score":{"是":0,"否":1}},
+						{"text":"有无定期检验报告","score":{"有":0,"无":1}},
+						{"text":"有无设计文件资料","score":{"有":0,"无":1}},
+						{"text":"日常运行及维修维护记录齐全、无或欠缺","score":{"齐全":0,"无或欠缺":1}}
+					]}
+				]},
+				{"id":"S2","name":"宏观检查","maxScore":20,"items":[
+					{"name":"位置与走向","maxScore":2,"options":[{"text":"管道位置与走向是否清晰","score":{"是":0,"否":2}}]},
+					{"name":"地面标志","maxScore":2,"options":[{"text":"地面标志齐全、无或欠缺","score":{"齐全":0,"无或欠缺":2}}]},
+					{"name":"管道探露或变形","maxScore":1,"options":[{"text":"是否存在地表滑坡、沉降、洪涝水毁等造成管道裸露或变形","score":{"是":1,"否":0}}]},
+					{"name":"管道元件","maxScore":1,"options":[{"text":"阀门、法兰、钢塑转换接头等管道元件的是否完好","score":{"是":0,"否":1}}]},
+					{"name":"穿越管道","maxScore":2,"options":[{"text":"穿越管道符合要求或存在隐患","score":{"符合要求":0,"存在隐患":2}}]},
+					{"name":"阀门井","maxScore":1,"options":[{"text":"是否定期排放积水以及护盖、排水装置是否完好","score":{"是":0,"否":1}}]},
+					{"name":"管道埋深","maxScore":4,"options":[{"text":"管道埋深","score":{"小于0.4m":4,"0.4~1.0m":2,"大于1.0m":1}}]},
+					{"name":"地面泄漏检查","maxScore":4,"options":[{"text":"地面泄漏检查结果","score":{"发现一级泄漏":4,"发现二级泄漏":3,"发现三级泄漏":2,"发现四级泄漏":1,"未发现泄漏":0}}]},
+					{"name":"安全保护装置","maxScore":2,"options":[{"text":"安全保护装置是否完好","score":{"是":0,"否":2}}]},
+					{"name":"地面保护设施","maxScore":1,"options":[{"text":"地面保护设施是否完好","score":{"是":0,"否":1}}]}
+				]},
+				{"id":"S3","name":"敷设环境调查","maxScore":12,"items":[
+					{"name":"地面活动频繁程度","maxScore":4,"options":[{"text":"地面活动频繁程度","score":{"铁路或公路主干道":4,"普通公路":3,"人行路":2,"绿化带、小区":1}}]},
+					{"name":"管道裸露","maxScore":2,"options":[{"text":"是否存在管道裸露情况","score":{"是":2,"否":0}}]},
+					{"name":"与构筑物或相邻管道的净距","maxScore":2,"options":[{"text":"与构筑物或相邻管道的净距是否符合要求","score":{"是":0,"否":2}}]},
+					{"name":"第三方施工活动","maxScore":2,"options":[{"text":"管道上方是否有第三方施工活动","score":{"是":2,"否":0}}]},
+					{"name":"地质条件","maxScore":2,"options":[{"text":"是否经过不良地质条件","score":{"是":2,"否":0}}]}
+				]},
+				{"id":"S4","name":"管道示踪系统完整性检查","maxScore":4,"items":[{"name":"管道示踪系统完整性","maxScore":4,"options":[{"text":"管道示踪系统完整性","score":{"完整有效":0,"无或部分缺失":4}}]}]},
+				{"id":"S5","name":"直接检验","maxScore":12,"items":[
+					{"name":"生物及深根植物","maxScore":2,"options":[{"text":"是否存在生物损坏情况","score":{"是":1,"否":0}},{"text":"是否存在深根植物破坏情况","score":{"是":1,"否":0}}]},
+					{"name":"管体状况","maxScore":3,"options":[{"text":"管道表面有无鼓胀、气泡、槽痕或凹痕等缺陷","score":{"有":1,"无":0}},{"text":"管道有无老化降解、表面粉化等迹象","score":{"有":2,"无":0}}]},
+					{"name":"管道敷设质量","maxScore":2,"options":[{"text":"示踪线（带）、警示带、管道的敷设质量是否符合要求","score":{"是":0,"否":2}}]},
+					{"name":"管道地下敷设环境温度","maxScore":3,"options":[{"text":"管道地下敷设环境温度","score":{"<-20℃":3,"-20℃~0℃":2,"0℃~30℃":0,"30℃~40℃":2,">40℃":3}}]},
+					{"name":"焊接接头无损检测","maxScore":2,"options":[{"text":"开挖检验时是否进行了焊接接头无损检测","score":{"是":0,"否":2}}]}
+				]},
+				{"id":"S6","name":"安装及验收","maxScore":20,"items":[
+					{"name":"安装单位资质","maxScore":2,"options":[{"text":"安装单位有无资质","score":{"有":0,"无":2}}]},
+					{"name":"管道元件控制","maxScore":4,"options":[{"text":"管道元件制造单位有无资质","score":{"有":0,"无":2}},{"text":"管道元件有无质量证明文件","score":{"有":0,"无":2}},{"text":"管道元件有无进货检验","score":{"有":0,"无":1}}]},
+					{"name":"焊接及其检验","maxScore":3,"options":[{"text":"焊接操作人员有无资质","score":{"有":0,"无":1}},{"text":"有无焊接工艺评定","score":{"有":0,"无":1}},{"text":"是否进行了焊接质量检验","score":{"是":0,"否":1}}]},
+					{"name":"强度试验","maxScore":2,"options":[{"text":"强度试验结果","score":{"合格":0,"无试验或不合格":2}}]},
+					{"name":"严密性试验","maxScore":2,"options":[{"text":"严密性试验结果","score":{"合格":0,"无试验或不合格":2}}]},
+					{"name":"监理","maxScore":2,"options":[{"text":"监理单位及人员有无资质","score":{"有":0,"无":1}},{"text":"监理结论是否合格","score":{"是":0,"否":1}}]},
+					{"name":"监检","maxScore":2,"options":[{"text":"监检单位及人员有无资质","score":{"有":0,"无":1}},{"text":"监检结论是否合格","score":{"是":0,"否":1}}]},
+					{"name":"竣工资料","maxScore":2,"options":[{"text":"竣工资料","score":{"齐全":0,"无或不齐全":2}}]},
+					{"name":"验收报告","maxScore":1,"options":[{"text":"有无验收报告","score":{"有":0,"无":1}}]}
+				]},
+				{"id":"S7","name":"使用年限","maxScore":6,"items":[{"name":"管道使用年限","maxScore":6,"options":[{"text":"管道使用年限","score":{"0~10年（含10年）":2,"10~30年（含30年）":4,"30~50年（含50年）":6}}]}]},
+				{"id":"S8","name":"安全管理","maxScore":18,"items":[
+					{"name":"巡线频率","maxScore":3,"options":[{"text":"巡线频率","score":{"周期性巡线":0,"不定期":1,"不巡线":3}}]},
+					{"name":"巡线方式","maxScore":2,"options":[{"text":"巡线方式","score":{"沿线逐步":0,"只巡检建设挖坑频繁的管段":1,"不巡线":2}}]},
+					{"name":"巡线人员的能力","maxScore":1,"options":[{"text":"巡线人员是否能够胜任","score":{"是":0,"否":1}}]},
+					{"name":"公众教育","maxScore":2,"options":[{"text":"公众教育情况","score":{"有资料且经常组织宣传管道安全知识":0,"有资料但较少组织宣传管道安全知识":1,"没有宣传资料、不组织宣传":2}}]},
+					{"name":"安全责任制","maxScore":2,"options":[{"text":"有无安全机构和人员","score":{"有":0,"无":1}},{"text":"是否落实到人","score":{"是":0,"否":1}}]},
+					{"name":"年度检查和定期检验","maxScore":3,"options":[{"text":"年度检查和定期检验实施情况","score":{"按规范要求实施":0,"发现问题才实施":2,"不实施":3}}]},
+					{"name":"设备装置的维护保养","maxScore":3,"options":[{"text":"有无维护保养计划","score":{"有":0,"无":1}},{"text":"是否定期维护保养及更换部件","score":{"是":0,"否":2}}]},
+					{"name":"信息管理系统","maxScore":2,"options":[{"text":"有无GIS、PIMS等信息管理系统","score":{"有":0,"无":2}}]}
+				]}
+			];
+
+			function l_generateCategoryContent(category){
+				return category.items.map((item,idx)=>{
+					// S4类别不显示二级标题，直接显示内容
+					if(category.id === 'S4') {
+						return `
+							<div class="scoring-item" data-s4="true">
+								<div class="item-content" id="item-content-${category.id}-${idx}">
+									<div class="item-content-inner">${l_generateItemOptions(category,item,idx)}</div>
+								</div>
+							</div>`;
+					} else if(category.id === 'S7') {
+						return `
+							<div class="scoring-item" data-s7="true">
+								<div class="item-content" id="item-content-${category.id}-${idx}">
+									<div class="item-content-inner">${l_generateItemOptions(category,item,idx)}</div>
+								</div>
+							</div>`;
+					} else {
+						return `
+                    <div class="scoring-item">
+						<div class="item-header" data-category="${category.id}" data-item="${idx}">
+							<div class="item-title"><i class="fas fa-chevron-right item-icon"></i>${item.name}</div>
+                            </div>
+						<div class="item-content" id="item-content-${category.id}-${idx}">
+							<div class="item-content-inner">${l_generateItemOptions(category,item,idx)}</div>
+                        </div>
+							</div>`;
+					}
+				}).join('');
+			}
+			function l_generateItemOptions(category,item,itemIndex){
+				return item.options.map((option,optionIndex)=>`
+                    <div class="option-group">
+                        <div class="option-question">${option.text}</div>
+						<div class="options-container">${l_generateOptionSelect(category.id,itemIndex,optionIndex,option)}</div>
+					</div>`).join('');
+			}
+			function l_generateOptionSelect(categoryId,itemIndex,optionIndex,option){
+				let options='';
+				let minScore = Infinity;
+				let minScoreKey = '';
+				
+				// 找到最低分的选项
+				for(const [key,value] of Object.entries(option.score)){
+					if(value < minScore){
+						minScore = value;
+						minScoreKey = key;
+					}
+				}
+				
+				// 特殊处理：对于"有无使用登记证"选项，"无"是默认选项
+				let defaultKey = minScoreKey;
+				if(option.text === "有无使用登记证"){
+					defaultKey = "无";
+				}
+				
+				// 检查是否只有一个选项
+				const optionCount = Object.keys(option.score).length;
+				const isDisabled = optionCount === 1;
+				
+				// 生成选项，指定的选项标记为默认
+				for(const [key,value] of Object.entries(option.score)){
+					const isDefault = (key === defaultKey);
+					const defaultText = isDefault ? ' (默认选项)' : '';
+					options+=`<option value="${key}" data-score="${value}" ${isDefault ? 'selected' : ''}>${key} (${value}分)${defaultText}</option>`;
+				}
+				
+				return `<select class="option-select" data-category="${categoryId}" data-item="${itemIndex}" data-option="${optionIndex}" ${isDisabled ? 'disabled' : ''}>${options}</select>`;
+        }
+			function l_updateCategoryScore(categoryId){
+				if(!l_userSelections[categoryId]){ root.querySelector(`#score-${categoryId}`).textContent=0; return; }
+				let score=0; for(const i in l_userSelections[categoryId]){ for(const j in l_userSelections[categoryId][i]){ score+=l_userSelections[categoryId][i][j].score; }}
+				root.querySelector(`#score-${categoryId}`).textContent=score;
+				l_checkAndUpdateTotalScore();
+			}
+			function l_checkAndUpdateTotalScore(){
+				// 同步导航栏左侧分数为当前可能性总分
+				try { setTextAll('.l-total-score', calculateLikelihoodTotalScore()); } catch(e) {}
+			}
+			function l_initializeDefaultSelections(){
+				// 为所有默认选中的选项初始化用户选择数据
+				root.querySelectorAll('.option-select').forEach(select => {
+					const category = select.getAttribute('data-category');
+					const itemIndex = select.getAttribute('data-item');
+					const optionIndex = select.getAttribute('data-option');
+					const value = select.value;
+					const selectedOption = select.options[select.selectedIndex];
+					const score = selectedOption.value ? parseInt(selectedOption.getAttribute('data-score')) : 0;
+					
+					if(!l_userSelections[category]) l_userSelections[category] = {};
+					if(!l_userSelections[category][itemIndex]) l_userSelections[category][itemIndex] = {};
+					l_userSelections[category][itemIndex][optionIndex] = {value, score};
+				});
+				
+				// 更新所有类别的分数显示
+				l_scoringData.forEach(category => {
+					l_updateCategoryScore(category.id);
+				});
+			}
+			function l_render(){
+				l_scoringData.forEach(category=>{
+					const acc=document.createElement('div');
+					acc.className='accordion';
+					acc.innerHTML=`
+						<div class="accordion-header" data-category="${category.id}">
+							<div class="accordion-title"><i class="fas fa-folder accordion-icon"></i>${category.id} ${category.name}</div>
+							<div class="accordion-score">得分: <span id="score-${category.id}">0</span>/${category.maxScore}</div>
+						</div>
+						<div class="accordion-content" id="content-${category.id}">
+							<div class="accordion-content-inner">${l_generateCategoryContent(category)}</div>
+						</div>`;
+					container.appendChild(acc);
+				});
+			}
+			function l_bind(){
+				// 主标题展开逻辑 - 支持多选展开
+				root.querySelectorAll('.accordion-header').forEach(header=>{
+					header.addEventListener('click',()=>{
+						const categoryId=header.getAttribute('data-category');
+						const content=root.querySelector(`#content-${categoryId}`);
+						const isActive=header.classList.contains('active');
+						
+						// 切换当前标题状态
+						if(isActive){
+							header.classList.remove('active');
+							content.style.display = 'none';
+							
+							// 折叠该类别下的所有二级标题
+							content.querySelectorAll('.item-header').forEach(itemHeader => {
+								itemHeader.classList.remove('active');
+								const itemContent = root.querySelector(`#item-content-${categoryId}-${itemHeader.getAttribute('data-item')}`);
+								if(itemContent) {
+									itemContent.classList.remove('expanded');
+									itemContent.style.display = 'none';
+								}
+							});
+						} else {
+							header.classList.add('active');
+							content.style.display = 'block';
+						}
+                });
+            });
+				
+				// 子标题展开逻辑 - 支持多选展开
+				root.querySelectorAll('.item-header').forEach(itemHeader=>{
+					itemHeader.addEventListener('click',()=>{
+						const categoryId=itemHeader.getAttribute('data-category');
+						const itemIndex=itemHeader.getAttribute('data-item');
+						
+						// 跳过S4类别，因为它没有二级标题
+						if(categoryId === 'S4') return;
+						
+						const content=root.querySelector(`#item-content-${categoryId}-${itemIndex}`);
+						const isActive=itemHeader.classList.contains('active');
+						
+						// 切换当前子标题状态
+						if(isActive){
+							itemHeader.classList.remove('active');
+							content.classList.remove('expanded');
+							content.style.display = 'none';
+						} else {
+							itemHeader.classList.add('active');
+							content.classList.add('expanded');
+							content.style.display = 'block';
+						}
+                });
+            });
+
+				root.addEventListener('change',(e)=>{
+					if(e.target.classList.contains('option-select')){
+						const category=e.target.getAttribute('data-category');
+						const itemIndex=e.target.getAttribute('data-item');
+						const optionIndex=e.target.getAttribute('data-option');
+						const value=e.target.value;
+						const selectedOption=e.target.options[e.target.selectedIndex];
+						const score=selectedOption.value ? parseInt(selectedOption.getAttribute('data-score')) : 0;
+						
+						if(!l_userSelections[category]) l_userSelections[category]={};
+						if(!l_userSelections[category][itemIndex]) l_userSelections[category][itemIndex]={};
+						l_userSelections[category][itemIndex][optionIndex]={value,score};
+						l_updateCategoryScore(category);
+					}
+				});
+				// 移除自动展开逻辑，所有标题默认折叠
+			}
+			l_render();
+			l_bind();
+			// 初始化默认选择
+			l_initializeDefaultSelections();
+			// 页面加载后立即统计并显示导航栏分数（可能性）
+			try { setTextAll('.l-total-score', calculateLikelihoodTotalScore()); } catch(e) {}
+			// 确保S4和S7内容可见
+			setTimeout(() => {
+				const s4Content = root.querySelector('#item-content-S4-0');
+				if(s4Content) {
+					s4Content.style.display = 'block';
+				}
+				const s7Content = root.querySelector('#item-content-S7-0');
+				if(s7Content) {
+					s7Content.style.display = 'block';
+				}
+			}, 100);
+		})();
+
+		// ========== Consequence app (index2) ==========
+		(function(){
+			const root=document.getElementById('consequence-app');
+			const container=root.querySelector('[data-role="c-accordionContainer"]');
+			const c_userSelections={};
+			// 将用户选择数据设置为全局变量
+			window.c_userSelections = c_userSelections;
+			const c_scoringData=[
+				{"id":"C1","name":"介质燃烧性","maxScore":20,"items":[{"name":"介质燃烧性","maxScore":20,"options":[{"text":"介质是天然气、人工煤气、液化石油气","score":{"是":20}}]}]},
+				{"id":"C2","name":"介质毒性","maxScore":10,"items":[{"name":"介质毒性","maxScore":10,"options":[{"text":"介质毒性","score":{"天然气":4,"人工煤气":10,"液化石油气":4}}]}]},
+				{"id":"C3","name":"最高工作压力","maxScore":6,"items":[{"name":"最高工作压力","maxScore":6,"options":[{"text":"最高工作压力","score":{"<0.1 MPa":2,"0.1 MPa≤最高工作压力≤0.4MPa":4,"0.4 MPa<最高工作压力≤0.8 Mpa":6}}]}]},
+				{"id":"C4","name":"最大泄漏量","maxScore":20,"items":[{"name":"最大泄漏量","maxScore":20,"options":[{"text":"介质最大泄漏量","score":{"≤1m³":1,"Є(1m³,10m³]":8,"Є(10 m³，100m³]":12,"Є(100m³，500m³]":16,">500m³":20}}]}]},
+				{"id":"C5","name":"地形","maxScore":6,"items":[{"name":"地形","maxScore":6,"options":[{"text":"泄漏处地形","score":{"闭塞":1,"开阔":6}}]}]},
+				{"id":"C6","name":"风速","maxScore":9,"items":[{"name":"风速","maxScore":9,"options":[{"text":"泄漏处年平均风速","score":{"低":2,"中等":6,"高":9}}]}]},
+				{"id":"C7","name":"人口密度","maxScore":20,"items":[{"name":"人口密度","maxScore":20,"options":[{"text":"泄漏处1.6km长度范围内，管道区段两侧各200m的范围内人口数量","score":{"荒无人烟地区":0,"€[1，100)":6,"€[100，300)":12,"€[300，500)":16,"≥500":20}}]}]},
+				{"id":"C8","name":"沿线环境（财产密度）","maxScore":15,"items":[{"name":"沿线环境（财产密度）","maxScore":15,"options":[{"text":"泄漏处1.6km长度范围内，管道区段两侧各200m的范围内环境","score":{"荒无人烟地区":0,"大多为农业生产区":3,"大多为住宅、宾馆、娱乐休闲地":6,"大多为商业区":9,"大多为仓库、码头、车站等":12,"大多为工业生产、住宅区":15}}]}]},
+				{"id":"C9","name":"泄漏原因","maxScore":8,"items":[{"name":"泄漏原因","maxScore":8,"options":[{"text":"泄漏原因","score":{"操作失误":1,"焊接质量":5,"第三方破坏或自然灾害":8}}]}]},
+				{"id":"C10","name":"抢修时间","maxScore":9,"items":[{"name":"抢修时间","maxScore":9,"options":[{"text":"抢修时间","score":{"<1天":1,"€[1天，2天)":3,"€[2天，4天)":5,"€[4天，7天)":7,"≥7天":9}}]}]},
+				{"id":"C11","name":"供应中断的影响范围和程度","maxScore":15,"items":[{"name":"供应中断的影响范围和程度","maxScore":15,"options":[{"text":"供应中断的影响范围和程度","score":{"无重要用户，供应中断对其他单位影响一般":3,"影响小城市、小城镇的工业用燃料":6,"影响小企业、小城市生活":9,"影响一般的工业生产、中型城市生活":12,"影响国家重要大型企业、大型中心城市的生产、生活":15}}]}]},
+				{"id":"C12","name":"用户对管道所输送介质的依赖性","maxScore":12,"items":[{"name":"用户对管道所输送介质的依赖性","maxScore":12,"options":[{"text":"用户对管道所输送介质的依赖性","score":{"供应中断的影响很小":3,"有代替介质可用":6,"有自备储存设施":9,"绝对依赖":12}}]}]}
+			];
+
+			function c_generateCContent(category){
+				return category.items.map((item,idx)=>`
+					<div class="scoring-item">
+						<div class="item-content" id="item-content-${category.id}-${idx}">
+							<div class="item-content-inner">${c_generateCItemOptions(category,item,idx)}</div>
+						</div>
+					</div>`).join('');
+			}
+			function c_generateCItemOptions(category,item,itemIndex){
+				return item.options.map((option,optionIndex)=>`
+					<div class="option-group" style="position: relative;">
+						<div class="option-question">${option.text}</div>
+						<div class="options-container">
+							${c_generateCSelect(category.id,itemIndex,optionIndex,option)}
+						</div>
+						${option.text === "介质最大泄漏量" ? '<button class="calculate-leakage-btn" style="position: absolute; top: 6px; right: 12px; padding: 4px 8px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; z-index: 10;">去计算</button>' : ''}
+					</div>`).join('');
+			}
+			function c_generateCSelect(categoryId,itemIndex,optionIndex,option){
+				let options='';
+				let minScore = Infinity;
+				let minScoreKey = '';
+				
+				// 找到最低分的选项
+				for(const [key,value] of Object.entries(option.score)){
+					if(value < minScore){
+						minScore = value;
+						minScoreKey = key;
+					}
+				}
+				
+				// 检查是否只有一个选项
+				const optionCount = Object.keys(option.score).length;
+				const isDisabled = optionCount === 1;
+				
+				// 特殊处理：对于"最高工作压力"选项，4分的选项是默认选项
+				let defaultKey = minScoreKey;
+				if(option.text === "最高工作压力"){
+					defaultKey = "0.1 MPa≤最高工作压力≤0.4MPa";
+				}
+				// 特殊处理：对于"泄漏处地形"选项，6分的选项是默认选项
+				if(option.text === "泄漏处地形"){
+					defaultKey = "开阔";
+				}
+				// 特殊处理：对于"泄漏处1.6km长度范围内，管道区段两侧各200m的范围内人口数量"选项，16分的选项是默认选项
+				if(option.text === "泄漏处1.6km长度范围内，管道区段两侧各200m的范围内人口数量"){
+					defaultKey = "€[300，500)";
+				}
+				// 特殊处理：对于"泄漏处1.6km长度范围内，管道区段两侧各200m的范围内环境"选项，6分的选项是默认选项
+				if(option.text === "泄漏处1.6km长度范围内，管道区段两侧各200m的范围内环境"){
+					defaultKey = "大多为住宅、宾馆、娱乐休闲地";
+				}
+				// 特殊处理：对于"供应中断的影响范围和程度"选项，9分的选项是默认选项
+				if(option.text === "供应中断的影响范围和程度"){
+					defaultKey = "影响小企业、小城市生活";
+				}
+				// 特殊处理：对于"用户对管道所输送介质的依赖性"选项，"绝对依赖"是默认选项
+				if(option.text === "用户对管道所输送介质的依赖性"){
+					defaultKey = "绝对依赖";
+				}
+				
+				// 生成选项，指定的选项标记为默认
+				for(const [key,value] of Object.entries(option.score)){
+					const isDefault = (key === defaultKey);
+					const defaultText = isDefault ? ' (默认选项)' : '';
+					options+=`<option value="${key}" data-score="${value}" ${isDefault ? 'selected' : ''}>${key} (${value}分)${defaultText}</option>`;
+				}
+				
+				return `<select class="option-select" data-category="${categoryId}" data-item="${itemIndex}" data-option="${optionIndex}" ${isDisabled ? 'disabled' : ''}>${options}</select>`;
+			}
+			function c_updateCategoryScore(categoryId){
+				if(!c_userSelections[categoryId]){ root.querySelector(`#score-${categoryId}`).textContent=0; return; }
+				let score=0; for(const i in c_userSelections[categoryId]){ for(const j in c_userSelections[categoryId][i]){ score+=c_userSelections[categoryId][i][j].score; }}
+				root.querySelector(`#score-${categoryId}`).textContent=score;
+				c_checkAndUpdateTotalScore();
+			}
+			function c_checkAndUpdateTotalScore(){
+				// 同步导航栏右侧分数为当前后果总分
+				try { setTextAll('.c-total-score', calculateConsequenceTotalScore()); } catch(e) {}
+			}
+			function c_initializeDefaultSelections(){
+				// 为所有默认选中的选项初始化用户选择数据
+				root.querySelectorAll('.option-select').forEach(select => {
+					const category = select.getAttribute('data-category');
+					const itemIndex = select.getAttribute('data-item');
+					const optionIndex = select.getAttribute('data-option');
+					const value = select.value;
+					const selectedOption = select.options[select.selectedIndex];
+					const score = selectedOption.value ? parseInt(selectedOption.getAttribute('data-score')) : 0;
+					
+					if(!c_userSelections[category]) c_userSelections[category] = {};
+					if(!c_userSelections[category][itemIndex]) c_userSelections[category][itemIndex] = {};
+					c_userSelections[category][itemIndex][optionIndex] = {value, score};
+				});
+				
+				// 更新所有类别的分数显示
+				c_scoringData.forEach(category => {
+					c_updateCategoryScore(category.id);
+				});
+			}
+			function c_render(){
+				c_scoringData.forEach(category=>{
+					const acc=document.createElement('div');
+					acc.className='accordion';
+					acc.innerHTML=`
+						<div class="accordion-header" data-category="${category.id}">
+							<div class="accordion-title"><i class="fas fa-folder accordion-icon"></i>${category.id} ${category.name}</div>
+							<div class="accordion-score">得分: <span id="score-${category.id}">0</span>/${category.maxScore}</div>
+						</div>
+						<div class="accordion-content" id="content-${category.id}">
+							<div class="accordion-content-inner">${c_generateCContent(category)}</div>
+						</div>`;
+					container.appendChild(acc);
+				});
+			}
+			function c_bind(){
+				root.querySelectorAll('.accordion-header').forEach(header=>{
+					header.addEventListener('click',()=>{
+						const categoryId=header.getAttribute('data-category');
+						const content=root.querySelector(`#content-${categoryId}`);
+						const isActive=header.classList.contains('active');
+						
+						// 切换当前标题状态
+						if(isActive){
+							header.classList.remove('active');
+							content.style.display = 'none';
+							
+							// 折叠该类别下的所有二级标题
+							content.querySelectorAll('.item-header').forEach(itemHeader => {
+								itemHeader.classList.remove('active');
+								const itemContent = root.querySelector(`#item-content-${categoryId}-${itemHeader.getAttribute('data-item')}`);
+								if(itemContent) {
+									itemContent.classList.remove('expanded');
+									itemContent.style.display = 'none';
+								}
+							});
+						} else {
+							header.classList.add('active');
+							content.style.display = 'block';
+						}
+					});
+				});
+
+				root.addEventListener('change',(e)=>{
+					if(e.target.classList.contains('option-select')){
+						const category=e.target.getAttribute('data-category');
+						const itemIndex=e.target.getAttribute('data-item');
+						const optionIndex=e.target.getAttribute('data-option');
+						const value=e.target.value;
+						const selectedOption=e.target.options[e.target.selectedIndex];
+						const score=selectedOption.value ? parseInt(selectedOption.getAttribute('data-score')) : 0;
+						
+						if(!c_userSelections[category]) c_userSelections[category]={};
+						if(!c_userSelections[category][itemIndex]) c_userSelections[category][itemIndex]={};
+						c_userSelections[category][itemIndex][optionIndex]={value,score};
+						c_updateCategoryScore(category);
+					}
+				});
+				
+				// 为"去计算"按钮添加事件监听器
+				root.addEventListener('click',(e)=>{
+					if(e.target.classList.contains('calculate-leakage-btn')){
+						// 打开PE管最大泄漏量计算窗口
+						const overlay = document.getElementById('pe-leak-modal-overlay');
+						if(overlay){
+							overlay.style.display = 'flex';
+							if(typeof updateAdjustmentDisplayModal === 'function') {
+								updateAdjustmentDisplayModal();
+							}
+						}
+					}
+				});
+				// 移除自动展开逻辑，所有标题默认折叠
+			}
+			c_render();
+			c_bind();
+			// 初始化默认选择
+			c_initializeDefaultSelections();
+			// 页面加载后立即统计并显示导航栏分数（后果）
+			try { setTextAll('.c-total-score', calculateConsequenceTotalScore()); } catch(e) {}
+		})();
+		
+		// 管道壁厚验证函数
+		function validateWallThickness(input) {
+			// 限制小数点后两位
+			if(input.value.includes('.') && input.value.split('.')[1].length > 2) {
+				input.value = input.value.slice(0, input.value.indexOf('.') + 3);
+			}
+			
+			// 验证厚度范围
+			const errorElement = document.getElementById('wall-thickness-error');
+			
+			// 如果输入为空，隐藏错误信息
+			if (!input.value || input.value === '') {
+				errorElement.style.display = 'none';
+				return;
+			}
+			
+			const thickness = parseFloat(input.value);
+			
+			// 检查是否为有效数字
+			if (isNaN(thickness)) {
+				errorElement.style.display = 'none';
+				return;
+			}
+			
+			if (thickness < 2.3 || thickness > 57.3) {
+				errorElement.style.display = 'inline';
+			} else {
+				errorElement.style.display = 'none';
+			}
+		}
+		
+		// 显示管道壁厚错误信息
+		function showWallThicknessError() {
+			const errorElement = document.getElementById('wall-thickness-error');
+			errorElement.style.display = 'inline';
+		}
+		
+		// 管道内介质压力验证函数
+		function validatePipePressure(input) {
+			// 限制小数点后两位
+			if(input.value.includes('.') && input.value.split('.')[1].length > 2) {
+				input.value = input.value.slice(0, input.value.indexOf('.') + 3);
+			}
+			
+			// 验证压力值不能为负数
+			const errorElement = document.getElementById('pipe-pressure-error');
+			
+			// 如果输入为空，隐藏错误信息
+			if (!input.value || input.value === '') {
+				errorElement.style.display = 'none';
+				return;
+			}
+			
+			
+			// 检查是否为有效数字
+			if (isNaN(pressure)) {
+				errorElement.style.display = 'none';
+				return;
+			}
+			
+			// 检查是否为负数
+			if (pressure < 0) {
+				errorElement.style.display = 'inline';
+				errorElement.textContent = '压力值不能为负数';
+				// 将输入值设为空
+				input.value = '';
+			} else {
+				errorElement.style.display = 'none';
+			}
+		}
+		
+		// 温度转换函数（摄氏度转开尔文）
+		function convertTemperature(input) {
+			// 限制小数点后两位
+			if(input.value.includes('.') && input.value.split('.')[1].length > 2) {
+				input.value = input.value.slice(0, input.value.indexOf('.') + 3);
+			}
+			
+			const temperatureDisplay = document.getElementById('temperature-display');
+			const kelvinValue = document.getElementById('kelvin-value');
+			
+			// 如果输入为空，隐藏显示
+			if (!input.value || input.value === '') {
+				temperatureDisplay.style.display = 'none';
+				return;
+			}
+			
+			const celsius = parseFloat(input.value);
+			
+			// 检查是否为有效数字
+			if (isNaN(celsius)) {
+				temperatureDisplay.style.display = 'none';
+				return;
+			}
+			
+			// 计算开尔文温度：K = °C + 273.15
+			const kelvin = celsius + 273.15;
+			
+			// 显示转换结果
+			kelvinValue.textContent = kelvin.toFixed(2);
+			temperatureDisplay.style.display = 'block';
+		}
+		
+		// 实时更新泄漏量调整值显示
+		function updateAdjustmentDisplay() {
+			const displayEl = document.getElementById('final-adjustment-display');
+			const monitoringEl = document.getElementById('monitoring-system');
+			const cutoffEl = document.getElementById('cutoff-system');
+			const fireEl = document.getElementById('fire-system');
+			const emergencyEl = document.getElementById('emergency-plan');
+			// 若元素不存在，安全退出
+			if(!displayEl || !monitoringEl || !cutoffEl || !fireEl || !emergencyEl){ return; }
+			const monitoringSystem = monitoringEl.value;
+			const cutoffSystem = cutoffEl.value;
+			const fireSystem = fireEl.value;
+			const emergencyPlan = emergencyEl.value;
+			
+			// 计算各部分调整值
+			let monitoringCutoffAdjustment = 0;
+			if (monitoringSystem === 'A' && cutoffSystem === 'A') {
+				monitoringCutoffAdjustment = 25;
+			} else if (monitoringSystem === 'A' && cutoffSystem === 'B') {
+				monitoringCutoffAdjustment = 20;
+			} else if (monitoringSystem === 'B' && cutoffSystem === 'C') {
+				monitoringCutoffAdjustment = 15;
+			} else if (monitoringSystem === 'A' && cutoffSystem === 'C') {
+				monitoringCutoffAdjustment = 10;
+			} else if (monitoringSystem === 'C') {
+				monitoringCutoffAdjustment = 0;
+			}
+			
+			let fireSystemAdjustment = 0;
+			if (fireSystem === 'emergency') {
+				fireSystemAdjustment = 25;
+			} else if (fireSystem === 'sprinkler') {
+				fireSystemAdjustment = 20;
+			} else if (fireSystem === 'foam') {
+				fireSystemAdjustment = 15;
+			} else if (fireSystem === 'water-monitor') {
+				fireSystemAdjustment = 5;
+			}
+			
+			let emergencyPlanAdjustment = 0;
+			if (emergencyPlan === 'complete') {
+				emergencyPlanAdjustment = 20;
+			} else if (emergencyPlan === 'incomplete') {
+				emergencyPlanAdjustment = 10;
+			} else if (emergencyPlan === 'none') {
+				emergencyPlanAdjustment = 0;
+			}
+			
+			// 计算最终调整值（取最大值）
+			const finalAdjustment = Math.max(monitoringCutoffAdjustment, fireSystemAdjustment, emergencyPlanAdjustment);
+			displayEl.textContent = finalAdjustment + '%';
+		}
+		// ===== Safe modal bindings (isolated IDs) =====
+		(function(){
+			// Guard if elements are absent
+			const consequenceRoot = document.getElementById('consequence-app');
+			const overlay = document.getElementById('pe-leak-modal-overlay');
+			const modal = document.getElementById('pe-leak-modal');
+			const closeBtn = document.getElementById('pe-leak-modal-close');
+			function openLeakModal(){ if(overlay){ overlay.style.display='flex'; updateAdjustmentDisplayModal(); } }
+			
+			// 全局函数，用于从"去计算"按钮调用
+			window.openLeakageCalculationModal = function(){
+				openLeakModal();
+			};
+			if(consequenceRoot && overlay && modal && closeBtn){
+				// 移除原有的介质最大泄漏量选项点击事件，现在只有"去计算"按钮才能打开模态窗口
+				// Close handlers
+				closeBtn.addEventListener('click', ()=> overlay.style.display='none');
+				overlay.addEventListener('click', (e)=>{ if(e.target===overlay){ overlay.style.display='none'; }});
+			}
+
+			// Modal-specific helpers (IDs suffixed with -m)
+			function validateNumberTwoDecimals(input){
+				if(input.value.includes('.') && input.value.split('.')[1].length > 2){
+					input.value = input.value.slice(0, input.value.indexOf('.') + 3);
+				}
+			}
+
+			// 验证所有输入项
+			window.validateAllInputs = function() {
+				// 清除所有红色边框
+				clearAllRedBorders();
+				
+				const pipePressure = parseFloat(document.getElementById('pipe-pressure-m')?.value);
+				const celsiusTemperature = parseFloat(document.getElementById('medium-temperature-m')?.value);
+				const pipeOuterDiameter = parseFloat(document.getElementById('pipe-outer-diameter-m')?.value);
+				const sdrValue = parseFloat(document.getElementById('pipe-wall-thickness-m')?.value);
+				const monitoringSystem = document.getElementById('monitoring-system-m')?.value;
+				const cutoffSystem = document.getElementById('cutoff-system-m')?.value;
+				const fireSystem = document.getElementById('fire-system-m')?.value;
+				const emergencyPlan = document.getElementById('emergency-plan-m')?.value;
+				
+				// 检查必填项，遇到第一个错误就返回false
+				if(!pipePressure || pipePressure <= 0) {
+					showRedBorder('pipe-pressure-m');
+					return false;
+				}
+				
+				if(!celsiusTemperature) {
+					showRedBorder('medium-temperature-m');
+					return false;
+				}
+				
+				if(!pipeOuterDiameter || pipeOuterDiameter <= 0) {
+					showRedBorder('pipe-outer-diameter-m');
+					return false;
+				}
+				
+				if(!sdrValue || sdrValue < 6 || sdrValue > 41) {
+					showRedBorder('pipe-wall-thickness-m');
+					return false;
+				}
+				
+				if(!monitoringSystem) {
+					showRedBorder('monitoring-system-m');
+					return false;
+				}
+				
+				if(!cutoffSystem) {
+					showRedBorder('cutoff-system-m');
+					return false;
+				}
+				
+				if(!fireSystem) {
+					showRedBorder('fire-system-m');
+					return false;
+				}
+				
+				if(!emergencyPlan) {
+					showRedBorder('emergency-plan-m');
+					return false;
+				}
+				
+				return true;
+			}
+			
+			window.calculateMaxLeakageModal = function(){
+				// 验证所有输入项
+				if (!window.validateAllInputs()) {
+					return;
+				}
+				
+				const pipePressure = parseFloat(document.getElementById('pipe-pressure-m')?.value);
+				const celsiusTemperature = parseFloat(document.getElementById('medium-temperature-m')?.value);
+				const pipeOuterDiameter = parseFloat(document.getElementById('pipe-outer-diameter-m')?.value);
+				const sdrValue = parseFloat(document.getElementById('pipe-wall-thickness-m')?.value);
+				// 根据SDR计算管道壁厚：T = De/SDR
+				const pipeWallThickness = pipeOuterDiameter / sdrValue;
+				const monitoringSystem = document.getElementById('monitoring-system-m')?.value;
+				const cutoffSystem = document.getElementById('cutoff-system-m')?.value;
+				const fireSystem = document.getElementById('fire-system-m')?.value;
+				const emergencyPlan = document.getElementById('emergency-plan-m')?.value;
+				const mediumTemperature = celsiusTemperature + 273.15;
+				let leakTime = 0;
+				if (monitoringSystem==='A' && cutoffSystem==='A') leakTime=300; else leakTime=1200;
+				
+				// 更新泄露时间显示
+				const leakTimeDisplayEl = document.getElementById('leak-time-display-m');
+				if(leakTimeDisplayEl) leakTimeDisplayEl.textContent = leakTime;
+				let monitoringCutoffAdjustment=0;
+				if (monitoringSystem==='A' && cutoffSystem==='A') monitoringCutoffAdjustment=25;
+				else if (monitoringSystem==='A' && cutoffSystem==='B') monitoringCutoffAdjustment=20;
+				else if (monitoringSystem==='B' && cutoffSystem==='C') monitoringCutoffAdjustment=15;
+				else if (monitoringSystem==='A' && cutoffSystem==='C') monitoringCutoffAdjustment=10;
+				let fireSystemAdjustment=0;
+				if (fireSystem==='emergency') fireSystemAdjustment=25;
+				else if (fireSystem==='sprinkler') fireSystemAdjustment=20;
+				else if (fireSystem==='foam') fireSystemAdjustment=15;
+				else if (fireSystem==='water-monitor') fireSystemAdjustment=5;
+				let emergencyPlanAdjustment=0;
+				if (emergencyPlan==='complete') emergencyPlanAdjustment=20;
+				else if (emergencyPlan==='incomplete') emergencyPlanAdjustment=10;
+				const adjustmentPercentage = Math.max(monitoringCutoffAdjustment, fireSystemAdjustment, emergencyPlanAdjustment);
+				const displayEl = document.getElementById('final-adjustment-display-m');
+				if(displayEl) displayEl.textContent = adjustmentPercentage + '%';
+				let wg=0;
+				if (pipePressure < 0.183848188){
+					const pipeInnerDiameter = pipeOuterDiameter - 2*pipeWallThickness;
+					const leakArea = (pipeInnerDiameter/2) * 3.14;
+					const w2 = 0.00476 * leakArea * pipePressure;
+					const e2 = 1.31;
+					const x3 = 0.1/pipePressure;
+					const y3 = 1 - Math.pow(x3,(e2-1)/e2);
+					const k2=32.2, j2=8.314;
+					const w3 = Math.pow(x3,2/e2)*e2*k2*2*e2/(j2*mediumTemperature*(e2-1));
+					wg = w2*Math.sqrt(w3*y3);
+				}else{
+					const pipeInnerDiameter = pipeOuterDiameter - 2*pipeWallThickness;
+					const leakArea = (pipeInnerDiameter/2) * 3.14;
+					const w2 = 0.00476 * leakArea * pipePressure;
+					const e2=1.31;
+					const x2 = 1.31*20*32.2/(8.314*mediumTemperature);
+					const y2 = Math.pow(2/(e2+1),(e2+1)/(e2-1));
+					wg = w2*Math.sqrt(x2*y2);
+				}
+				const q = wg*leakTime;
+				const maxLeakage = q*(1 - adjustmentPercentage/100)/0.714;
+				const resultEl = document.getElementById('max-leakage-m');
+				if(resultEl) resultEl.textContent = maxLeakage.toFixed(4);
+				const resultContainer = document.getElementById('leakage-result-m');
+				resultContainer.style.display='block';
+				
+				// 自动滚动到结果显示区域
+				resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				
+				// 存储计算结果供自动选择按钮使用
+				window.lastCalculatedLeakage = maxLeakage;
+				
+				// 启用自动选择按钮
+				const autoSelectBtn = document.getElementById('auto-select-btn-m');
+				if(autoSelectBtn) {
+					autoSelectBtn.disabled = false;
+				}
+			}
+
+			window.showManualDiameterInput = function(){
+				const currentValue = document.getElementById('pipe-outer-diameter-m').value;
+				const inputValue = prompt('请输入管道外径(mm):', currentValue);
+				if(inputValue !== null && inputValue !== '') {
+					const numValue = parseFloat(inputValue);
+					if(!isNaN(numValue) && numValue > 0) {
+						// 如果输入的值不在预设选项中，添加新选项
+						const select = document.getElementById('pipe-outer-diameter-m');
+						let optionExists = false;
+						for(let i = 0; i < select.options.length; i++) {
+							if(parseFloat(select.options[i].value) === numValue) {
+								select.selectedIndex = i;
+								optionExists = true;
+								break;
+							}
+						}
+						if(!optionExists) {
+							const newOption = document.createElement('option');
+							newOption.value = numValue;
+							newOption.text = numValue;
+							select.add(newOption);
+							select.value = numValue;
+						}
+					} else {
+						alert('请输入有效的正数！');
+					}
+				}
+			}
+			
+			window.autoSelectLeakageOption = function(){
+				// 先验证所有输入项
+				if (!window.validateAllInputs()) {
+					return; // 验证失败时，validateAllInputs已经处理了跳转和高亮
+				}
+				
+				// 执行计算
+				window.calculateMaxLeakageModal();
+				
+				// 执行自动选择
+				if (typeof updateMaxLeakageOption === 'function' && window.lastCalculatedLeakage !== undefined) {
+					updateMaxLeakageOption(window.lastCalculatedLeakage);
+					// 关闭PE管最大泄漏量计算页面
+					const overlay = document.getElementById('pe-leak-modal-overlay');
+					if(overlay) {
+						overlay.style.display = 'none';
+					}
+				}
+			}
+			
+			window.updateAdjustmentDisplayModal = function(){
+				const monitoringSystem = document.getElementById('monitoring-system-m')?.value;
+				const cutoffSystem = document.getElementById('cutoff-system-m')?.value;
+				const fireSystem = document.getElementById('fire-system-m')?.value;
+				const emergencyPlan = document.getElementById('emergency-plan-m')?.value;
+				if([monitoringSystem,cutoffSystem,fireSystem,emergencyPlan].some(v=>v===undefined)) return;
+				
+				// 更新泄露时间显示
+				let leakTime = 0;
+				if (monitoringSystem==='A' && cutoffSystem==='A') leakTime=300; else leakTime=1200;
+				const leakTimeDisplayEl = document.getElementById('leak-time-display-m');
+				if(leakTimeDisplayEl) leakTimeDisplayEl.textContent = leakTime;
+				let monitoringCutoffAdjustment=0;
+				if (monitoringSystem==='A' && cutoffSystem==='A') monitoringCutoffAdjustment=25;
+				else if (monitoringSystem==='A' && cutoffSystem==='B') monitoringCutoffAdjustment=20;
+				else if (monitoringSystem==='B' && cutoffSystem==='C') monitoringCutoffAdjustment=15;
+				else if (monitoringSystem==='A' && cutoffSystem==='C') monitoringCutoffAdjustment=10;
+				let fireSystemAdjustment=0;
+				if (fireSystem==='emergency') fireSystemAdjustment=25;
+				else if (fireSystem==='sprinkler') fireSystemAdjustment=20;
+				else if (fireSystem==='foam') fireSystemAdjustment=15;
+				else if (fireSystem==='water-monitor') fireSystemAdjustment=5;
+				let emergencyPlanAdjustment=0;
+				if (emergencyPlan==='complete') emergencyPlanAdjustment=20;
+				else if (emergencyPlan==='incomplete') emergencyPlanAdjustment=10;
+				const finalAdjustment = Math.max(monitoringCutoffAdjustment, fireSystemAdjustment, emergencyPlanAdjustment);
+				const displayEl = document.getElementById('final-adjustment-display-m');
+				if(displayEl) displayEl.textContent = finalAdjustment + '%';
+			}
+
+			// Attach modal-specific listeners if DOM present
+			document.addEventListener('DOMContentLoaded', ()=>{
+				const pressureEl=document.getElementById('pipe-pressure-m');
+				if(pressureEl){ pressureEl.addEventListener('input', ()=>validateNumberTwoDecimals(pressureEl)); }
+				const tempEl=document.getElementById('medium-temperature-m');
+				if(tempEl){ tempEl.addEventListener('input', ()=>convertTemperatureModal(tempEl)); }
+				['monitoring-system-m','cutoff-system-m','fire-system-m','emergency-plan-m'].forEach(id=>{
+					const el=document.getElementById(id); if(el){ el.addEventListener('change', updateAdjustmentDisplayModal); }
+				});
+				const btn=document.getElementById('calculate-leakage-btn-m');
+				if(btn){ btn.addEventListener('click', calculateMaxLeakageModal); }
+				
+				const autoSelectBtn=document.getElementById('auto-select-btn-m');
+				if(autoSelectBtn){ autoSelectBtn.addEventListener('click', autoSelectLeakageOption); }
+				
+				const manualInputDiameterBtn=document.getElementById('manual-input-diameter-btn');
+				if(manualInputDiameterBtn){ manualInputDiameterBtn.addEventListener('click', showManualDiameterInput); }
+				
+				// 为所有输入框添加焦点事件，清除红色边框
+				const inputElements = [
+					'pipe-pressure-m',
+					'medium-temperature-m', 
+					'pipe-outer-diameter-m',
+					'pipe-wall-thickness-m',
+					'monitoring-system-m',
+					'cutoff-system-m',
+					'fire-system-m',
+					'emergency-plan-m'
+				];
+				
+				inputElements.forEach(id => {
+					const element = document.getElementById(id);
+					if(element) {
+						element.addEventListener('focus', function() {
+							this.style.border = '';
+							this.style.boxShadow = '';
+						});
+					}
+				});
+				// 移除C4选项的事件监听器，现在只有"去计算"按钮才能打开模态窗口
+			});
+		})();
+
+		// 移除C4选项的事件监听器，现在只有"去计算"按钮才能打开模态窗口
+		(function(){
+			document.addEventListener('DOMContentLoaded', function(){
+				// Close handlers
+				const overlay = document.getElementById('pe-leak-modal-overlay');
+				const closeBtn = document.getElementById('pe-leak-modal-close');
+				if(closeBtn && overlay){
+					closeBtn.addEventListener('click', ()=> overlay.style.display='none');
+					overlay.addEventListener('click', (e)=>{ if(e.target===overlay){ overlay.style.display='none'; }});
+				}
+			});
+		})();
+
+		function convertTemperatureModal(input){
+			validateNumberTwoDecimals(input);
+			const display = document.getElementById('temperature-display-m');
+			const kelvinSpan = document.getElementById('kelvin-value-m');
+			if(!display || !kelvinSpan){ return; }
+			if(!input.value || input.value===''){ display.style.display='none'; return; }
+			const celsius = parseFloat(input.value);
+			if(isNaN(celsius)){ display.style.display='none'; return; }
+			const kelvin = celsius + 273.15;
+			kelvinSpan.textContent = kelvin.toFixed(2);
+			display.style.display='block';
+		}
+	</script>
+
+	<!-- Safe, isolated modal HTML appended at end to avoid interfering existing pages -->
+	<div id="pe-leak-modal-overlay">
+		<div id="pe-leak-modal">
+			<header>
+				<h2>PE管最大泄漏量计算</h2>
+				<button id="pe-leak-modal-close" class="close-btn" aria-label="关闭">×</button>
+			</header>
+			<div class="body">
+
+				<div class="calculator">
+					<div class="input-group">
+						<label for="pipe-pressure-m">P(管道内介质压力，MPa):</label>
+						<input type="number" id="pipe-pressure-m" step="0.01" min="0.01" placeholder="请输入管道内介质压力" oninput="enforcePositive(this)">
+					</div>
+					<div class="input-group">
+						<label for="medium-temperature-m">C(介质温度，°C):</label>
+						<input type="number" id="medium-temperature-m" step="0.1" placeholder="请输入介质温度(摄氏度)">
+						<span id="temperature-display-m" style="color: #2563eb; font-size: 12px; margin-top: 4px; display: none;">开尔文温度: <span id="kelvin-value-m">0</span> K</span>
+					</div>
+					<div class="input-group">
+						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+							<label for="pipe-outer-diameter-m">De(管道外径，mm):</label>
+							<button id="manual-input-diameter-btn" style="padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">手动输入</button>
+						</div>
+						<select id="pipe-outer-diameter-m" style="width: 100%;">
+							<option value="50">50</option>
+							<option value="63">63</option>
+							<option value="75">75</option>
+							<option value="90">90</option>
+							<option value="110">110</option>
+							<option value="160">160</option>
+							<option value="200">200</option>
+							<option value="250">250</option>
+							<option value="315">315</option>
+							<option value="400">400</option>
+						</select>
+					</div>
+					<div class="input-group">
+						<label for="pipe-wall-thickness-m">SDR（标准尺寸比）:</label>
+						<input type="number" id="pipe-wall-thickness-m" step="0.01" min="0.01" placeholder="请输入SDR值" oninput="enforcePositive(this); validateSDR(this)">
+					</div>
+					<div class="input-group">
+						<label>t(泄露时间，s): <span id="leak-time-display-m" style="color: #2563eb; font-weight: 600; margin-left: 8px;">1200</span> <span style="color: #ef4444; font-size: 12px; margin-left: 8px;">（默认取较大规模泄漏）</span></label>
+						<label>m(泄漏量调整值，%): <span id="final-adjustment-display-m" style="color: #2563eb; font-weight: 600; margin-left: 8px;">0%</span></label>
+						<div style="margin-top: 8px;">
+							<div style="margin-bottom: 12px;">
+								<label style="font-size: 14px; color: #2563eb; font-weight: 600;">按照监测与切断系统调整泄漏量:</label>
+								<div style="margin-top: 8px;">
+									<label for="monitoring-system-m" style="font-size: 14px; color: #495057;">监测系统类型:</label>
+									<select id="monitoring-system-m" style="width: 100%; margin-top: 4px;">
+										<option value="A">A级 - 监测关键参数的变化从而间接监测介质流失的专用设备</option>
+										<option value="B">B级 - 直接监测介质实际流失的灵敏的探测器</option>
+										<option value="C">C级 - 目测,摄像头等</option>
+									</select>
+									<div style="margin-top: 8px;">
+										<label for="cutoff-system-m" style="font-size: 14px; color: #495057;">切断系统类型:</label>
+										<select id="cutoff-system-m" style="width: 100%; margin-top: 4px;">
+											<option value="A">A级 - 自动切断装置</option>
+											<option value="B">B级 - 远程人为切断装置</option>
+											<option value="C">C级 - 人工切断阀</option>
+										</select>
+									</div>
+								</div>
+							</div>
+							<div style="margin-bottom: 12px;">
+								<label style="font-size: 14px; color: #2563eb; font-weight: 600;">按照消防系统调整泄漏量:</label>
+								<div style="margin-top: 8px;">
+									<label for="fire-system-m" style="font-size: 14px; color: #495057;">消防系统:</label>
+									<select id="fire-system-m" style="width: 100%; margin-top: 4px;">
+										<option value="emergency">紧急泄放系统,且装备有A级或B级切断系统</option>
+										<option value="sprinkler">消防水喷淋和监测系统</option>
+										<option value="foam">泡沫喷射系统</option>
+										<option value="water-monitor">消防水监测系统</option>
+									</select>
+								</div>
+							</div>
+							<div>
+								<label style="font-size: 14px; color: #2563eb; font-weight: 600;">按照应急预案调整泄漏量:</label>
+								<div style="margin-top: 8px;">
+									<label for="emergency-plan-m" style="font-size: 14px; color: #495057;">应急预案:</label>
+									<select id="emergency-plan-m" style="width: 100%; margin-top: 4px;">
+										<option value="complete">应急预案完整可靠,经常演习</option>
+										<option value="incomplete">应急预案不完整,或缺乏演习</option>
+										<option value="none">无应急预案</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+						<button id="calculate-leakage-btn-m" class="calculate-risk-btn">计算最大泄漏量</button>
+						<button id="auto-select-btn-m" class="calculate-risk-btn" style="background: linear-gradient(135deg, #10b981, #059669);">自动选择对应选项</button>
+					</div>
+					<div id="leakage-result-m" class="risk-result" style="display:none;">
+						<div class="risk-info">
+							<div class="risk-item">
+								<span class="risk-label">最大泄漏量 (m³):</span>
+								<span id="max-leakage-m" class="risk-value">0</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<script>
+// Helper to safely update all repeated score elements across pages
+function setTextAll(selector, text) {
+  var nodes = document.querySelectorAll(selector);
+  for (var i = 0; i < nodes.length; i++) {
+    nodes[i].textContent = text;
+  }
+}
+</script>
+</body>
+</html>

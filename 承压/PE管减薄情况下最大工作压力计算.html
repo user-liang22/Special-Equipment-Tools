@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>PE管减薄情况下最大工作压力计算</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		:root { --primary:#2563eb; --bg:#f5f7fa; --radius:8px; --shadow:0 2px 6px rgba(0,0,0,.1); --transition:all .25s ease; }
+		* { box-sizing:border-box; }
+		html, body { height:100%; }
+		body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:var(--bg); color:#333; display:flex; flex-direction:column; overflow-x:auto; }
+		.wrap { width:1200px; min-width:1200px; margin:0 auto; background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+		header { background:linear-gradient(135deg, #2c3e50, #3498db); color:#fff; padding:28px; text-align:center; }
+		header h1 { margin:0 0 10px; font-size:28px; }
+		header .description { opacity:.9; font-size:15px; }
+
+		.pressure-calculator { max-width: 900px; margin: 0 auto; padding: 28px; text-align: center; }
+		.input-group { margin-bottom: 20px; text-align: left; }
+		.input-group label { display: block; font-weight: 600; color: #495057; margin-bottom: 10px; font-size:16px; }
+		.input-group input, .input-group select { width: 100%; padding: 14px 14px; border: 2px solid #e9ecef; border-radius: 10px; font-size: 16px; transition: border-color 0.2s; }
+		.input-group input:focus, .input-group select:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,0.1); }
+
+		.calculate-risk-btn { background: linear-gradient(135deg, var(--primary), #1d4ed8); color: #fff; border: none; padding: 14px 28px; border-radius: 10px; font-size: 18px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+		.calculate-risk-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+
+		.risk-result { margin-top: 20px; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+		.risk-info { display: flex; justify-content: center; }
+		.risk-item { display:flex; justify-content:center; gap:14px; align-items:center; padding:10px 14px; background:#f8f9fa; border-radius:8px; }
+		.risk-label { font-weight:700; color:#495057; font-size:16px; }
+		.risk-value { font-weight:800; color:var(--primary); font-size:22px; }
+
+		/* 隐藏数字输入框的增减按钮 */
+		#thickness::-webkit-outer-spin-button,
+		#thickness::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+		#thickness[type=number] { -moz-appearance: textfield; }
+
+		/* 同步全局数字输入样式以与 index.html 一致 */
+		input[type=number]::-webkit-outer-spin-button,
+		input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+		input[type=number] { -moz-appearance: textfield; }
+		
+		/* 移动端适配 */
+		@media (max-width: 768px) {
+			.wrap { 
+				width: 100%; 
+				min-width: auto; 
+				margin: 0; 
+				border-radius: 0; 
+			}
+			header { 
+				padding: 20px 16px; 
+			}
+			header h1 { 
+				font-size: 20px; 
+				line-height: 1.3; 
+			}
+			header .description { 
+				font-size: 14px; 
+			}
+			.pressure-calculator { 
+				padding: 16px; 
+			}
+			.input-group { 
+				margin-bottom: 16px; 
+			}
+			.input-group label { 
+				font-size: 14px; 
+				margin-bottom: 8px; 
+			}
+			.input-group input, 
+			.input-group select { 
+				padding: 12px; 
+				font-size: 14px; 
+			}
+			.calculate-risk-btn { 
+				padding: 12px 20px; 
+				font-size: 16px; 
+			}
+			.risk-result { 
+				margin-top: 16px; 
+				padding: 16px; 
+			}
+			.risk-item { 
+				padding: 8px 12px; 
+			}
+			.risk-label { 
+				font-size: 14px; 
+			}
+			.risk-value { 
+				font-size: 18px; 
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<header>
+			<h1>PE管减薄情况下最大工作压力计算</h1>
+			<p class="description">根据《聚乙烯燃气管道技术规程》制定</p>
+		</header>
+		<div class="pressure-calculator">
+			<div class="input-group">
+				<label for="mrs-strength">MRS(最小要求强度,MPa):</label>
+				<select id="mrs-strength">
+					<option value="8">8MPa (PE80)</option>
+					<option value="10">10MPa (PE100)</option>
+				</select>
+			</div>
+			<div class="input-group">
+				<label for="design-factor">C(设计系数):</label>
+				<input type="text" id="design-factor" value="2.5（适用于天然气）" readonly style="background-color:#f5f5f5;">
+			</div>
+			<div class="input-group">
+				<div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:8px;">
+					<label for="pipe-diameter">De(管道外径，mm):</label>
+					<button id="manual-input-diameter-btn-p" style="padding: 8px 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; white-space:nowrap;">手动输入</button>
+				</div>
+				<select id="pipe-diameter" style="width: 100%;">
+						<option value="50">50</option>
+						<option value="63">63</option>
+						<option value="75">75</option>
+						<option value="90">90</option>
+						<option value="110">110</option>
+						<option value="160">160</option>
+						<option value="200">200</option>
+						<option value="250">250</option>
+						<option value="315">315</option>
+						<option value="400">400</option>
+				</select>
+			</div>
+			<div class="input-group">
+				<label for="thickness">T(管道壁厚,mm):</label>
+				<input type="number" id="thickness" step="0.01" min="0" placeholder="请输入厚度(mm)" oninput="validateThickness(this)">
+				<span id="thickness-error" style="color: red; font-size: 12px; display: none;">请输入正确的厚度</span>
+			</div>
+			<button id="calculate-pressure-btn" class="calculate-risk-btn">计算最大工作压力</button>
+			<div id="pressure-result" class="risk-result" style="display:none;">
+				<div class="risk-info">
+					<div class="risk-item">
+						<span class="risk-label">最大允许工作压力 (MPa):</span>
+						<span id="max-pressure" class="risk-value">0</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// 厚度验证函数
+		function validateThickness(input) {
+			if(input.value.includes('.') && input.value.split('.')[1].length > 2) {
+				input.value = input.value.slice(0, input.value.indexOf('.') + 3);
+			}
+			const errorElement = document.getElementById('thickness-error');
+			if (!input.value || input.value === '') { errorElement.style.display = 'none'; return; }
+			const thickness = parseFloat(input.value);
+			if (isNaN(thickness)) { errorElement.style.display = 'none'; return; }
+			if (thickness < 2.3 || thickness > 57.3) { errorElement.style.display = 'inline'; } else { errorElement.style.display = 'none'; }
+		}
+
+		function showThicknessError() {
+			document.getElementById('thickness-error').style.display = 'inline';
+		}
+
+		// 计算最大允许工作压力（仅显示结果）
+		function calculateMaxPressure() {
+			const mrsStrength = parseFloat(document.getElementById('mrs-strength').value);
+			const designFactor = 2.5;
+			const pipeDiameter = parseFloat(document.getElementById('pipe-diameter').value);
+			const thickness = parseFloat(document.getElementById('thickness').value);
+
+			if (!mrsStrength || !designFactor || !pipeDiameter || !thickness) {
+				if (!thickness) { showThicknessError(); }
+				return;
+			}
+			if (thickness < 2.3 || thickness > 57.3) { return; }
+
+			const sigma = mrsStrength / designFactor; // MPa
+			const sdr = pipeDiameter / thickness; // 标准尺寸比
+			const maxPressure = (2 * sigma) / (sdr - 1);
+
+			document.getElementById('max-pressure').textContent = maxPressure.toFixed(2);
+			document.getElementById('pressure-result').style.display = 'block';
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+			document.getElementById('calculate-pressure-btn')?.addEventListener('click', calculateMaxPressure);
+
+			// 手动输入外径（pressure.html）
+			const manualBtn = document.getElementById('manual-input-diameter-btn-p');
+			if(manualBtn){
+				manualBtn.addEventListener('click', function(){
+					const select = document.getElementById('pipe-diameter');
+					const currentValue = select?.value || '';
+					const inputValue = prompt('请输入外径(mm)，需为大于0的数值:', currentValue);
+					if(inputValue === null) return;
+					const numValue = parseFloat(inputValue);
+					if(isNaN(numValue) || numValue <= 0){
+						alert('请输入大于0的有效数值');
+						return;
+					}
+					let exists = false;
+					for(let i=0;i<select.options.length;i++){
+						if(parseFloat(select.options[i].value) === numValue){
+							select.selectedIndex = i;
+							exists = true;
+							break;
+						}
+					}
+					if(!exists){
+						const opt = document.createElement('option');
+						opt.value = numValue;
+						opt.text = numValue;
+						select.add(opt);
+						select.value = numValue;
+					}
+				});
+			}
+		});
+	</script>
+</body>
+</html>
+
+
