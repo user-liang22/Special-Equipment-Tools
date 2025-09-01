@@ -8,6 +8,73 @@
 		/* 移动端兜底样式（当外链CSS无法加载时生效） */
 		html { font-size: 16px; -webkit-text-size-adjust: 100%; }
 		body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; line-height: 1.6; color: #ffffff; }
+		
+		/* 去除移动端点击高亮和蓝色边框 */
+		* {
+			-webkit-tap-highlight-color: transparent !important;
+			-webkit-user-select: none;
+			-webkit-touch-callout: none;
+		}
+		
+		input, select, button, textarea, a {
+			-webkit-tap-highlight-color: transparent !important;
+			-webkit-appearance: none !important;
+			outline: none !important;
+		}
+		
+		input:focus, select:focus, button:focus, textarea:focus {
+			outline: none !important;
+			border: 1px solid #d1d5db !important;
+			box-shadow: none !important;
+			-webkit-appearance: none !important;
+		}
+		
+		input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible {
+			outline: none !important;
+			border: 1px solid #d1d5db !important;
+			box-shadow: none !important;
+		}
+		
+		.option-select:focus, .option-input:focus {
+			border: 1px solid #d1d5db !important;
+			outline: none !important;
+			box-shadow: none !important;
+		}
+		
+		button:active {
+			background-color: transparent !important;
+			transform: scale(0.98);
+			outline: none !important;
+			border-color: #d1d5db !important;
+		}
+		
+		/* 强制移除所有蓝色聚焦效果 */
+		input[type="text"]:focus,
+		input[type="number"]:focus,
+		input[type="email"]:focus,
+		input[type="password"]:focus,
+		select:focus,
+		textarea:focus {
+			outline: 0 !important;
+			outline-offset: 0 !important;
+			border-color: #d1d5db !important;
+			box-shadow: 0 0 0 0 transparent !important;
+			-webkit-appearance: none !important;
+			-moz-appearance: none !important;
+			appearance: none !important;
+		}
+		
+		/* 移除Webkit浏览器的默认样式 */
+		input::-webkit-outer-spin-button,
+		input::-webkit-inner-spin-button {
+			-webkit-appearance: none !important;
+			margin: 0 !important;
+		}
+		
+		/* 移除Firefox的默认样式 */
+		input[type="number"] {
+			-moz-appearance: textfield !important;
+		}
 		.container { padding: 16px; }
 		.page-header { text-align: center; padding: 16px 12px; }
 		.page-header h1 { font-size: 22px; margin: 8px 0; color: #ffffff; }
@@ -604,8 +671,8 @@
 				<h3>重要提示</h3>
 			</div>
 			<div class="default-notice-content">
-				<p class="notice-main-text">当前<strong>第三方破坏</strong>，<strong>腐蚀</strong>，<strong>设备及操作</strong>，<strong>管道本质安全</strong>模块所有默认选项均为「<strong>最高值选项</strong>」，<strong>失效后果评分</strong>模块所有默认选项均为「<strong>最低值选项</strong>」，请您根据实际需求核对调整，避免影响使用效果。</p>
-				<p class="notice-sub-text">补充说明：若存在多个选项默认均显示为<strong>最低值</strong>/<strong>最高值</strong>的情况，系统将自动取其中一个<strong>最低值</strong>/<strong>最高值</strong>生效，建议您手动确认最终生效选项是否符合预期。</p>
+				<p class="notice-main-text">当前<strong class="extreme-highlight">第三方破坏</strong>，<strong class="extreme-highlight">腐蚀</strong>，<strong class="extreme-highlight">设备及操作</strong>，<strong class="extreme-highlight">管道本质安全</strong>模块所有默认选项均为「<strong class="extreme-highlight">最高值选项</strong>」，<strong class="extreme-highlight">失效后果评分</strong>模块所有默认选项均为「<strong class="extreme-highlight">最低值选项</strong>」，请您根据实际需求核对调整，避免影响使用效果。</p>
+				<p class="notice-sub-text">补充说明：若存在多个选项默认均显示为<strong class="extreme-highlight">最低值</strong>/<strong class="extreme-highlight">最高值</strong>的情况，系统将自动取其中一个<strong class="extreme-highlight">最低值</strong>/<strong class="extreme-highlight">最高值</strong>生效，建议您手动确认最终生效选项是否符合预期。</p>
 			</div>
 			<div class="default-notice-footer">
 				<button type="button" class="notice-close-btn" onclick="closeDefaultNotice()">我知道了</button>

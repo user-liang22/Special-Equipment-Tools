@@ -51,33 +51,18 @@ class RBIAssessmentSystem {
                     </div>
                     
                     <div class="leakage-calc-input-group">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <label for="leakage-pipe-outer-diameter">De(管道外径，mm):</label>
-                            <button id="leakage-manual-input-diameter-btn" style="padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">手动输入</button>
-                        </div>
-                        <select id="leakage-pipe-outer-diameter" style="width: 100%;">
-                            <option value="50">50</option>
-                            <option value="63">63</option>
-                            <option value="75">75</option>
-                            <option value="90">90</option>
-                            <option value="110">110</option>
-                            <option value="160">160</option>
-                            <option value="200">200</option>
-                            <option value="250">250</option>
-                            <option value="315">315</option>
-                            <option value="400">400</option>
-                        </select>
+                        <label for="leakage-pipe-outer-diameter">De(管道外径，mm):</label>
+                        <input type="number" id="leakage-pipe-outer-diameter" step="0.01" min="0.01" placeholder="请输入管道外径">
                     </div>
                     
                     <div class="leakage-calc-input-group">
-                        <label for="leakage-sdr">SDR（标准尺寸比）:</label>
-                        <input type="number" id="leakage-sdr" step="0.01" min="0.01" placeholder="请输入SDR值">
-                        <span id="leakage-sdr-hint" style="color:#6b7280; font-size:12px;">壁厚 T = De / SDR</span>
-                        <span id="leakage-sdr-error" style="color:#ef4444; font-size:12px; display:none; margin-left:8px;">SDR应在 6 - 41 范围内</span>
+                        <label for="leakage-wall-thickness">T（管道壁厚，mm）:</label>
+                        <input type="number" id="leakage-wall-thickness" step="0.01" min="0.01" placeholder="请输入管道壁厚">
+                        <span id="leakage-wall-thickness-error" style="color:#ef4444; font-size:12px; display:none; margin-left:8px;">壁厚必须大于0</span>
                     </div>
                     
                     <div class="leakage-calc-input-group">
-                        <label>t(泄露时间，s): <span id="leakage-leak-time-display" style="color: #2563eb; font-weight: 600; margin-left: 8px;">1200</span></label>
+                        <label>t(泄露时间，s): <span id="leakage-leak-time-display" style="color: #2563eb; font-weight: 600; margin-left: 8px;">1200</span> （默认取较大规模泄漏）</label>
                         <label>m(泄漏量调整值，%): <span id="leakage-final-adjustment-display" style="color: #2563eb; font-weight: 600; margin-left: 8px;">0%</span></label>
                         <div style="margin-top: 8px;">
                             <div style="margin-bottom: 12px;">
@@ -191,13 +176,13 @@ class RBIAssessmentSystem {
             temperatureDisplay.style.display = 'block';
         }
 
-        function validateSDRRange() {
-            const el = modal.querySelector('#leakage-sdr');
-            const err = modal.querySelector('#leakage-sdr-error');
+        function validateWallThickness() {
+            const el = modal.querySelector('#leakage-wall-thickness');
+            const err = modal.querySelector('#leakage-wall-thickness-error');
             if (!el || !err) return;
             const v = parseFloat(el.value);
             if (isNaN(v)) { err.style.display = 'none'; return; }
-            if (v < 6 || v > 41) { err.style.display = 'inline'; } else { err.style.display = 'none'; }
+            if (v <= 0) { err.style.display = 'inline'; } else { err.style.display = 'none'; }
         }
 
         function updateAdjustment() {
@@ -236,13 +221,13 @@ class RBIAssessmentSystem {
             const pipePressure = parseFloat(modal.querySelector('#leakage-pipe-pressure').value);
             const celsius = parseFloat(modal.querySelector('#leakage-medium-temperature').value);
             const De = parseFloat(modal.querySelector('#leakage-pipe-outer-diameter').value);
-            const sdr = parseFloat(modal.querySelector('#leakage-sdr').value);
+            const wallThickness = parseFloat(modal.querySelector('#leakage-wall-thickness').value);
             
             // 检查所有必要的输入是否都已填写且有效
             if (!pipePressure || pipePressure <= 0 || 
                 isNaN(celsius) || 
                 !De || De <= 0 || 
-                !sdr || sdr < 6 || sdr > 41) {
+                !wallThickness || wallThickness <= 0) {
                 // 如果参数不完整，隐藏结果
                 modal.querySelector('#leakage-calc-result').style.display = 'none';
                 return;
@@ -256,7 +241,7 @@ class RBIAssessmentSystem {
             const pipePressure = parseFloat(modal.querySelector('#leakage-pipe-pressure').value);
             const celsius = parseFloat(modal.querySelector('#leakage-medium-temperature').value);
             const De = parseFloat(modal.querySelector('#leakage-pipe-outer-diameter').value);
-            const sdr = parseFloat(modal.querySelector('#leakage-sdr').value);
+            const wallThickness = parseFloat(modal.querySelector('#leakage-wall-thickness').value);
             const monitoring = modal.querySelector('#leakage-monitoring-system').value;
             const cutoff = modal.querySelector('#leakage-cutoff-system').value;
             const fire = modal.querySelector('#leakage-fire-system').value;
@@ -267,10 +252,10 @@ class RBIAssessmentSystem {
                 if (!pipePressure || pipePressure <= 0) { alert('请输入有效的压力值'); return; }
                 if (isNaN(celsius)) { alert('请输入介质温度'); return; }
                 if (!De || De <= 0) { alert('请选择或输入有效外径'); return; }
-                if (!sdr || sdr < 6 || sdr > 41) { alert('请输入有效的SDR(6-41)'); return; }
+                if (!wallThickness || wallThickness <= 0) { alert('请输入有效的管道壁厚'); return; }
             } else {
                 // 自动计算时静默检查，不符合条件直接返回
-                if (!pipePressure || pipePressure <= 0 || isNaN(celsius) || !De || De <= 0 || !sdr || sdr < 6 || sdr > 41) { 
+                if (!pipePressure || pipePressure <= 0 || isNaN(celsius) || !De || De <= 0 || !wallThickness || wallThickness <= 0) { 
                     return; 
                 }
             }
@@ -284,7 +269,7 @@ class RBIAssessmentSystem {
             const K2 = 32.2; // gc 转变系数
             const J2 = 8.314; // R' 气体常数
             
-            const T = De / sdr;
+            const T = wallThickness;
             const I2 = celsius + 273.15; // T 介质温度 K
             const P2 = (monitoring === 'A' && cutoff === 'A') ? 300 : 1200; // t 泄露时间 s
             
@@ -350,36 +335,8 @@ class RBIAssessmentSystem {
             modal.querySelector('#leakage-calc-result').style.display = 'block';
         }
 
-        function showManualDiameterInput() {
-            const currentValue = modal.querySelector('#leakage-pipe-outer-diameter').value;
-            const inputValue = prompt('请输入管道外径(mm):', currentValue);
-            if (inputValue !== null && inputValue !== '') {
-                const numValue = parseFloat(inputValue);
-                if (!isNaN(numValue) && numValue > 0) {
-                    const select = modal.querySelector('#leakage-pipe-outer-diameter');
-                    let optionExists = false;
-                    for (let i = 0; i < select.options.length; i++) {
-                        if (parseFloat(select.options[i].value) === numValue) { 
-                            select.selectedIndex = i; 
-                            optionExists = true; 
-                            break; 
-                        }
-                    }
-                    if (!optionExists) {
-                        const newOption = document.createElement('option');
-                        newOption.value = numValue;
-                        newOption.text = numValue;
-                        select.add(newOption);
-                        select.value = numValue;
-                    }
-                } else { 
-                    alert('请输入有效的正数！'); 
-                }
-            }
-        }
 
         // 绑定事件监听器
-        modal.querySelector('#leakage-manual-input-diameter-btn').addEventListener('click', showManualDiameterInput);
         
         modal.querySelector('#leakage-medium-temperature').addEventListener('input', function() { 
             convertTemperature(this); 
@@ -392,14 +349,16 @@ class RBIAssessmentSystem {
             autoCalculate(); 
         });
         
-        modal.querySelector('#leakage-sdr').addEventListener('input', function() { 
+        modal.querySelector('#leakage-wall-thickness').addEventListener('input', function() { 
             enforcePositive(this); 
             limitTwoDecimals(this); 
-            validateSDRRange(); 
+            validateWallThickness(); 
             autoCalculate(); 
         });
         
-        modal.querySelector('#leakage-pipe-outer-diameter').addEventListener('change', function() { 
+        modal.querySelector('#leakage-pipe-outer-diameter').addEventListener('input', function() { 
+            enforcePositive(this); 
+            limitTwoDecimals(this); 
             autoCalculate(); 
         });
         
@@ -410,22 +369,30 @@ class RBIAssessmentSystem {
         
         modal.querySelector('#leakage-apply-result-btn').addEventListener('click', function() {
             if (typeof lastCalculatedLeakage !== 'undefined') {
-                const score = modal.querySelector('#leakage-score-result').textContent;
-                const scoreValue = parseFloat(score);
-                if (!isNaN(scoreValue) && scoreValue >= 1 && scoreValue <= 20) {
-                    // 应用评分到E.3输入框
-                    targetInput.value = scoreValue;
-                    targetInput.readOnly = false; // 临时允许编辑以触发事件
-                    targetInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    targetInput.readOnly = true; // 恢复只读状态
+                const leakageValue = parseFloat(modal.querySelector('#leakage-max-leakage').textContent);
+                if (!isNaN(leakageValue)) {
+                    // 根据泄漏量选择对应的下拉框选项
+                    let selectedOption;
+                    if (leakageValue <= 450) {
+                        selectedOption = 'leakage1_1';
+                    } else if (leakageValue <= 4500) {
+                        selectedOption = 'leakage1_8';
+                    } else if (leakageValue <= 45000) {
+                        selectedOption = 'leakage1_12';
+                    } else if (leakageValue <= 450000) {
+                        selectedOption = 'leakage1_16';
+                    } else {
+                        selectedOption = 'leakage1_20';
+                    }
                     
-                    // 更新输入框的显示样式
-                    targetInput.style.backgroundColor = 'white';
-                    targetInput.style.color = '#333';
-                    targetInput.title = `泄漏量评分：${scoreValue}分 (泄漏量：${lastCalculatedLeakage.toFixed(4)} kg) - 点击重新计算`;
+                    // 应用到下拉框
+                    targetInput.value = selectedOption;
+                    targetInput.dispatchEvent(new Event('change', { bubbles: true }));
                     
-                    // 直接关闭计算器，不显示提示框
-                    modal.remove();
+                    // 直接关闭计算器
+                    setTimeout(() => {
+                        modal.remove();
+                    }, 100);
                 } else {
                     alert('计算结果无效，请重新计算');
                 }
@@ -438,7 +405,8 @@ class RBIAssessmentSystem {
         updateAdjustment();
     }
 
-    // 创建附加安全裕度计算器窗口（样式复用埋地段计算器）
+
+
     createSafetyMarginCalculator() {
         const existing = document.getElementById('safety-margin-calculator');
         if (existing) existing.remove();
@@ -819,108 +787,108 @@ class RBIAssessmentSystem {
                 id: "D2233",
                 title: "D.2.3.3埋深的评分",
                 maxScore: 8,
-                type: "tabs",
-                tabs: [
+                type: "conditional",
+                items: [
                     {
-                        id: "tab1",
-                        title: "非水下穿越管道埋深",
-                        icon: "🌊",
-                        active: false,
-                        content: {
-                            id: "D22332",
-                            title: "D.2.3.3.2非水下穿越管道埋深的评分",
-                            maxScore: 8,
-                            items: [
-                                {
-                                    id: "depth1a",
-                                    title: "跨越段或露管段",
-                                    options: [
-                                        { id: "depth1a1", text: "跨越段或露管段", score: 0 }
-                                    ],
-                                    selected: "depth1a1"
-                                },
-                                {
-                                    id: "depth1b",
-                                    title: "埋地段",
-                                    inputType: "number",
-                                    minValue: 0,
-                                    maxValue: 8,
-                                    step: 0.1,
-                                    placeholder: "请输入0-8之间的数值，根据实际埋深评分",
-                                    defaultValue: 0
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        id: "tab2",
-                        title: "水下穿越管道埋深",
-                        icon: "🌊",
-                        active: true,
-                        content: {
-                            id: "D22333",
-                            title: "D.2.3.3.3水下穿越管道埋深的评分",
-                            maxScore: 8,
-                            subitems: [
-                                {
-                                    id: "depth2",
-                                    title: "可通航河道河底土壤表面(河床表面)与航船底面距离或未通航河道的水深",
-                                    maxScore: 2,
-                                    items: [
-                                        {
-                                            id: "depth2a",
-                                            title: "通航距离或深度",
-                                            options: [
-                                                { id: "depth2a1", text: "上述距离或深度∈[0m～0.5m)", score: 0 },
-                                                { id: "depth2a2", text: "上述距离或深度∈[0.5m～1.0m)", score: 0.5 },
-                                                { id: "depth2a3", text: "上述距离或深度∈[1.0m～1.5m)", score: 1 },
-                                                { id: "depth2a4", text: "上述距离或深度∈[1.5m～2.0m)", score: 1.5 },
-                                                { id: "depth2a5", text: "上述距离或深度≥2.0m", score: 2 }
-                                            ],
-                                            selected: "depth2a5"
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: "depth3",
-                                    title: "在河底的土壤埋深",
-                                    maxScore: 4,
-                                    items: [
-                                        {
-                                            id: "depth3a",
-                                            title: "土壤埋深",
-                                            options: [
-                                                { id: "depth3a1", text: "埋深∈[0m～0.5m)", score: 0 },
-                                                { id: "depth3a2", text: "埋深∈[0.5m～1.0m)", score: 1 },
-                                                { id: "depth3a3", text: "埋深∈[1.0m～1.5m)", score: 2 },
-                                                { id: "depth3a4", text: "埋深∈[1.5m～2.0m)", score: 3 },
-                                                { id: "depth3a5", text: "埋深≥2.0m", score: 4 }
-                                            ],
-                                            selected: "depth3a5"
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: "depth4",
-                                    title: "保护措施",
-                                    maxScore: 2,
-                                    items: [
-                                        {
-                                            id: "depth4a",
-                                            title: "保护措施",
-                                            options: [
-                                                { id: "depth4a1", text: "无保护措施", score: 0 },
-                                                { id: "depth4a2", text: "采用石笼稳管、加设固定墩等稳管措施", score: 1 },
-                                                { id: "depth4a3", text: "采用30mm以上水泥保护层或其他能达到同样加固效果的措施", score: 2 }
-                                            ],
-                                            selected: "depth4a3"
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
+                        id: "depth_type_selector",
+                        title: "请选择管道类型",
+                        options: [
+                            { id: "", text: "请选择" },
+                            { id: "non_underwater", text: "非水下穿越管道埋深的评分", score: null },
+                            { id: "underwater", text: "水下穿越管道埋深的评分", score: null }
+                        ],
+                        selected: "",
+                        conditional: true
                     }
-                ]
+                ],
+                conditionalContent: {
+                    non_underwater: {
+                        id: "D22332",
+                        title: "D.2.3.3.2非水下穿越管道埋深的评分",
+                        items: [
+                            {
+                                id: "depth1a",
+                                title: "跨越段或露管段",
+                                options: [
+                                    { id: "depth1a1", text: "跨越段或露管段", score: 0 }
+                                ],
+                                selected: "depth1a1"
+                            },
+                            {
+                                id: "depth1b",
+                                title: "埋地段",
+                                inputType: "number",
+                                minValue: 0,
+                                maxValue: 8,
+                                step: 0.1,
+                                placeholder: "请输入0-8之间的数值，根据实际埋深评分",
+                                defaultValue: 0,
+                                showCalculator: true
+                            }
+                        ]
+                    },
+                    underwater: {
+                        id: "D22333",
+                        title: "D.2.3.3.3水下穿越管道埋深的评分",
+                        subitems: [
+                            {
+                                id: "depth2",
+                                title: "可通航河道河底土壤表面(河床表面)与航船底面距离或未通航河道的水深",
+                                maxScore: 2,
+                                items: [
+                                    {
+                                        id: "depth2a",
+                                        title: "通航距离或深度",
+                                        options: [
+                                            { id: "depth2a1", text: "上述距离或深度∈[0m～0.5m)", score: 0 },
+                                            { id: "depth2a2", text: "上述距离或深度∈[0.5m～1.0m)", score: 0.5 },
+                                            { id: "depth2a3", text: "上述距离或深度∈[1.0m～1.5m)", score: 1 },
+                                            { id: "depth2a4", text: "上述距离或深度∈[1.5m～2.0m)", score: 1.5 },
+                                            { id: "depth2a5", text: "上述距离或深度≥2.0m", score: 2 }
+                                        ],
+                                        selected: "depth2a5"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "depth3",
+                                title: "在河底的土壤埋深",
+                                maxScore: 4,
+                                items: [
+                                    {
+                                        id: "depth3a",
+                                        title: "土壤埋深",
+                                        options: [
+                                            { id: "depth3a1", text: "埋深∈[0m～0.5m)", score: 0 },
+                                            { id: "depth3a2", text: "埋深∈[0.5m～1.0m)", score: 1 },
+                                            { id: "depth3a3", text: "埋深∈[1.0m～1.5m)", score: 2 },
+                                            { id: "depth3a4", text: "埋深∈[1.5m～2.0m)", score: 3 },
+                                            { id: "depth3a5", text: "埋深≥2.0m", score: 4 }
+                                        ],
+                                        selected: "depth3a5"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "depth4",
+                                title: "保护措施",
+                                maxScore: 2,
+                                items: [
+                                    {
+                                        id: "depth4a",
+                                        title: "保护措施",
+                                        options: [
+                                            { id: "depth4a1", text: "无保护措施", score: 0 },
+                                            { id: "depth4a2", text: "采用石笼稳管、加设固定墩等稳管措施", score: 1 },
+                                            { id: "depth4a3", text: "采用30mm以上水泥保护层或其他能达到同样加固效果的措施", score: 2 }
+                                        ],
+                                        selected: "depth4a3"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
             },
             {
                 id: "D2234",
@@ -1236,7 +1204,8 @@ class RBIAssessmentSystem {
                                     maxValue: 8,
                                     step: 0.1,
                                     placeholder: "请输入0-8之间的数值，根据实际埋深评分",
-                                    defaultValue: 0
+                                    defaultValue: 0,
+                                showCalculator: true
                                 }
                             ]
                         }
@@ -1517,197 +1486,195 @@ class RBIAssessmentSystem {
                 title: "D.3.2大气腐蚀的评分",
                 maxScore: 10,
                 collapsed: false,
-                type: "tabs",
-                tabs: [
+                type: "conditional",
+                items: [
                     {
-                        id: "tab_atm_underground",
-                        title: "D.3.2.2 埋地段",
-                        icon: "🕳️",
-                        active: false,
-                        content: {
-                            id: "D322",
-                            title: "D.3.2.2埋地段的大气腐蚀的评分",
-                            maxScore: 10,
-                            items: [
-                                {
-                                    id: "atm1",
-                                    title: "埋地段的大气腐蚀评分",
-                                    options: [
-                                        { id: "atm1a", text: "埋地段的大气腐蚀的得分为10分", score: 10 },
-                                        { id: "atm1b", text: "不参与评分", score: 0 }
-                                    ],
-                                    selected: "atm1a"
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        id: "tab_atm_crossing",
-                        title: "D.3.2.3 跨越段",
-                        icon: "🌉",
-                        active: true,
-                        content: {
-                            id: "D323",
-                            title: "D.3.2.3跨越段的大气腐蚀的评分",
-                            maxScore: 10,
-                            subitems: [
-                                {
-                                    id: "D3232",
-                                    title: "D.3.2.3.2跨越段的位置特点的评分",
-                                    maxScore: 2,
-                                    collapsed: false,
-                                    items: [
-                                        {
-                                            id: "pos1",
-                                            title: "跨越段的位置特点",
-                                            noHeader: true,
-                                            options: [
-                                                { id: "pos1a", text: "位于水与空气的界面", score: 0 },
-                                                { id: "pos1b", text: "位于土壤与空气界面", score: 1 },
-                                                { id: "pos1c", text: "位于空气中", score: 2 }
-                                            ],
-                                            selected: "pos1c"
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: "D3233",
-                                    title: "D.3.2.3.3跨越段的结构特点的评分",
-                                    maxScore: 1,
-                                    collapsed: false,
-                                    items: [
-                                        {
-                                            id: "struct1",
-                                            title: "跨越段的结构特点",
-                                            noHeader: true,
-                                            options: [
-                                                { id: "struct1a", text: "加装套管", score: 0 },
-                                                { id: "struct1b", text: "存在支撑或吊架", score: 0.5 },
-                                                { id: "struct1c", text: "无上述情况", score: 1 }
-                                            ],
-                                            selected: "struct1c"
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: "D3234",
-                                    title: "D.3.2.3.4大气腐蚀性的评分",
-                                    maxScore: 3,
-                                    collapsed: false,
-                                    items: [
-                                        {
-                                            id: "corrosion1",
-                                            title: "大气腐蚀性",
-                                            noHeader: true,
-                                            options: [
-                                                { id: "corrosion1a", text: "未进行大气腐蚀性调查", score: 0 },
-                                                { id: "corrosion1b", text: "海洋气候，并且含化学品", score: 0 },
-                                                { id: "corrosion1c", text: "工业大气或一般大气，含化学品，并且湿度高", score: 1 },
-                                                { id: "corrosion1d", text: "海洋气候并且不含化学品", score: 1.5 },
-                                                { id: "corrosion1e", text: "工业大气或一般大气，不含化学品，并且湿度高、温度高", score: 2 },
-                                                { id: "corrosion1f", text: "工业大气或一般大气，含化学品，并且湿度低", score: 2.5 },
-                                                { id: "corrosion1g", text: "工业大气或一般大气，不含化学品，并且湿度低、温度低", score: 3 }
-                                            ],
-                                            selected: "corrosion1g"
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: "D3235",
-                                    title: "D.3.2.3.5大气腐蚀防腐层的评分",
-                                    maxScore: 4,
-                                    collapsed: false,
-                                    subitems: [
-                                        {
-                                            id: "applicability",
-                                            title: "a) 大气腐蚀防腐层的适用性",
-                                            maxScore: 1,
-                                            collapsed: false,
-                                            items: [
-                                                {
-                                                    id: "app1",
-                                                    title: "防腐层适用性",
-                                                    noHeader: true,
-                                                    options: [
-                                                        { id: "app1a", text: "无大气腐蚀防腐层", score: 0 },
-                                                        { id: "app1b", text: "大气腐蚀防腐层不适合管道区段所处环境", score: 0 },
-                                                        { id: "app1c", text: "大气腐蚀防腐层不是专门为管道区段所处环境设计的", score: 0.5 },
-                                                        { id: "app1d", text: "大气腐蚀防腐层是适应管道区段所处环境的防腐层", score: 1 }
-                                                    ],
-                                                    selected: "app1d"
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            id: "quality",
-                                            title: "b) 大气腐蚀防腐层的施工质量",
-                                            maxScore: 1,
-                                            collapsed: false,
-                                            items: [
-                                                {
-                                                    id: "quality1",
-                                                    title: "施工质量",
-                                                    noHeader: true,
-                                                    options: [
-                                                        { id: "quality1a", text: "无大气腐蚀防腐层", score: 0 },
-                                                        { id: "quality1a", text: "无大气腐蚀防腐层", score: 0 },
-                                                        { id: "quality1b", text: "施工步骤疏漏，没有进行环境控制", score: 0 },
-                                                        { id: "quality1c", text: "施工步骤齐全，但操作不规范", score: 0.5 },
-                                                        { id: "quality1d", text: "施工步骤齐全，操作较规范，但没有正规的质量控制程序", score: 0.8 },
-                                                        { id: "quality1e", text: "有详细的规范说明，采用适当的质量控制系统", score: 1 }
-                                                    ],
-                                                    selected: "quality1e"
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            id: "inspection",
-                                            title: "c) 大气腐蚀防腐层的日常检查",
-                                            maxScore: 1,
-                                            collapsed: false,
-                                            items: [
-                                                {
-                                                    id: "inspection1",
-                                                    title: "日常检查",
-                                                    noHeader: true,
-                                                    options: [
-                                                        { id: "inspection1a", text: "无大气腐蚀防腐层", score: 0 },
-                                                        { id: "inspection1b", text: "未检查大气腐蚀防腐层", score: 0 },
-                                                        { id: "inspection1c", text: "很少检查，偶尔查看常出问题的地方", score: 0.5 },
-                                                        { id: "inspection1d", text: "检查不正规，检查人员未经专门培训或检查时间间隔过长", score: 0.8 },
-                                                        { id: "inspection1e", text: "进行正规彻底的检查，检查人员经专门培训，检查时间间隔合理", score: 1 }
-                                                    ],
-                                                    selected: "inspection1e"
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            id: "repair",
-                                            title: "d) 大气腐蚀防腐层的修补更换",
-                                            maxScore: 1,
-                                            collapsed: false,
-                                            items: [
-                                                {
-                                                    id: "repair1",
-                                                    title: "修补更换",
-                                                    noHeader: true,
-                                                    options: [
-                                                        { id: "repair1a", text: "无大气腐蚀防腐层", score: 0 },
-                                                        { id: "repair1b", text: "不修补、更换损坏的大气腐蚀防腐层", score: 0 },
-                                                        { id: "repair1c", text: "不坚持报告和修复缺陷", score: 0.5 },
-                                                        { id: "repair1d", text: "不正式报告缺陷，仅在方便的时候才进行修复", score: 0.8 },
-                                                        { id: "repair1e", text: "立即报告缺陷，并有文件记录安排修复时间，按照时间安排和规范进行修复", score: 1 }
-                                                    ],
-                                                    selected: "repair1e"
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
+                        id: "atmospheric_type_selector",
+                        title: "请选择管道段类型",
+                        options: [
+                            { id: "", text: "请选择" },
+                            { id: "underground", text: "埋地段的大气腐蚀评分" },
+                            { id: "crossing", text: "跨越段的大气腐蚀评分" }
+                        ],
+                        selected: "",
+                        conditional: true
                     }
-                ]
+                ],
+                conditionalContent: {
+                    underground: {
+                        id: "D322",
+                        title: "D.3.2.2埋地段的大气腐蚀的评分",
+                        items: [
+                            {
+                                id: "atm1",
+                                title: "埋地段的大气腐蚀评分",
+                                options: [
+                                    { id: "atm1a", text: "埋地段的大气腐蚀的得分为10分", score: 10 },
+                                    { id: "atm1b", text: "不参与评分", score: 0 }
+                                ],
+                                selected: "atm1a"
+                            }
+                        ]
+                    },
+                    crossing: {
+                        id: "D323",
+                        title: "D.3.2.3跨越段的大气腐蚀的评分",
+                        subitems: [
+                            {
+                                id: "D3232",
+                                title: "D.3.2.3.2跨越段的位置特点的评分",
+                                maxScore: 2,
+                                collapsed: false,
+                                items: [
+                                    {
+                                        id: "pos1",
+                                        title: "跨越段的位置特点",
+                                        noHeader: true,
+                                        options: [
+                                            { id: "pos1a", text: "位于水与空气的界面", score: 0 },
+                                            { id: "pos1b", text: "位于土壤与空气界面", score: 1 },
+                                            { id: "pos1c", text: "位于空气中", score: 2 }
+                                        ],
+                                        selected: "pos1c"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "D3233",
+                                title: "D.3.2.3.3跨越段的结构特点的评分",
+                                maxScore: 1,
+                                collapsed: false,
+                                items: [
+                                    {
+                                        id: "struct1",
+                                        title: "跨越段的结构特点",
+                                        noHeader: true,
+                                        options: [
+                                            { id: "struct1a", text: "加装套管", score: 0 },
+                                            { id: "struct1b", text: "存在支撑或吊架", score: 0.5 },
+                                            { id: "struct1c", text: "无上述情况", score: 1 }
+                                        ],
+                                        selected: "struct1c"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "D3234",
+                                title: "D.3.2.3.4大气腐蚀性的评分",
+                                maxScore: 3,
+                                collapsed: false,
+                                items: [
+                                    {
+                                        id: "corrosion1",
+                                        title: "大气腐蚀性",
+                                        noHeader: true,
+                                        options: [
+                                            { id: "corrosion1a", text: "未进行大气腐蚀性调查", score: 0 },
+                                            { id: "corrosion1b", text: "海洋气候，并且含化学品", score: 0 },
+                                            { id: "corrosion1c", text: "工业大气或一般大气，含化学品，并且湿度高", score: 1 },
+                                            { id: "corrosion1d", text: "海洋气候并且不含化学品", score: 1.5 },
+                                            { id: "corrosion1e", text: "工业大气或一般大气，不含化学品，并且湿度高、温度高", score: 2 },
+                                            { id: "corrosion1f", text: "工业大气或一般大气，含化学品，并且湿度低", score: 2.5 },
+                                            { id: "corrosion1g", text: "工业大气或一般大气，不含化学品，并且湿度低、温度低", score: 3 }
+                                        ],
+                                        selected: "corrosion1g"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "D3235",
+                                title: "D.3.2.3.5大气腐蚀防腐层的评分",
+                                maxScore: 4,
+                                collapsed: false,
+                                subitems: [
+                                    {
+                                        id: "applicability",
+                                        title: "a) 大气腐蚀防腐层的适用性",
+                                        maxScore: 1,
+                                        collapsed: false,
+                                        items: [
+                                            {
+                                                id: "app1",
+                                                title: "防腐层适用性",
+                                                noHeader: true,
+                                                options: [
+                                                    { id: "app1a", text: "无大气腐蚀防腐层", score: 0 },
+                                                    { id: "app1b", text: "大气腐蚀防腐层不适合管道区段所处环境", score: 0 },
+                                                    { id: "app1c", text: "大气腐蚀防腐层不是专门为管道区段所处环境设计的", score: 0.5 },
+                                                    { id: "app1d", text: "大气腐蚀防腐层是适应管道区段所处环境的防腐层", score: 1 }
+                                                ],
+                                                selected: "app1d"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        id: "quality",
+                                        title: "b) 大气腐蚀防腐层的施工质量",
+                                        maxScore: 1,
+                                        collapsed: false,
+                                        items: [
+                                            {
+                                                id: "quality1",
+                                                title: "施工质量",
+                                                noHeader: true,
+                                                options: [
+                                                    { id: "quality1a", text: "无大气腐蚀防腐层", score: 0 },
+                                                    { id: "quality1b", text: "施工步骤疏漏，没有进行环境控制", score: 0 },
+                                                    { id: "quality1c", text: "施工步骤齐全，但操作不规范", score: 0.5 },
+                                                    { id: "quality1d", text: "施工步骤齐全，操作较规范，但没有正规的质量控制程序", score: 0.8 },
+                                                    { id: "quality1e", text: "有详细的规范说明，采用适当的质量控制系统", score: 1 }
+                                                ],
+                                                selected: "quality1e"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        id: "inspection",
+                                        title: "c) 大气腐蚀防腐层的日常检查",
+                                        maxScore: 1,
+                                        collapsed: false,
+                                        items: [
+                                            {
+                                                id: "inspection1",
+                                                title: "日常检查",
+                                                noHeader: true,
+                                                options: [
+                                                    { id: "inspection1a", text: "无大气腐蚀防腐层", score: 0 },
+                                                    { id: "inspection1b", text: "未检查大气腐蚀防腐层", score: 0 },
+                                                    { id: "inspection1c", text: "很少检查，偶尔查看常出问题的地方", score: 0.5 },
+                                                    { id: "inspection1d", text: "检查不正规，检查人员未经专门培训或检查时间间隔过长", score: 0.8 },
+                                                    { id: "inspection1e", text: "进行正规彻底的检查，检查人员经专门培训，检查时间间隔合理", score: 1 }
+                                                ],
+                                                selected: "inspection1e"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        id: "repair",
+                                        title: "d) 大气腐蚀防腐层的修补更换",
+                                        maxScore: 1,
+                                        collapsed: false,
+                                        items: [
+                                            {
+                                                id: "repair1",
+                                                title: "修补更换",
+                                                noHeader: true,
+                                                options: [
+                                                    { id: "repair1a", text: "无大气腐蚀防腐层", score: 0 },
+                                                    { id: "repair1b", text: "不修补、更换损坏的大气腐蚀防腐层", score: 0 },
+                                                    { id: "repair1c", text: "不坚持报告和修复缺陷", score: 0.5 },
+                                                    { id: "repair1d", text: "不正式报告缺陷，仅在方便的时候才进行修复", score: 0.8 },
+                                                    { id: "repair1e", text: "立即报告缺陷，并有文件记录安排修复时间，按照时间安排和规范进行修复", score: 1 }
+                                                ],
+                                                selected: "repair1e"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
             },
             {
                 id: "D33",
@@ -3588,14 +3555,15 @@ class RBIAssessmentSystem {
                                  items: [
                                      {
                                          id: "strength1",
-                                         title: "强度试验",
+                                         title: "强度试验(GB 50251)",
                                          noHeader: false,
-                                         options: [
-                                             { id: "strength1a", text: "未进行强度试验", score: 0 },
-                                             { id: "strength1b", text: "强度试验不符合相关标准规范", score: 0 },
-                                             { id: "strength1c", text: "进行了符合相关标准规范的强度试验，参照附件（打开计算器）", score: null }
-                                         ],
-                                         selected: "strength1b"
+                                         inputType: "number",
+                                         minValue: 0,
+                                         maxValue: 3,
+                                         step: 0.1,
+                                         placeholder: "未进行强度试验/强度试验不符合相关标准规范0分，进行了符合相关标准规范的强度试验，点击去计算进行计算",
+                                         defaultValue: 0,
+                                         showCalculator: true
                                      }
                                  ]
                              },
@@ -3702,7 +3670,8 @@ class RBIAssessmentSystem {
                                  maxValue: 2,
                                  step: 0.1,
                                  placeholder: "请输入0-2之间的数值，附加安全裕度小于0时，失效可能性为100",
-                                 defaultValue: 0
+                                 defaultValue: 0,
+                                showCalculator: true
                              }
                          ]
                      },
@@ -4421,11 +4390,9 @@ class RBIAssessmentSystem {
                                 id: "other1",
                                 title: "其他评价项目",
                                 noHeader: false,
-                                                                 options: [
-                                     { id: "oth1a", text: "未进行其他评价项目", score: 0 },
-                                     { id: "oth1b", text: "进行其他评价项目", score: 0 }
-                                 ],
-                                 selected: "oth1b"
+                                fixedScore: 0,
+                                fixedText: "固定得分：0分",
+                                hidden: true
                             }
                         ]
                     }
@@ -4661,12 +4628,15 @@ class RBIAssessmentSystem {
                     {
                         id: "leakage1",
                         title: "介质最大泄漏量",
-                        inputType: "number",
-                        minValue: 1,
-                        maxValue: 20,
-                        step: 0.1,
-                        placeholder: "请输入1-20之间的数值，根据实际泄漏量评分",
-                        defaultValue: "点击打开计算器",
+                        options: [
+                            { id: "leakage1_1", text: "最大泄漏量小于等于450kg", score: 1 },
+                            { id: "leakage1_8", text: "大于450kg，小于等于4500kg", score: 8 },
+                            { id: "leakage1_12", text: "大于4500kg，小于等于45000kg", score: 12 },
+                            { id: "leakage1_16", text: "大于45000kg，小于等于450000kg", score: 16 },
+                            { id: "leakage1_20", text: "大于450000kg", score: 20 }
+                        ],
+                        selected: "leakage1_1",
+                        showCalculator: true,
                         description: "评分标准：≤450kg得1分，450-4500kg得8分，4500-45000kg得12分，45000-450000kg得16分，>450000kg得20分"
                     }
                 ]
@@ -4905,6 +4875,10 @@ class RBIAssessmentSystem {
             console.log('创建选项卡元素:', section.title);
             const tabsElement = this.createTabsElement(section, moduleId);
             sectionContent.appendChild(tabsElement);
+        } else if (section.type === "conditional") {
+            console.log('创建条件选择元素:', section.title);
+            const conditionalElement = this.createConditionalElement(section, moduleId);
+            sectionContent.appendChild(conditionalElement);
         } else {
             // 渲染子项
             if (section.subitems) {
@@ -4988,6 +4962,89 @@ class RBIAssessmentSystem {
         
         console.log('选项卡元素创建完成:', tabsDiv);
         return tabsDiv;
+    }
+
+    // 创建条件选择元素
+    createConditionalElement(section, moduleId) {
+        console.log('创建条件选择元素:', section, moduleId);
+        
+        const conditionalDiv = document.createElement('div');
+        conditionalDiv.className = 'conditional-container';
+        conditionalDiv.dataset.moduleId = moduleId;
+        
+        // 渲染初始选择器
+        if (section.items) {
+            section.items.forEach(item => {
+                if (item.conditional) {
+                    const selectorElement = this.createItemElement(item, moduleId);
+                    conditionalDiv.appendChild(selectorElement);
+                    
+                    // 添加条件内容容器
+                    const conditionalContent = document.createElement('div');
+                    conditionalContent.className = 'conditional-content';
+                    conditionalContent.id = `conditional-content-${moduleId}`;
+                    conditionalContent.style.display = 'none'; // 初始隐藏
+                    
+                    conditionalDiv.appendChild(conditionalContent);
+                    
+                    // 监听选择器变化
+                    const select = selectorElement.querySelector('select');
+                    if (select) {
+                        select.addEventListener('change', (e) => {
+                            this.handleConditionalSelection(e.target.value, section, conditionalContent, moduleId);
+                        });
+                    }
+                }
+            });
+        }
+        
+        console.log('条件选择元素创建完成:', conditionalDiv);
+        return conditionalDiv;
+    }
+
+    // 处理条件选择
+    handleConditionalSelection(selectedValue, section, contentContainer, moduleId) {
+        console.log('处理条件选择:', selectedValue, moduleId);
+        
+        // 清空当前内容
+        contentContainer.innerHTML = '';
+        
+        // 如果选择为空或"请选择"，隐藏内容
+        if (!selectedValue || selectedValue === '') {
+            contentContainer.style.display = 'none';
+            console.log('选择了"请选择"，隐藏内容');
+            return;
+        }
+        
+        if (selectedValue && section.conditionalContent && section.conditionalContent[selectedValue]) {
+            const selectedContent = section.conditionalContent[selectedValue];
+            
+            // 渲染选中的内容
+            if (selectedContent.subitems) {
+                selectedContent.subitems.forEach(subitem => {
+                    const subitemElement = this.createSubitemElement(subitem, moduleId);
+                    contentContainer.appendChild(subitemElement);
+                });
+            }
+            
+            if (selectedContent.items) {
+                selectedContent.items.forEach(item => {
+                    const itemElement = this.createItemElement(item, moduleId);
+                    contentContainer.appendChild(itemElement);
+                });
+            }
+            
+            // 显示内容
+            contentContainer.style.display = 'block';
+            
+            // 更新分数
+            setTimeout(() => {
+                this.updateSectionScores(moduleId);
+            }, 0);
+        } else {
+            // 隐藏内容
+            contentContainer.style.display = 'none';
+        }
     }
 
     // 切换选项卡
@@ -5162,11 +5219,8 @@ class RBIAssessmentSystem {
                     // 记录数字输入的分数
                     const inputElement = document.querySelector(`[data-item-id="${item.id}"] input`);
                     if (inputElement) {
-                        // 特殊处理E.3模块：如果显示"点击打开计算器"则分数为0
-                        if (item.id === "leakage1" && inputElement.value === "点击打开计算器") {
-                            this.scores[moduleId][item.id] = 0;
                         // 特殊处理D.2.3.3埋深评分：确保输入框显示正确的placeholder
-                        } else if (item.id === "depth1b") {
+                        if (item.id === "depth1b") {
                             // 如果输入框为空或值为默认值0，重置为正确的placeholder状态
                             if (!inputElement.value || inputElement.value === "0") {
                                 inputElement.value = '';
@@ -5434,6 +5488,20 @@ class RBIAssessmentSystem {
 
     // 创建项目元素
     createItemElement(item, moduleId) {
+        // 如果项目设置为隐藏，仍然保存分数但不渲染UI
+        if (item.hidden) {
+            // 保存固定分数到scores对象
+            if (!this.scores[moduleId]) {
+                this.scores[moduleId] = {};
+            }
+            this.scores[moduleId][item.id] = item.fixedScore || 0;
+            
+            // 返回一个空的不可见元素
+            const hiddenDiv = document.createElement('div');
+            hiddenDiv.style.display = 'none';
+            return hiddenDiv;
+        }
+
         const itemDiv = document.createElement('div');
         itemDiv.className = 'scoring-item';
         
@@ -5464,40 +5532,103 @@ class RBIAssessmentSystem {
             if (!this.scores[moduleId]) {
                 this.scores[moduleId] = {};
             }
-            // 特殊处理：E.3介质最大泄漏量评分 - 初始分数为0
-            if (item.id === "leakage1") {
-                this.scores[moduleId][item.id] = 0;
-            } else {
-                this.scores[moduleId][item.id] = parseFloat(item.defaultValue) || 0;
-            }
+            this.scores[moduleId][item.id] = parseFloat(item.defaultValue) || 0;
             
-            if (item.id === "leakage1") {
-                input.style.cursor = 'pointer';
-                input.title = '点击打开钢管泄漏量计算器';
-                input.placeholder = '点击打开钢管泄漏量计算器';
-                input.readOnly = true;
+            optionsContainer.appendChild(input);
+            
+            // 如果有计算器按钮，添加在输入框右上角
+            if (item.showCalculator && (item.id === 'depth1b' || item.id === 'safetyMargin1' || item.id === 'strength1')) {
+                const calcBtn = document.createElement('button');
+                calcBtn.type = 'button';
+                calcBtn.className = 'calculator-btn';
+                calcBtn.textContent = '去计算';
+                // 检测是否为移动端
+                const isMobile = window.innerWidth <= 768;
                 
-                input.addEventListener('click', () => {
-                    this.openLeakageCalculator(input);
-                });
+                if (isMobile) {
+                    calcBtn.style.cssText = `
+                        position: absolute;
+                        top: -45px;
+                        right: 5px;
+                        padding: 2px 4px;
+                        font-size: 9px;
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 2px;
+                        cursor: pointer;
+                        z-index: 20;
+                        white-space: nowrap;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                        transform: scale(0.9);
+                        -webkit-tap-highlight-color: transparent;
+                        -webkit-user-select: none;
+                        outline: none;
+                    `;
+                } else {
+                    calcBtn.style.cssText = `
+                        position: absolute;
+                        top: -35px;
+                        right: 0px;
+                        padding: 4px 8px;
+                        font-size: 12px;
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 3px;
+                        cursor: pointer;
+                        z-index: 10;
+                        white-space: nowrap;
+                        -webkit-tap-highlight-color: transparent;
+                        -webkit-user-select: none;
+                        outline: none;
+                    `;
+                }
                 
-                // 添加视觉提示样式
-                input.addEventListener('mouseenter', () => {
-                    input.style.borderColor = '#10b981';
-                    if (!input.value || input.value === '') {
-                        input.style.backgroundColor = '#f0fdf4';
-                    } else {
-                        input.style.backgroundColor = '#e8f5e8';
+                calcBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (item.id === 'depth1b') {
+                        this.createDepthCalculator();
+                    } else if (item.id === 'safetyMargin1') {
+                        this.createSafetyMarginCalculator();
+                    } else if (item.id === 'strength1') {
+                        this.createStrengthCalculator();
                     }
                 });
                 
-                input.addEventListener('mouseleave', () => {
-                    input.style.borderColor = '#e9ecef';
-                    input.style.backgroundColor = 'white';
-                });
+                // 确保选项容器有相对定位
+                optionsContainer.style.position = 'relative';
+                optionsContainer.appendChild(calcBtn);
+                
+                // 添加窗口大小变化监听器，动态调整按钮位置
+                const adjustButtonPosition = () => {
+                    const isMobile = window.innerWidth <= 768;
+                    if (isMobile) {
+                        calcBtn.style.top = '-45px';
+                        calcBtn.style.right = '5px';
+                        calcBtn.style.fontSize = '9px';
+                        calcBtn.style.padding = '2px 4px';
+                        calcBtn.style.background = '#007bff';
+                        calcBtn.style.zIndex = '20';
+                        calcBtn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+                        calcBtn.style.borderRadius = '2px';
+                        calcBtn.style.transform = 'scale(0.9)';
+                    } else {
+                        calcBtn.style.top = '-35px';
+                        calcBtn.style.right = '0px';
+                        calcBtn.style.fontSize = '12px';
+                        calcBtn.style.padding = '4px 8px';
+                        calcBtn.style.background = '#007bff';
+                        calcBtn.style.zIndex = '10';
+                        calcBtn.style.boxShadow = 'none';
+                        calcBtn.style.borderRadius = '3px';
+                        calcBtn.style.transform = 'none';
+                    }
+                };
+                
+                window.addEventListener('resize', adjustButtonPosition);
             }
-            
-            optionsContainer.appendChild(input);
             
             // 确保输入框在页面加载时处于可用状态
             if (item.id === "depth1b") {
@@ -5508,69 +5639,253 @@ class RBIAssessmentSystem {
                 input.step = 'any';
             }
             
-            // 为埋地段输入框添加点击事件，触发计算器
-            if (item.id === "depth1b") {
-                input.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.createDepthCalculator();
-                });
-                
-                // 添加提示样式
-                input.style.cursor = 'pointer';
-                input.title = '点击打开埋地段计算器';
-            }
             
             // 强度试验已改为下拉选项 + 隐藏输入，不再直接绑定输入框点击事件
+            
+            // 为埋地段输入框添加基本输入限制（只限制非数字字符）
+            if (item.id === "depth1b") {
+                input.addEventListener('keydown', (e) => {
+                    // 允许删除键、退格键、Tab键、Enter键、方向键等控制键
+                    if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Tab' || 
+                        e.key === 'Enter' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || 
+                        e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'Home' || 
+                        e.key === 'End' || (e.ctrlKey && (e.key === 'a' || e.key === 'c' || e.key === 'v' || e.key === 'x'))) {
+                        return;
+                    }
+                    
+                    // 只允许数字、小数点和负号
+                    if (!/[0-9.-]/.test(e.key)) {
+                        e.preventDefault();
+                        return;
+                    }
+                });
+            }
             
             // 添加输入验证和事件处理
             input.addEventListener('input', (e) => {
                 const value = parseFloat(e.target.value);
                 if (!isNaN(value)) {
-                    // 检查D.5.2.5附加安全裕度的范围验证
-                    if (this.isAdditionalSafetyMarginField(input)) {
-                        // 使用专门的验证函数
-                        if (!this.validateSafetyMarginScore(value)) {
-                            // 验证失败时不显示提示框，只记录日志
-                            if (value < 0) {
-                                console.log(`D.5.2.5附加安全裕度分值为负数(${value})，将被忽略，不计入总分`);
-                            } else if (value > item.maxValue) {
-                                console.log(`D.5.2.5附加安全裕度分值超出范围(${value})，最大值应为${item.maxValue}`);
-                            } else {
-                                console.log(`D.5.2.5附加安全裕度分值无效(${value})`);
-                            }
-                            return;
-                        } else {
-                            input.setCustomValidity('');
-                        }
-                    }
+                    // 检查D.5.2.5附加安全裕度的范围验证 - 注释掉早期验证，让后面的特殊处理来处理
+                    // if (this.isAdditionalSafetyMarginField(input)) {
+                    //     // 使用专门的验证函数
+                    //     if (!this.validateSafetyMarginScore(value)) {
+                    //         // 验证失败时不显示提示框，只记录日志
+                    //         if (value < 0) {
+                    //             console.log(`D.5.2.5附加安全裕度分值为负数(${value})，将被忽略，不计入总分`);
+                    //         } else if (value > item.maxValue) {
+                    //             console.log(`D.5.2.5附加安全裕度分值超出范围(${value})，最大值应为${item.maxValue}`);
+                    //         } else {
+                    //             console.log(`D.5.2.5附加安全裕度分值无效(${value})`);
+                    //         }
+                    //         return;
+                    //     } else {
+                    //         input.setCustomValidity('');
+                    //     }
+                    // }
                     
-                    // 特殊处理埋地段输入框：不进行范围验证，避免变红
+                    // 特殊处理埋地段输入框：限制0-8分范围
                     if (item.id === "depth1b") {
-                        // 埋地段输入框不进行范围验证，直接保存值
+                        // 验证范围0-8分
+                        if (value < 0 || value > 8) {
+                            // 设置输入框为淡红色边框 - 使用多种方式确保样式生效
+                            input.style.setProperty('border', '2px solid #f87171', 'important');
+                            input.style.setProperty('border-color', '#f87171', 'important');
+                            input.style.setProperty('border-width', '2px', 'important');
+                            input.style.setProperty('box-shadow', '0 0 0 0.2rem rgba(248, 113, 113, 0.15)', 'important');
+                            input.style.setProperty('outline', 'none', 'important');
+                            input.setCustomValidity('请输入0-8之间的数值');
+                            input.classList.add('invalid-input');
+                            
+                            console.log('设置红色边框样式，当前输入值:', value);
+                            
+                            // 创建或更新提示信息
+                            let tooltip = input.parentElement.querySelector('.validation-tooltip');
+                            if (!tooltip) {
+                                tooltip = document.createElement('div');
+                                tooltip.className = 'validation-tooltip';
+                                tooltip.style.cssText = `
+                                    position: absolute;
+                                    top: 100%;
+                                    left: 0;
+                                    background: #f87171;
+                                    color: white;
+                                    padding: 4px 8px;
+                                    border-radius: 3px;
+                                    font-size: 12px;
+                                    white-space: nowrap;
+                                    z-index: 1000;
+                                    margin-top: 2px;
+                                `;
+                                input.parentElement.appendChild(tooltip);
+                            }
+                            tooltip.textContent = `输入值 ${value} 超出范围，请输入0-8之间的数值`;
+                            tooltip.style.display = 'block';
+                            
+                            // 不保存超出范围的值
+                            return;
+                        }
+                        
+                        // 范围内的值直接保存
                         this.scores[moduleId][item.id] = value;
                         console.log(`埋地段分值 ${value} 已保存到scores对象`);
                         
-                        // 清除任何验证错误状态
+                        // 清除验证错误状态
                         input.setCustomValidity('');
-                        input.classList.remove('error', 'invalid');
-                        input.style.borderColor = '';
-                        input.style.boxShadow = '';
-                        // 确保不受 step 约束影响
-                        input.step = 'any';
-                    } else if (this.isAdditionalSafetyMarginField(input) && value < 0) {
-                        // 特殊处理D.5.2.5附加安全裕度：负值不保存到scores对象中
-                        console.log(`D.5.2.5附加安全裕度分值为负数(${value})，将被忽略，不计入总分`);
+                        input.style.removeProperty('border');
+                        input.style.removeProperty('border-color');
+                        input.style.removeProperty('border-width');
+                        input.style.removeProperty('box-shadow');
+                        input.style.removeProperty('outline');
+                        input.classList.remove('invalid-input');
                         
-                        // 从scores对象中移除该项（如果之前存在）
-                        if (this.scores[moduleId][item.id] !== undefined) {
-                            delete this.scores[moduleId][item.id];
-                            console.log(`已从scores对象中移除负数的附加安全裕度分值`);
+                        console.log('清除红色边框样式，当前输入值:', value);
+                        
+                        // 隐藏提示信息
+                        const tooltip = input.parentElement.querySelector('.validation-tooltip');
+                        if (tooltip) {
+                            tooltip.style.display = 'none';
                         }
                         
-                        // 显示警告提示
-                        this.showSafetyMarginWarning();
+                        input.step = 'any';
+                    } else if (this.isAdditionalSafetyMarginField(input)) {
+                        // 特殊处理D.5.2.5附加安全裕度
+                        console.log(`检测到附加安全裕度输入，值=${value}, ID=${input.id}, data-item-id=${input.getAttribute('data-item-id')}`);
+                        if (value < 0) {
+                            // 负值：失效可能性为100
+                            console.log(`D.5.2.5附加安全裕度分值为负数(${value})，失效可能性为100`);
+                            
+                            // 保存负值到scores对象（用于S=100状态判断），但在分数计算时会被忽略
+                            this.scores[moduleId][item.id] = value;
+                            console.log(`保存负数的附加安全裕度分值${value}到scores对象（用于S=100状态判断）`);
+                            
+                            // 显示S=100提示
+                            this.showSafetyMarginWarning();
+                            
+                            // 清除红色边框（因为负值是有效的，只是表示S=100）
+                            input.style.removeProperty('border');
+                            input.style.removeProperty('border-color');
+                            input.style.removeProperty('border-width');
+                            input.style.removeProperty('box-shadow');
+                            input.style.removeProperty('outline');
+                            input.setCustomValidity('');
+                            
+                            // 隐藏提示信息
+                            const tooltip = input.parentElement.querySelector('.validation-tooltip');
+                            if (tooltip) {
+                                tooltip.style.display = 'none';
+                            }
+                        } else if (value > 2) {
+                            // 大于2：显示红色边框和提示
+                            console.log(`附加安全裕度值${value}大于2，设置红色边框和提示`);
+                            input.style.setProperty('border', '2px solid #f87171', 'important');
+                            input.style.setProperty('border-color', '#f87171', 'important');
+                            input.style.setProperty('border-width', '2px', 'important');
+                            input.style.setProperty('box-shadow', '0 0 0 0.2rem rgba(248, 113, 113, 0.15)', 'important');
+                            input.style.setProperty('outline', 'none', 'important');
+                            input.setCustomValidity('附加安全裕度应不大于2');
+                            
+                            // 创建或更新提示信息
+                            let tooltip = input.parentElement.querySelector('.validation-tooltip');
+                            if (!tooltip) {
+                                tooltip = document.createElement('div');
+                                tooltip.className = 'validation-tooltip';
+                                tooltip.style.cssText = `
+                                    position: absolute;
+                                    top: 100%;
+                                    left: 0;
+                                    background: #f87171;
+                                    color: white;
+                                    padding: 4px 8px;
+                                    border-radius: 3px;
+                                    font-size: 12px;
+                                    white-space: nowrap;
+                                    z-index: 1000;
+                                    margin-top: 2px;
+                                `;
+                                input.parentElement.appendChild(tooltip);
+                            }
+                            tooltip.textContent = `输入值 ${value} 超出范围，附加安全裕度应不大于2`;
+                            tooltip.style.display = 'block';
+                            
+                            // 不保存超出范围的值
+                            return;
+                        } else {
+                            // 0-2范围内的有效值
+                            this.scores[moduleId][item.id] = value;
+                            console.log(`附加安全裕度分值 ${value} 已保存到scores对象`);
+                            
+                            // 清除验证错误状态
+                            input.setCustomValidity('');
+                            input.style.removeProperty('border');
+                            input.style.removeProperty('border-color');
+                            input.style.removeProperty('border-width');
+                            input.style.removeProperty('box-shadow');
+                            input.style.removeProperty('outline');
+                            
+                            // 隐藏提示信息
+                            const tooltip = input.parentElement.querySelector('.validation-tooltip');
+                            if (tooltip) {
+                                tooltip.style.display = 'none';
+                            }
+                        }
+                    } else if (item.id === 'strength1') {
+                        // 特殊处理D.5.2.4.9强度试验输入框：限制0-3分范围
+                        if (value < 0 || value > 3) {
+                            // 设置输入框为淡红色边框
+                            input.style.setProperty('border', '2px solid #f87171', 'important');
+                            input.style.setProperty('border-color', '#f87171', 'important');
+                            input.style.setProperty('border-width', '2px', 'important');
+                            input.style.setProperty('box-shadow', '0 0 0 0.2rem rgba(248, 113, 113, 0.15)', 'important');
+                            input.style.setProperty('outline', 'none', 'important');
+                            input.setCustomValidity('强度试验分值应在0-3分范围内');
+                            
+                            // 创建或更新提示信息
+                            let tooltip = input.parentElement.querySelector('.validation-tooltip');
+                            if (!tooltip) {
+                                tooltip = document.createElement('div');
+                                tooltip.className = 'validation-tooltip';
+                                tooltip.style.cssText = `
+                                    position: absolute;
+                                    top: 100%;
+                                    left: 0;
+                                    background: #f87171;
+                                    color: white;
+                                    padding: 4px 8px;
+                                    border-radius: 3px;
+                                    font-size: 12px;
+                                    white-space: nowrap;
+                                    z-index: 1000;
+                                    margin-top: 2px;
+                                `;
+                                input.parentElement.appendChild(tooltip);
+                            }
+                            tooltip.textContent = `输入值 ${value} 超出范围，强度试验分值应在0-3分范围内`;
+                            tooltip.style.display = 'block';
+                            
+                            console.log(`强度试验分值${value}超出0-3分范围，显示红色边框和提示`);
+                            // 不保存超出范围的值
+                            return;
+                        } else {
+                            // 0-3范围内的有效值
+                            this.scores[moduleId][item.id] = value;
+                            console.log(`强度试验分值 ${value} 已保存到scores对象`);
+                            
+                            // 清除验证错误状态
+                            input.setCustomValidity('');
+                            input.style.removeProperty('border');
+                            input.style.removeProperty('border-color');
+                            input.style.removeProperty('border-width');
+                            input.style.removeProperty('box-shadow');
+                            input.style.removeProperty('outline');
+                            
+                            // 隐藏提示信息
+                            const tooltip = input.parentElement.querySelector('.validation-tooltip');
+                            if (tooltip) {
+                                tooltip.style.display = 'none';
+                            }
+                        }
                     } else {
-                        // 保存正数或零值
+                        // 保存其他输入框的值
                         this.scores[moduleId][item.id] = value;
                         console.log(`输入框分值 ${value} 已保存到scores对象`);
                     }
@@ -5593,6 +5908,27 @@ class RBIAssessmentSystem {
                 descriptionDiv.textContent = item.description;
                 optionsContainer.appendChild(descriptionDiv);
             }
+        } else if (item.fixedScore !== undefined) {
+            // 固定分数项目，显示固定文本
+            const fixedDiv = document.createElement('div');
+            fixedDiv.className = 'fixed-score-item';
+            fixedDiv.style.cssText = `
+                padding: 8px 12px;
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                color: #6c757d;
+                font-weight: 500;
+            `;
+            fixedDiv.textContent = item.fixedText || `固定得分：${item.fixedScore}分`;
+            
+            optionsContainer.appendChild(fixedDiv);
+            
+            // 保存固定分数到scores对象
+            if (!this.scores[moduleId]) {
+                this.scores[moduleId] = {};
+            }
+            this.scores[moduleId][item.id] = item.fixedScore;
         } else if (item.options && item.options.length > 0) {
             // 正常的下拉框选项
             const select = document.createElement('select');
@@ -5607,8 +5943,8 @@ class RBIAssessmentSystem {
                 const optionElement = document.createElement('option');
                 optionElement.value = option.id;
                 
-                // 如果分数为null，则不显示分数
-                if (option.score === null) {
+                // 如果分数为null或undefined，则不显示分数
+                if (option.score === null || option.score === undefined) {
                     optionElement.textContent = option.text;
                 } else {
                     optionElement.textContent = `${option.text} (${option.score}分)`;
@@ -5618,8 +5954,8 @@ class RBIAssessmentSystem {
                 select.appendChild(optionElement);
             });
 
-            // 特例：强度试验改为选项 + 隐藏结果输入框（选择“参照附件”时弹出计算器）
-            if (item.id === 'strength1') {
+            // 特例：强度试验已改为输入框，跳过旧的下拉选择器逻辑
+            if (false && item.id === 'strength1') {
                 // 创建隐藏输入框以承载计算结果，参与分数统计
                 const hiddenInput = document.createElement('input');
                 hiddenInput.type = 'number';
@@ -5657,6 +5993,98 @@ class RBIAssessmentSystem {
                 optionsContainer.appendChild(hiddenInput);
             } else {
                 optionsContainer.appendChild(select);
+            }
+            
+            // 如果有计算器按钮，添加在下拉框上方右侧
+            if (item.showCalculator && (item.id === 'leakage1' || item.id === 'depth1b')) {
+                const calcBtn = document.createElement('button');
+                calcBtn.type = 'button';
+                calcBtn.className = 'calculator-btn';
+                calcBtn.textContent = '去计算';
+                // 检测是否为移动端
+                const isMobile = window.innerWidth <= 768;
+                
+                if (isMobile) {
+                    calcBtn.style.cssText = `
+                        position: absolute;
+                        top: -45px;
+                        right: 5px;
+                        padding: 2px 4px;
+                        font-size: 9px;
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 2px;
+                        cursor: pointer;
+                        z-index: 20;
+                        white-space: nowrap;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                        transform: scale(0.9);
+                        -webkit-tap-highlight-color: transparent;
+                        -webkit-user-select: none;
+                        outline: none;
+                    `;
+                } else {
+                    calcBtn.style.cssText = `
+                        position: absolute;
+                        top: -35px;
+                        right: 0px;
+                        padding: 4px 8px;
+                        font-size: 12px;
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 3px;
+                        cursor: pointer;
+                        z-index: 10;
+                        white-space: nowrap;
+                        -webkit-tap-highlight-color: transparent;
+                        -webkit-user-select: none;
+                        outline: none;
+                    `;
+                }
+                
+                calcBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (item.id === 'leakage1') {
+                        this.openLeakageCalculator(select || optionsContainer.querySelector('select'));
+                    } else if (item.id === 'depth1b') {
+                        this.createDepthCalculator();
+                    }
+                });
+                
+                // 确保选项容器有相对定位
+                optionsContainer.style.position = 'relative';
+                optionsContainer.appendChild(calcBtn);
+                
+                // 添加窗口大小变化监听器，动态调整按钮位置
+                const adjustButtonPosition = () => {
+                    const isMobile = window.innerWidth <= 768;
+                    if (isMobile) {
+                        calcBtn.style.top = '-45px';
+                        calcBtn.style.right = '5px';
+                        calcBtn.style.fontSize = '9px';
+                        calcBtn.style.padding = '2px 4px';
+                        calcBtn.style.background = '#007bff';
+                        calcBtn.style.zIndex = '20';
+                        calcBtn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+                        calcBtn.style.borderRadius = '2px';
+                        calcBtn.style.transform = 'scale(0.9)';
+                    } else {
+                        calcBtn.style.top = '-35px';
+                        calcBtn.style.right = '0px';
+                        calcBtn.style.fontSize = '12px';
+                        calcBtn.style.padding = '4px 8px';
+                        calcBtn.style.background = '#007bff';
+                        calcBtn.style.zIndex = '10';
+                        calcBtn.style.boxShadow = 'none';
+                        calcBtn.style.borderRadius = '3px';
+                        calcBtn.style.transform = 'none';
+                    }
+                };
+                
+                window.addEventListener('resize', adjustButtonPosition);
             }
             
             // 如果选项被固定，添加事件监听器来阻止更改
@@ -5809,7 +6237,7 @@ class RBIAssessmentSystem {
             }
         }
         
-        // 如果是附加安全裕度：清理无效值并绑定计算器触发
+        // 如果是附加安全裕度：清理无效值，允许直接输入
         if (item.id === "safetyMargin1") {
             setTimeout(() => {
                 this.cleanupInvalidSafetyMarginScore();
@@ -5817,13 +6245,11 @@ class RBIAssessmentSystem {
             const smInput = optionsContainer.querySelector('input.option-input');
             if (smInput) {
                 smInput.step = 'any';
-                smInput.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.createSafetyMarginCalculator();
-                });
-                smInput.style.cursor = 'pointer';
-                smInput.title = '点击打开附加安全裕度计算器';
-                // 若之前为S=100文本状态，点击时恢复为number，便于重新计算
+                // 移除点击跳出计算器的事件，允许直接输入
+                smInput.style.cursor = 'text';
+                smInput.title = '请输入附加安全裕度分值';
+                
+                // 若之前为S=100文本状态，点击时恢复为number，便于重新输入
                 smInput.addEventListener('focus', () => {
                     if (smInput.dataset.s100 === 'true') {
                         smInput.type = 'number';
@@ -5938,15 +6364,9 @@ class RBIAssessmentSystem {
             select.value = '';
         });
         
-        // 如果是第三方破坏模块，启用所有埋深评分选项
-        if (moduleId === 'third_party') {
-            this.enableAllDepthScores();
-        }
+        // 如果是第三方破坏模块，启用所有埋深评分选项 - 已移除，现在使用条件选择方式
         
-        // 如果是腐蚀模块，启用所有大气腐蚀评分选项
-        if (moduleId === 'corrosion') {
-            this.enableAllAtmosphericCorrosionScores();
-        }
+        // 如果是腐蚀模块，启用所有大气腐蚀评分选项 - 已移除，现在使用条件选择方式
         
         this.scores[moduleId] = 0;
         this.updateSectionScores(moduleId);
@@ -5963,6 +6383,7 @@ class RBIAssessmentSystem {
         if (!module) return;
         
         const totalScore = this.calculateModuleTotalScore(moduleId);
+        console.log(`模块 ${moduleId} 计算出的总分: ${totalScore}`);
         this.scores[moduleId] = totalScore;
         
         this.showModuleScoreResult(moduleId, totalScore);
@@ -6106,16 +6527,41 @@ class RBIAssessmentSystem {
                 <div style="margin-top: 16px; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px; color: #92400e; font-size: 14px; line-height: 1.5;">
                     <strong style="color: #78350f;">特别说明：</strong><br>
                     因为选择了以下高风险选项，所以失效可能性S直接为100：<br>
-                    ${specialOptions.map((option, index) => `${index + 1}. ${option}`).join('<br>')}
+                    ${specialOptions.map((option, index) => {
+                        const highlightKeys = [
+                            'D.5.2.4.7焊接及其检验的评分焊接质量中的焊缝含有不能通过GB/T 19624进行的安全评定的缺陷，取失效可能性S直接为100',
+                            'D.5.3.4.4管体缺陷检验及评价的评分管体缺陷检验及评价结果中的管体含有不能通过按照GB/T 19624安全评定的缺陷，则取失效可能性S直接为100',
+                            'D.5.2.5附加安全裕度小于0，失效可能性S=100'
+                        ];
+                        const shouldHighlight = highlightKeys.some(key => option.includes(key));
+                        const text = `${index + 1}. ${option}`;
+                        return shouldHighlight ? `<span style=\"color: #dc2626;\">${text}</span>` : text;
+                    }).join('<br>')}
+                </div>
+            `;
+        }
+
+        // 正常计算时，仅呈现“失效可能性S”的代入计算过程（不显示说明文字）
+        let sFormulaHtml = '';
+        if (specialOptions.length === 0) {
+            const tp = Number(this.scores.third_party || 0);
+            const co = Number(this.scores.corrosion || 0);
+            const eq = Number(this.scores.equipment || 0);
+            const sa = Number(this.scores.safety || 0);
+            const weighted = 0.3 * tp + 0.3 * co + 0.1 * eq + 0.3 * sa;
+            sFormulaHtml = `
+                <div style="margin-top: 6px; font-size: 14px; color: #111827; line-height: 1.6;">
+                    S = 100 - (0.3×${tp.toFixed(2)} + 0.3×${co.toFixed(2)} + 0.1×${eq.toFixed(2)} + 0.3×${sa.toFixed(2)}) = 100 - ${weighted.toFixed(2)} = ${S.toFixed(2)}
                 </div>
             `;
         }
         
         finalScore.innerHTML = `
             <div>失效可能性 S = ${S.toFixed(2)}</div>
+            ${sFormulaHtml}
             <div>失效后果 C = ${C.toFixed(2)}</div>
             <div style="margin-top: 10px; font-weight: bold;">风险值 R = S × C = ${R.toFixed(2)}</div>
-            <div style="margin-top: 10px; font-size: 0.8em;">风险等级: ${riskLevel}</div>
+            <div class="risk-level" style="margin-top: 10px;">风险等级: ${riskLevel}</div>
             ${explanationHtml}
         `;
         
@@ -6128,10 +6574,10 @@ class RBIAssessmentSystem {
     }
 
     classifyRisk(R) {
-        if (R > 0 && R < 3600) return '低风险绝对等级';
-        if (R >= 3600 && R < 7800) return '中等风险绝对等级';
-        if (R >= 7800 && R < 12600) return '较高风险绝对等级';
-        if (R >= 12600 && R <= 15000) return '高风险绝对等级';
+        if (R > 0 && R < 3600) return '低风险';
+        if (R >= 3600 && R < 7800) return '中等风险';
+        if (R >= 7800 && R < 12600) return '较高风险';
+        if (R >= 12600 && R <= 15000) return '高风险';
         return '未评定';
     }
     
@@ -6400,6 +6846,7 @@ class RBIAssessmentSystem {
         // S=100 显示满分
         if (this.isInS100State() && this.shouldShowFullScore(moduleId)) {
             const maxScore = this.getModuleMaxScore(moduleId);
+            console.log(`模块 ${moduleId} 处于S=100状态，应显示满分: ${maxScore}`);
             return maxScore;
         }
 
@@ -6463,12 +6910,9 @@ class RBIAssessmentSystem {
             
             this.updateModuleScore(moduleId, score);
             
-            // 处理埋深评分的互斥逻辑
-            if (moduleId === 'third_party') {
-                this.handleDepthScoreMutualExclusion(itemId, score);
-            }
+            // 处理埋深评分的互斥逻辑 - 已移除，现在使用条件选择方式
             
-            // 取消大气腐蚀评分的互斥逻辑（允许 D.3.2.2 与 D.3.2.3 同时评分）
+            // 取消大气腐蚀评分的互斥逻辑 - 已移除，现在使用条件选择方式
             
             // 延迟更新得分，避免重复计算
             setTimeout(() => {
@@ -6476,13 +6920,8 @@ class RBIAssessmentSystem {
                 this.updateSectionScores(moduleId);
             }, 0);
         } else {
-            // 当选择被复原为占位项或无得分选项时，解除禁用状态
-            if (moduleId === 'corrosion') {
-                this.enableAllAtmosphericCorrosionScores();
-            }
-            if (moduleId === 'third_party') {
-                this.enableAllDepthScores();
-            }
+            // 当选择被复原为占位项或无得分选项时，解除禁用状态 - 已移除，现在使用条件选择方式
+            // 移除埋深评分的重置逻辑 - 现在使用条件选择方式
 
             setTimeout(() => {
                 this.updateSectionScores(moduleId);
@@ -6510,201 +6949,30 @@ class RBIAssessmentSystem {
         }, 0);
     }
 
-    // 处理埋深评分的互斥逻辑
-    handleDepthScoreMutualExclusion(itemId, score) {
-        // 检查是否选择了非水下穿越管道埋深评分
-        if (itemId === 'depth1' || itemId === 'depth1c') {
-            // 如果选择了非水下穿越管道埋深评分，则水下穿越管道埋深评分设为"不评分"并禁用
-            this.resetUnderwaterDepthScores();
-            this.disableUnderwaterDepthScores();
-        }
-        
-        // 检查是否选择了水下穿越管道埋深评分
-        if (itemId === 'depth2a' || itemId === 'depth3a' || itemId === 'depth4a') {
-            // 如果选择了水下穿越管道埋深评分，则非水下穿越管道埋深评分设为"不评分"并禁用
-            this.resetNonUnderwaterDepthScores();
-            this.disableNonUnderwaterDepthScores();
-        }
-    }
+    // 处理埋深评分的互斥逻辑 - 已移除，现在使用条件选择方式
 
-    // 重置水下穿越管道埋深评分为"不评分"
-    resetUnderwaterDepthScores() {
-        const module = document.getElementById('module-third_party');
-        if (!module) return;
-        
-        // 重置水下穿越管道埋深的三个评分项
-        const underwaterSelects = [
-            module.querySelector('select[data-item-id="depth2a"]'),
-            module.querySelector('select[data-item-id="depth3a"]'),
-            module.querySelector('select[data-item-id="depth4a"]')
-        ];
-        
-        underwaterSelects.forEach(select => {
-            if (select) {
-                select.value = '';
-                // 不触发change事件，避免重复处理
-            }
-        });
-    }
+    // 重置水下穿越管道埋深评分为"不评分" - 已移除，现在使用条件选择方式
 
-    // 重置非水下穿越管道埋深评分为"不评分"
-    resetNonUnderwaterDepthScores() {
-        const module = document.getElementById('module-third_party');
-        if (!module) return;
-        
-        // 重置非水下穿越管道埋深的两个评分项
-        const nonUnderwaterSelects = [
-            module.querySelector('select[data-item-id="depth1"]'),
-            module.querySelector('select[data-item-id="depth1c"]')
-        ];
-        
-        nonUnderwaterSelects.forEach(select => {
-            if (select) {
-                select.value = '';
-                // 不触发change事件，避免重复处理
-            }
-        });
-    }
+    // 重置非水下穿越管道埋深评分为"不评分" - 已移除，现在使用条件选择方式
 
-    // 禁用水下穿越管道埋深评分选项
-    disableUnderwaterDepthScores() {
-        const module = document.getElementById('module-third_party');
-        if (!module) return;
-        
-        // 禁用水下穿越管道埋深的三个评分项
-        const underwaterSelects = [
-            module.querySelector('select[data-item-id="depth2a"]'),
-            module.querySelector('select[data-item-id="depth3a"]'),
-            module.querySelector('select[data-item-id="depth4a"]')
-        ];
-        
-        underwaterSelects.forEach(select => {
-            if (select) {
-                select.disabled = true;
-                select.style.opacity = '0.5';
-                select.style.cursor = 'not-allowed';
-            }
-        });
-    }
+    // 禁用水下穿越管道埋深评分选项 - 已移除，现在使用条件选择方式
 
-    // 禁用非水下穿越管道埋深评分选项
-    disableNonUnderwaterDepthScores() {
-        const module = document.getElementById('module-third_party');
-        if (!module) return;
-        
-        // 禁用非水下穿越管道埋深的两个评分项
-        const nonUnderwaterSelects = [
-            module.querySelector('select[data-item-id="depth1"]'),
-            module.querySelector('select[data-item-id="depth1c"]')
-        ];
-        
-        nonUnderwaterSelects.forEach(select => {
-            if (select) {
-                select.disabled = true;
-                select.style.opacity = '0.5';
-                select.style.cursor = 'not-allowed';
-            }
-        });
-    }
+    // 禁用非水下穿越管道埋深评分选项 - 已移除，现在使用条件选择方式
 
-    // 启用所有埋深评分选项
-    enableAllDepthScores() {
-        const module = document.getElementById('module-third_party');
-        if (!module) return;
-        
-        // 启用所有埋深评分项
-        const allDepthSelects = [
-            module.querySelector('select[data-item-id="depth1"]'),
-            module.querySelector('select[data-item-id="depth1c"]'),
-            module.querySelector('select[data-item-id="depth2a"]'),
-            module.querySelector('select[data-item-id="depth3a"]'),
-            module.querySelector('select[data-item-id="depth4a"]')
-        ];
-        
-        allDepthSelects.forEach(select => {
-            if (select) {
-                select.disabled = false;
-                select.style.opacity = '1';
-                select.style.cursor = 'pointer';
-            }
-        });
-    }
+    // 启用所有埋深评分选项 - 已移除，现在使用条件选择方式
 
     // 已取消大气腐蚀评分互斥逻辑：不再对 D.3.2.2 与 D.3.2.3 进行互斥处理
     handleAtmosphericCorrosionMutualExclusion(itemId, score) {
         return;
     }
 
-    // 重置跨越段大气腐蚀评分为"不评分"
-    resetOverheadCorrosionScores() {
-        const module = document.getElementById('module-corrosion');
-        if (!module) return;
-        
-        // 重置跨越段大气腐蚀的所有评分项（仅用于外部调用时的复位，不主动触发）
-        const overheadSelects = [
-            module.querySelector('select[data-item-id="pos1"]'),
-            module.querySelector('select[data-item-id="struct1"]'),
-            module.querySelector('select[data-item-id="corrosion1"]'),
-            module.querySelector('select[data-item-id="applicability"]'),
-            module.querySelector('select[data-item-id="quality"]'),
-            module.querySelector('select[data-item-id="inspection"]'),
-            module.querySelector('select[data-item-id="repair"]')
-        ];
-        
-        overheadSelects.forEach(select => {
-            if (select) {
-                select.value = '';
-                // 不触发change事件，避免重复处理
-            }
-        });
-    }
+    // 重置跨越段大气腐蚀评分 - 已移除，现在使用条件选择方式
 
-    // 重置埋地段大气腐蚀评分为"不评分"
-    resetUndergroundCorrosionScores() {
-        const module = document.getElementById('module-corrosion');
-        if (!module) return;
-        
-        // 重置埋地段大气腐蚀的评分项（仅用于外部调用时的复位，不主动触发）
-        const undergroundSelects = [ module.querySelector('select[data-item-id="atm1"]') ];
-        
-        undergroundSelects.forEach(select => {
-            if (select) {
-                select.value = '';
-                // 不触发change事件，避免重复处理
-            }
-        });
-    }
+    // 重置埋地段大气腐蚀评分 - 已移除，现在使用条件选择方式
 
-    // 保留函数名避免引用错误，但不再禁用跨越段大气腐蚀评分选项
-    disableOverheadCorrosionScores() { }
+    // 禁用大气腐蚀评分选项 - 已移除，现在使用条件选择方式
 
-    // 保留函数名避免引用错误，但不再禁用埋地段大气腐蚀评分选项
-    disableUndergroundCorrosionScores() { }
-    // 启用所有大气腐蚀评分选项
-    enableAllAtmosphericCorrosionScores() {
-        const module = document.getElementById('module-corrosion');
-        if (!module) return;
-        
-        // 启用所有大气腐蚀评分项
-        const allCorrosionSelects = [
-            module.querySelector('select[data-item-id="atm1"]'),
-            module.querySelector('select[data-item-id="pos1"]'),
-            module.querySelector('select[data-item-id="struct1"]'),
-            module.querySelector('select[data-item-id="corrosion1"]'),
-            module.querySelector('select[data-item-id="app1"]'),
-            module.querySelector('select[data-item-id="quality1"]'),
-            module.querySelector('select[data-item-id="inspection1"]'),
-            module.querySelector('select[data-item-id="repair1"]')
-        ];
-        
-        allCorrosionSelects.forEach(select => {
-            if (select) {
-                select.disabled = false;
-                select.style.opacity = '1';
-                select.style.cursor = 'pointer';
-            }
-        });
-    }
+    // 启用所有大气腐蚀评分选项 - 已移除，现在使用条件选择方式
 
     updateModuleScore(moduleId, score) {
         // 始终使用DOM当前状态重新计算模块总分，
@@ -6798,121 +7066,151 @@ class RBIAssessmentSystem {
                 id: "D2233",
                 title: "D.2.3.3埋深的评分",
                 maxScore: 8,
-                type: "tabs",
-                tabs: [
+                type: "conditional",
+                items: [
                     {
-                        id: "tab1",
-                        title: "非水下穿越管道埋深",
-                        icon: "🌊",
-                        active: false,
-                        content: {
-                            id: "D22332",
-                            title: "D.2.3.3.2非水下穿越管道埋深的评分",
-                            maxScore: 8,
-                            items: [
-                                {
-                                    id: "depth1a",
-                                    title: "跨越段或露管段",
-                                    options: [
-                                        { id: "depth1a1", text: "跨越段或露管段", score: 0 }
-                                    ],
-                                    selected: "depth1a1"
-                                },
-                                {
-                                    id: "depth1b",
-                                    title: "埋地段",
-                                    inputType: "number",
-                                    minValue: 0,
-                                    maxValue: 8,
-                                    step: 0.1,
-                                    placeholder: "请输入0-8之间的数值，根据实际埋深评分",
-                                    defaultValue: 0
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        id: "tab2",
-                        title: "水下穿越管道埋深",
-                        icon: "🌊",
-                        active: true,
-                        content: {
-                            id: "D22333",
-                            title: "D.2.3.3.3水下穿越管道埋深的评分",
-                            maxScore: 8,
-                            subitems: [
-                                {
-                                    id: "depth2",
-                                    title: "可通航河道河底土壤表面(河床表面)与航船底面距离或未通航河道的水深",
-                                    maxScore: 2,
-                                    items: [
-                                        {
-                                            id: "depth2a",
-                                            title: "通航距离或深度",
-                                            options: [
-                                                { id: "depth2a1", text: "上述距离或深度∈[0m～0.5m)", score: 0 },
-                                                { id: "depth2a2", text: "上述距离或深度∈[0.5m～1.0m)", score: 0.5 },
-                                                { id: "depth2a3", text: "上述距离或深度∈[1.0m～1.5m)", score: 1 },
-                                                { id: "depth2a4", text: "上述距离或深度∈[1.5m～2.0m)", score: 1.5 },
-                                                { id: "depth2a5", text: "上述距离或深度≥2.0m", score: 2 }
-                                            ],
-                                            selected: "depth2a5"
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: "depth3",
-                                    title: "在河底的土壤埋深",
-                                    maxScore: 4,
-                                    items: [
-                                        {
-                                            id: "depth3a",
-                                            title: "土壤埋深",
-                                            options: [
-                                                { id: "depth3a1", text: "埋深∈[0m～0.5m)", score: 0 },
-                                                { id: "depth3a2", text: "埋深∈[0.5m～1.0m)", score: 1 },
-                                                { id: "depth3a3", text: "埋深∈[1.0m～1.5m)", score: 2 },
-                                                { id: "depth3a4", text: "埋深∈[1.5m～2.0m)", score: 3 },
-                                                { id: "depth3a5", text: "埋深≥2.0m", score: 4 }
-                                            ],
-                                            selected: "depth3a5"
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: "depth4",
-                                    title: "保护措施",
-                                    maxScore: 2,
-                                    items: [
-                                        {
-                                            id: "depth4a",
-                                            title: "保护措施",
-                                            options: [
-                                                { id: "depth4a1", text: "无保护措施", score: 0 },
-                                                { id: "depth4a2", text: "采用石笼稳管、加设固定墩等稳管措施", score: 1 },
-                                                { id: "depth4a3", text: "采用30mm以上水泥保护层或其他能达到同样加固效果的措施", score: 2 }
-                                            ],
-                                            selected: "depth4a3"
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
+                        id: "depth_type_selector",
+                        title: "请选择管道类型",
+                        options: [
+                            { id: "", text: "请选择" },
+                            { id: "non_underwater", text: "非水下穿越管道埋深的评分", score: null },
+                            { id: "underwater", text: "水下穿越管道埋深的评分", score: null }
+                        ],
+                        selected: "",
+                        conditional: true
                     }
-                ]
+                ],
+                conditionalContent: {
+                    non_underwater: {
+                        id: "D22332",
+                        title: "D.2.3.3.2非水下穿越管道埋深的评分",
+                        items: [
+                            {
+                                id: "depth1a",
+                                title: "跨越段或露管段",
+                                options: [
+                                    { id: "depth1a1", text: "跨越段或露管段", score: 0 }
+                                ],
+                                selected: "depth1a1"
+                            },
+                            {
+                                id: "depth1b",
+                                title: "埋地段",
+                                inputType: "number",
+                                minValue: 0,
+                                maxValue: 8,
+                                step: 0.1,
+                                placeholder: "请输入0-8之间的数值，根据实际埋深评分",
+                                defaultValue: 0,
+                                showCalculator: true
+                            }
+                        ]
+                    },
+                    underwater: {
+                        id: "D22333",
+                        title: "D.2.3.3.3水下穿越管道埋深的评分",
+                        subitems: [
+                            {
+                                id: "depth2",
+                                title: "可通航河道河底土壤表面(河床表面)与航船底面距离或未通航河道的水深",
+                                maxScore: 2,
+                                items: [
+                                    {
+                                        id: "depth2a",
+                                        title: "通航距离或深度",
+                                        options: [
+                                            { id: "depth2a1", text: "上述距离或深度∈[0m～0.5m)", score: 0 },
+                                            { id: "depth2a2", text: "上述距离或深度∈[0.5m～1.0m)", score: 0.5 },
+                                            { id: "depth2a3", text: "上述距离或深度∈[1.0m～1.5m)", score: 1 },
+                                            { id: "depth2a4", text: "上述距离或深度∈[1.5m～2.0m)", score: 1.5 },
+                                            { id: "depth2a5", text: "上述距离或深度≥2.0m", score: 2 }
+                                        ],
+                                        selected: "depth2a5"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "depth3",
+                                title: "在河底的土壤埋深",
+                                maxScore: 4,
+                                items: [
+                                    {
+                                        id: "depth3a",
+                                        title: "土壤埋深",
+                                        options: [
+                                            { id: "depth3a1", text: "埋深∈[0m～0.5m)", score: 0 },
+                                            { id: "depth3a2", text: "埋深∈[0.5m～1.0m)", score: 1 },
+                                            { id: "depth3a3", text: "埋深∈[1.0m～1.5m)", score: 2 },
+                                            { id: "depth3a4", text: "埋深∈[1.5m～2.0m)", score: 3 },
+                                            { id: "depth3a5", text: "埋深≥2.0m", score: 4 }
+                                        ],
+                                        selected: "depth3a5"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "depth4",
+                                title: "保护措施",
+                                maxScore: 2,
+                                items: [
+                                    {
+                                        id: "depth4a",
+                                        title: "保护措施",
+                                        options: [
+                                            { id: "depth4a1", text: "无保护措施", score: 0 },
+                                            { id: "depth4a2", text: "采用石笼稳管、加设固定墩等稳管措施", score: 1 },
+                                            { id: "depth4a3", text: "采用30mm以上水泥保护层或其他能达到同样加固效果的措施", score: 2 }
+                                        ],
+                                        selected: "depth4a3"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
             };
         }
         if (moduleId === 'corrosion') {
-            // 返回大气腐蚀双选项卡的section定义
+            // 返回大气腐蚀条件选择的section定义
             return {
                 id: "D32",
                 title: "D.3.2大气腐蚀的评分",
                 maxScore: 10,
-                type: "tabs",
-                tabs: [
-                    { id: 'tab_atm_underground', title: 'D.3.2.2 埋地段', icon: '🕳️', active: false, content: { id: 'D322' } },
-                    { id: 'tab_atm_crossing', title: 'D.3.2.3 跨越段', icon: '🌉', active: true, content: { id: 'D323' } }
-                ]
+                type: "conditional",
+                items: [
+                    {
+                        id: "atmospheric_type_selector",
+                        title: "请选择管道段类型",
+                        options: [
+                            { id: "", text: "请选择" },
+                            { id: "underground", text: "埋地段的大气腐蚀评分" },
+                            { id: "crossing", text: "跨越段的大气腐蚀评分" }
+                        ],
+                        selected: "",
+                        conditional: true
+                    }
+                ],
+                conditionalContent: {
+                    underground: {
+                        id: "D322",
+                        title: "D.3.2.2埋地段的大气腐蚀的评分",
+                        items: [
+                            {
+                                id: "atm1",
+                                title: "埋地段的大气腐蚀评分",
+                                options: [
+                                    { id: "atm1a", text: "埋地段的大气腐蚀的得分为10分", score: 10 },
+                                    { id: "atm1b", text: "不参与评分", score: 0 }
+                                ],
+                                selected: "atm1a"
+                            }
+                        ]
+                    },
+                    crossing: {
+                        id: "D323",
+                        title: "D.3.2.3跨越段的大气腐蚀的评分"
+                    }
+                }
             };
         }
         return null;
@@ -6971,12 +7269,7 @@ class RBIAssessmentSystem {
                     const inputElement = document.querySelector(`[data-item-id="${item.id}"] input`);
                     if (inputElement) {
                         let value;
-                        // 特殊处理E.3模块：如果显示"点击打开计算器"则分数为0
-                        if (item.id === "leakage1" && inputElement.value === "点击打开计算器") {
-                            value = 0;
-                        } else {
-                            value = parseFloat(inputElement.value) || 0;
-                        }
+                        value = parseFloat(inputElement.value) || 0;
                         this.scores[moduleId][item.id] = value;
                         totalScore += value;
                     }
@@ -7116,67 +7409,11 @@ class RBIAssessmentSystem {
         }
     }
     
-    // 处理埋深评分的互斥逻辑
-    handleDepthMutualExclusion(excludeType, moduleId) {
-        // 如果正在初始化，不执行互斥逻辑
-        if (this.isInitializing) {
-            return;
-        }
-        
-        const module = document.getElementById(`module-${moduleId}`);
-        if (!module) return;
-        
-        if (excludeType === 'underwater') {
-            // 禁用并清空水下穿越管道埋深的所有选项
-            this.clearAndDisableDepthOptions(module, ['depth2a', 'depth3a', 'depth4a']);
-        } else if (excludeType === 'buried') {
-            // 禁用并清空埋地段输入框
-            this.clearAndDisableDepthInput(module, 'depth1b');
-        } else if (excludeType === 'non-underwater') {
-            // 禁用并清空非水下穿越管道埋深的所有选项
-            this.clearAndDisableDepthOptions(module, ['depth1a']);
-            this.clearAndDisableDepthInput(module, 'depth1b');
-        }
-        
-        // 更新分数显示
-        this.updateSectionScores(moduleId);
-    }
+    // 处理埋深评分的互斥逻辑 - 已移除，现在使用条件选择方式
     
-    // 清空并禁用埋深选项
-    clearAndDisableDepthOptions(module, itemIds) {
-        itemIds.forEach(itemId => {
-            const select = module.querySelector(`select[data-item-id="${itemId}"]`);
-            if (select) {
-                select.value = '';
-                select.disabled = true;
-                select.style.opacity = '0.5';
-                select.style.cursor = 'not-allowed';
-                
-                // 清空相关的分数
-                const moduleId = select.getAttribute('data-module-id');
-                if (this.scores[moduleId] && this.scores[moduleId][itemId]) {
-                    delete this.scores[moduleId][itemId];
-                }
-            }
-        });
-    }
+    // 清空并禁用埋深选项 - 已移除，现在使用条件选择方式
     
-    // 清空并禁用埋深输入框
-    clearAndDisableDepthInput(module, itemId) {
-        const input = module.querySelector(`input[data-item-id="${itemId}"]`);
-        if (input) {
-            input.value = '';
-            input.disabled = true;
-            input.style.opacity = '0.5';
-            input.style.cursor = 'not-allowed';
-            
-            // 清空相关的分数
-            const moduleId = input.getAttribute('data-module-id');
-            if (this.scores[moduleId] && this.scores[moduleId][itemId]) {
-                delete this.scores[moduleId][itemId];
-            }
-        }
-    }
+    // 清空并禁用埋深输入框 - 已移除，现在使用条件选择方式
     
 
     
@@ -7779,21 +8016,50 @@ class RBIAssessmentSystem {
         
         console.log(`找到section:`, section);
         
-        // 重置该section中所有下拉框的选择为“最高值”（前三个模块+安全）或“最低值”（失效后果）；固定选项跳过
+        // 特殊处理：重置条件选择器为默认值
+        const conditionalSelects = section.querySelectorAll('select[data-item-id="depth_type_selector"], select[data-item-id="atmospheric_type_selector"]');
+        conditionalSelects.forEach(select => {
+            const itemId = select.getAttribute('data-item-id');
+            console.log(`重置条件选择器 ${itemId} 为默认值`);
+            
+            // 重置为"请选择"选项（空值）
+            select.value = '';
+            
+            // 隐藏条件内容容器
+            const section = select.closest('.scoring-section');
+            const contentContainer = section.querySelector('.conditional-content');
+            if (contentContainer) {
+                contentContainer.style.display = 'none';
+                contentContainer.innerHTML = '';
+                console.log(`隐藏条件选择器 ${itemId} 的内容容器`);
+            }
+            
+            // 触发change事件
+            setTimeout(() => select.dispatchEvent(new Event('change', { bubbles: true })), 0);
+        });
+        
+        // 重置该section中所有下拉框的选择为"最高值"（前三个模块+安全）或"最低值"（失效后果）；固定选项跳过
         const selects = section.querySelectorAll('.option-select');
         const preferHighest = moduleId !== 'consequence';
         console.log(`找到 ${selects.length} 个下拉框，策略=${preferHighest ? '最高值' : '最低值'}`);
 
         selects.forEach((select, index) => {
+            const itemId = select.getAttribute('data-item-id') || '';
+            
             if (select.hasAttribute('data-fixed')) {
-                console.log(`跳过固定选项: ${select.getAttribute('data-item-id')}`);
+                console.log(`跳过固定选项: ${itemId}`);
+                return;
+            }
+            
+            // 跳过已经处理的条件选择器
+            if (itemId === 'depth_type_selector' || itemId === 'atmospheric_type_selector') {
+                console.log(`跳过已处理的条件选择器: ${itemId}`);
                 return;
             }
             let chosenValue = '';
             let bestScore = preferHighest ? -Infinity : Infinity;
-            const itemId = select.getAttribute('data-item-id') || '';
-            // 特例：D.5.2.4.9 强度试验，重置时恢复到“强度试验不符合相关标准规范”（strength1b）
-            if (itemId === 'strength1') {
+            // 特例：D.5.2.4.9 强度试验已改为输入框，跳过旧的下拉选择器重置逻辑
+            if (false && itemId === 'strength1') {
                 // 还原“参照附件”文本与分数痕迹
                 const optC = Array.from(select.options).find(o => o.value === 'strength1c');
                 if (optC) {
@@ -7858,13 +8124,6 @@ class RBIAssessmentSystem {
                     if (input.dataset) {
                         delete input.dataset.s100;
                     }
-                // 特例：E.3 介质最大泄漏量需要回到"点击打开计算器"状态
-                } else if (itemId === 'leakage1') {
-                    input.value = '点击打开计算器';
-                    input.readOnly = true;
-                    input.style.cursor = 'pointer';
-                    input.style.backgroundColor = 'white';
-                    input.title = '点击打开钢管泄漏量计算器';
                 } else {
                     // 其他数值输入：优先根据min/max选择
                     const min = (input.min !== undefined && input.min !== '') ? parseFloat(input.min) : null;
@@ -8166,14 +8425,18 @@ class RBIAssessmentSystem {
     // 检查是否处于S=100状态
     isInS100State() {
         const specialOptions = this.checkSpecialOptionsForFailureProbability();
-        return specialOptions.length > 0;
+        const isS100 = specialOptions.length > 0;
+        console.log(`S=100状态检查: 特殊选项数量=${specialOptions.length}, 结果=${isS100}`, specialOptions);
+        return isS100;
     }
     
     // 判断是否应该显示满分
     shouldShowFullScore(moduleId) {
-        // 当S=100时，以下模块显示满分
-        const fullScoreModules = ['third_party', 'corrosion', 'equipment', 'safety'];
-        return fullScoreModules.includes(moduleId);
+        // 当S=100时，以下模块显示满分（管道本质安全评估模块除外，继续显示正常分数）
+        const fullScoreModules = ['third_party', 'corrosion', 'equipment'];
+        const shouldShow = fullScoreModules.includes(moduleId);
+        console.log(`模块 ${moduleId} 是否显示满分: ${shouldShow}`);
+        return shouldShow;
     }
     
     // 获取section的最大分数
@@ -8408,7 +8671,7 @@ class RBIAssessmentSystem {
                     <input type="number" id="y-input" class="option-input" step="1" min="0" placeholder="请输入y">
                 </div>
                 <div class="result-group">
-                    <label>RBI 得分</label>
+                    <label>计算结果</label>
                     <div class="result-display" id="strength-calculation-result">—</div>
                 </div>
                 <div class="button-group">
@@ -8418,8 +8681,6 @@ class RBIAssessmentSystem {
         `;
 
         document.body.appendChild(calculator);
-
-        // 显示
         setTimeout(() => calculator.classList.add('show'), 10);
 
         // 事件
@@ -8476,46 +8737,16 @@ class RBIAssessmentSystem {
         applyBtn.addEventListener('click', () => {
             const score = compute();
             if (score == null) return;
-            // 写回 管道本质安全模块 下的 strength1 输入
-            const input = document.querySelector('#safety-strength1');
-            if (input) {
-                input.value = score;
-                // 触发 input 与 change 事件，驱动分数联动逻辑
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-                input.dispatchEvent(new Event('change', { bubbles: true }));
-                // 同步更新下拉框显示文案，追加“（X分）”
-                const select = document.querySelector('#safety-strength1')?.closest('.options-container')?.querySelector('select[data-item-id="strength1"]');
-                if (select) {
-                    const opt = Array.from(select.options).find(o => o.value === 'strength1c');
-                    if (opt) {
-                        if (!opt.dataset.baseText) {
-                            opt.dataset.baseText = opt.textContent;
-                        }
-                        // 将“参照附件”选项的分数写入到该option的data-score，参与选择器计分
-                        opt.dataset.score = String(score);
-                        opt.textContent = `${opt.dataset.baseText}（${score}分）`;
-                        // 避免与隐藏输入重复计分：清空隐藏输入值
-                        input.value = '';
-                        select.value = 'strength1c';
-                        // 直接调用统一处理逻辑，避免触发strength1的change监听再次弹出计算器
-                        try {
-                            this.handleScoreChange(select);
-                        } catch (e) {
-                            console.warn('handleScoreChange 调用失败：', e);
-                        }
-                    }
-                }
-                // 触发分数刷新，确保分数计入，并刷新导航栏分数
-                try {
-                    this.updateSectionScores('safety');
-                    this.updateModuleScore('safety');
-                } catch (e) {
-                    console.warn('更新分数失败（非致命）：', e);
-                }
+            const strengthInput = document.querySelector('input[data-item-id="strength1"]');
+            if (strengthInput) {
+                strengthInput.value = score;
+                const event = new Event('input', { bubbles: true });
+                strengthInput.dispatchEvent(event);
             }
             calculator.remove();
         });
     }
+
     
     // 计算埋地段分数
     calculateDepthScore(d1, d3) {
@@ -8618,7 +8849,12 @@ class RBIAssessmentSystem {
     // 判断是否为D.5.2.5附加安全裕度字段的方法
     isAdditionalSafetyMarginField(inputElement) {
         // 方法1：通过ID判断
-        if (inputElement.id === 'safetyMargin1') {
+        if (inputElement.id === 'safetyMargin1' || inputElement.id === 'safety-safetyMargin1') {
+            return true;
+        }
+        
+        // 方法1.5：通过data-item-id属性判断
+        if (inputElement.getAttribute('data-item-id') === 'safetyMargin1') {
             return true;
         }
         
@@ -8681,6 +8917,57 @@ class RBIAssessmentSystem {
 
 // 页面加载完成后初始化系统
 document.addEventListener('DOMContentLoaded', () => {
+    // 强制添加移动端样式重置，确保完全移除蓝色边框
+    const style = document.createElement('style');
+    style.id = 'mobile-reset-styles';
+    style.textContent = `
+        * {
+            -webkit-tap-highlight-color: transparent !important;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        input, select, button, textarea {
+            -webkit-tap-highlight-color: transparent !important;
+            -webkit-appearance: none !important;
+            outline: none !important;
+            -webkit-focus-ring-color: transparent !important;
+        }
+        input:focus, select:focus, button:focus, textarea:focus,
+        input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible,
+        input:active, select:active, button:active, textarea:active {
+            outline: 0 !important;
+            outline-width: 0 !important;
+            outline-style: none !important;
+            outline-color: transparent !important;
+            outline-offset: 0 !important;
+            border: 1px solid #d1d5db !important;
+            box-shadow: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            -webkit-focus-ring-color: transparent !important;
+        }
+        .option-select, .option-input {
+            border: 1px solid #d1d5db !important;
+            outline: none !important;
+            box-shadow: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            -webkit-focus-ring-color: transparent !important;
+        }
+        .option-select:focus, .option-input:focus,
+        .option-select:focus-visible, .option-input:focus-visible,
+        .option-select:active, .option-input:active {
+            border: 1px solid #d1d5db !important;
+            outline: none !important;
+            box-shadow: none !important;
+            -webkit-appearance: none !important;
+            -webkit-focus-ring-color: transparent !important;
+        }
+    `;
+    document.head.appendChild(style);
+    
     new RBIAssessmentSystem();
 });
 // ================== 失效可能性S=100特殊选项检查函数 ==================

@@ -245,8 +245,8 @@ h1 {
         flex: 1;
     }
     
-    /* 桌面端：当严重程度有4个选项时，让按钮在一行显示 */
-    .severity-section:has(label:nth-child(4)) label {
+    /* 桌面端：当严重程度有4个选项时，让按钮在一行显示（小尺寸） */
+    .severity-section:has(label:nth-child(4):not(:nth-child(5))) label {
         min-width: 40px;
         padding: 6px 8px;
         font-size: 0.8em;
@@ -259,6 +259,31 @@ h1 {
         padding: 6px 8px;
         font-size: 0.8em;
         margin: 0px 3px 1px 0;
+    }
+    
+    /* 桌面端：当严重程度只有2个选项时，确保使用正常大小 */
+    .severity-section:has(label:nth-child(2):last-child) label {
+        min-width: 60px !important;
+        padding: 10px 16px !important;
+        font-size: 0.95em !important;
+        margin: 0px 8px 3px 0 !important;
+    }
+    
+    /* 兼容性处理：为不支持:has()的浏览器提供备选方案 */
+    .severity-section.two-options label {
+        min-width: 60px !important;
+        padding: 10px 16px !important;
+        font-size: 0.95em !important;
+        margin: 0px 8px 3px 0 !important;
+    }
+    
+    /* 更具体的选择器，确保2个选项的严重程度按钮样式正确 */
+    .severity-section label:nth-child(2):last-child,
+    .severity-section label:first-child:nth-last-child(2) {
+        min-width: 60px !important;
+        padding: 10px 16px !important;
+        font-size: 0.95em !important;
+        margin: 0px 8px 3px 0 !important;
     }
     
     /* 桌面端：当概率等级有6个选项时，让按钮一行显示三个 */

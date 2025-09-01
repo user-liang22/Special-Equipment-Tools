@@ -10,6 +10,65 @@
 		* { box-sizing:border-box; }
 		html, body { height:100%; }
 		body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:var(--bg); color:#333; display:flex; flex-direction:column; }
+		/* 媒体元素移动端自适应：等比缩放不溢出容器 */
+		img, svg, video, canvas {
+			max-width: 100%;
+			height: auto;
+			display: block;
+		}
+		/* 常见图片容器占满父级宽度，避免横向滚动 */
+		.figure, .image, .img-wrap, .media-wrap {
+			width: 100%;
+			overflow: hidden;
+		}
+		
+		/* 回到主页按钮样式 */
+		.back-home-btn {
+			position: fixed;
+			top: 20px;
+			left: 20px;
+			z-index: 1000;
+			background: linear-gradient(135deg, #2563eb, #1d4ed8);
+			color: white;
+			border: none;
+			border-radius: 50px;
+			padding: 12px 20px;
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+			transition: all 0.3s ease;
+			text-decoration: none;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			font-family: 'Microsoft YaHei', Arial, sans-serif;
+		}
+		
+		.back-home-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+			background: linear-gradient(135deg, #1d4ed8, #1e40af);
+		}
+		
+		.back-home-btn:active {
+			transform: translateY(0);
+		}
+		
+		.back-home-btn i {
+			font-size: 16px;
+		}
+		
+		/* 移动端适配 */
+		@media (max-width: 768px) {
+			.back-home-btn {
+				top: 15px;
+				left: 15px;
+				padding: 10px 16px;
+				font-size: 13px;
+			}
+		}
+		
 		.header { background:linear-gradient(135deg,#2c3e50 0%,var(--primary) 100%); color:#fff; padding:16px 20px; }
 		.title { margin:0; font-size:20px; }
 		.tabs { display:flex; gap:12px; padding:20px; background:linear-gradient(135deg,#f8f9fa,#e9ecef); border-radius:var(--radius); margin:20px 0; box-shadow:var(--shadow); justify-content:space-between; }
@@ -167,6 +226,14 @@
 			transform: translateY(-2px); 
 			box-shadow: 0 4px 12px rgba(37,99,235,0.4); 
 		}
+		/* 保存/历史按钮颜色与电梯页面对齐 */
+		#save-pe-result-btn { background: #28a745 !important; }
+		#save-pe-result-btn:hover { background: #218838 !important; }
+		#view-pe-history-btn { background: #17a2b8 !important; }
+		#view-pe-history-btn:hover { background: #117a8b !important; }
+		/* 隐藏保存/历史按钮（两个页面） */
+		#save-pe-result-btn, #view-pe-history-btn,
+		#save-pe-result-btn-c, #view-pe-history-btn-c { display:none !important; }
 		.risk-result { 
 			margin-top: 16px; 
 			padding: 16px; 
@@ -176,14 +243,34 @@
 		}
 		.risk-info { 
 			display: grid; 
-			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-			gap: 12px; 
+			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+			gap: 6px; 
+		}
+		/* S/C 详情行：单行横向滚动，避免在手机上溢出 */
+		.risk-info.s-row, .risk-info.c-row {
+			display: flex;
+			flex-wrap: nowrap;
+			gap: 4px;
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+			padding-bottom: 2px;
+			justify-content: center;
+		}
+		.risk-info.s-row .risk-item, .risk-info.c-row .risk-item {
+			flex: 0 0 auto;
+			padding: 0 4px;
+			text-align: center;
+			min-width: max-content;
+		}
+		.risk-info.s-row .risk-label, .risk-info.s-row .risk-value,
+		.risk-info.c-row .risk-label, .risk-info.c-row .risk-value { 
+			font-size: 16px; 
 		}
 		.risk-item { 
 			display: flex; 
 			justify-content: space-between; 
 			align-items: center; 
-			padding: 8px 12px; 
+			padding: 4px 8px; 
 			background: #f8f9fa; 
 			border-radius: 6px; 
 		}
@@ -195,6 +282,10 @@
 			font-weight: 700; 
 			color: var(--primary); 
 			font-size: 18px; 
+		}
+		/* 总分（S、C）显示为红色 */
+		.risk-value.total-red { 
+			color: #ef4444; 
 		}
 		.risk-level { 
 			font-weight: 700; 
@@ -218,6 +309,18 @@
 			background: #f5c6cb; 
 			color: #721c24; 
 		}
+
+		/* ===== 历史记录弹窗样式（参考电梯页面） ===== */
+		.pe-modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; }
+		.pe-modal-content { background-color: #fff; margin: 5% auto; padding: 24px; border-radius: 10px; width: 88%; max-width: 820px; max-height: 80vh; overflow-y: auto; position: relative; }
+		.pe-modal .close { color: #aaa; position: absolute; right: 20px; top: 14px; font-size: 26px; font-weight: bold; cursor: pointer; }
+		.pe-modal .close:hover { color: #000; }
+		.pe-history-controls { margin-bottom: 16px; text-align: center; }
+		#pe-clear-all-history-btn { background-color: #dc3545; color:#fff; border:none; border-radius:8px; padding:10px 18px; cursor:pointer; }
+		#pe-clear-all-history-btn:hover { background-color:#c82333; }
+		.pe-history-item { background-color:#f8f9fa; border:1px solid #dee2e6; border-radius:8px; padding:14px; margin-bottom:12px; position:relative; }
+		.pe-history-item-header { font-weight:700; color:#2c3e50; margin-bottom:6px; display:flex; justify-content:space-between; align-items:flex-start; }
+		.pe-delete-history-btn { background-color:#dc3545; color:#fff; border:none; border-radius:50%; width:22px; height:22px; cursor:pointer; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
 		/* 隐藏数字输入框的增减按钮 */
 		#thickness::-webkit-outer-spin-button,
 		#thickness::-webkit-inner-spin-button {
@@ -390,10 +493,31 @@
 				-webkit-user-select: none;
 				user-select: none;
 			}
+			/* 评估结果S/C详情：移动端允许换行显示，取消横向滚动 */
+			.risk-info.s-row, .risk-info.c-row {
+				flex-wrap: wrap;
+				overflow-x: visible;
+				justify-content: center;
+			}
+			.risk-info.s-row .risk-item, .risk-info.c-row .risk-item {
+				flex: 0 1 auto;
+				min-width: 68px;
+				padding: 0 4px;
+			}
+			.risk-info.s-row .risk-label, .risk-info.s-row .risk-value,
+			.risk-info.c-row .risk-label, .risk-info.c-row .risk-value {
+				font-size: 14px;
+			}
 		}
     </style>
 </head>
 <body>
+	<!-- 回到主页按钮 -->
+	<a href="../index.html" class="back-home-btn">
+		<i class="fas fa-home"></i>
+		回到主页
+	</a>
+	
 	<div class="apps">
 		<section id="likelihood-app" class="app active">
 			<div class="wrap">
@@ -408,24 +532,17 @@
 				<div class="content"><div class="main" data-role="l-accordionContainer"></div></div>
 				<div class="risk-calculator">
 					<button id="calculate-risk-btn" class="calculate-risk-btn">计算风险等级</button>
-					<div id="risk-result" class="risk-result" style="display:none;">
-						<div class="risk-info">
-							<div class="risk-item">
-								<span class="risk-label">失效可能性得分 (S):</span>
-								<span id="likelihood-score" class="risk-value">0</span>
-							</div>
-							<div class="risk-item">
-								<span class="risk-label">失效后果得分 (C):</span>
-								<span id="consequence-score" class="risk-value">0</span>
-							</div>
-							<div class="risk-item">
-								<span class="risk-label">风险值 (R = S × C):</span>
-								<span id="risk-value" class="risk-value">0</span>
-							</div>
-							<div class="risk-item">
-								<span class="risk-label">风险等级:</span>
-								<span id="risk-level" class="risk-level">低风险</span>
-							</div>
+					<!-- 移除原四格风险结果展示（改为统一的评估结果 pe-results） -->
+					<!-- 评估结果区块（与电梯评估风格一致） -->
+					<div id="pe-results" class="risk-result" style="display:none; margin-top:12px;">
+						<h2>评估结果</h2>
+						<p id="pe-summary"></p>
+						<p id="pe-score"></p>
+						<p id="pe-level"></p>
+						<!-- 已按要求去掉安全评估结论展示 -->
+						<div class="button-group" style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
+							<button type="button" id="save-pe-result-btn" class="calculate-risk-btn">保存当前结果</button>
+							<button type="button" id="view-pe-history-btn" class="calculate-risk-btn">查看历史记录</button>
 						</div>
 					</div>
 				</div>
@@ -444,27 +561,19 @@
 				<div class="content"><div class="main" data-role="c-accordionContainer"></div></div>
 				<div class="risk-calculator">
 					<button id="calculate-risk-btn-c" class="calculate-risk-btn">计算风险等级</button>
-					<div id="risk-result-c" class="risk-result" style="display:none;">
-						<div class="risk-info">
-							<div class="risk-item">
-								<span class="risk-label">失效可能性得分 (S):</span>
-								<span id="likelihood-score-c" class="risk-value">0</span>
-							</div>
-							<div class="risk-item">
-								<span class="risk-label">失效后果得分 (C):</span>
-								<span id="consequence-score-c" class="risk-value">0</span>
-							</div>
-							<div class="risk-item">
-								<span class="risk-label">风险值 (R = S × C):</span>
-								<span id="risk-value-c" class="risk-value">0</span>
-							</div>
-							<div class="risk-item">
-								<span class="risk-label">风险等级:</span>
-								<span id="risk-level-c" class="risk-level">低风险</span>
-							</div>
+					<!-- 评估结果区块（与电梯评估风格一致，供后果评分页使用） -->
+					<div id="pe-results-c" class="risk-result" style="display:none; margin-top:12px;">
+						<h2>评估结果</h2>
+						<p id="pe-summary-c"></p>
+						<p id="pe-score-c"></p>
+						<p id="pe-level-c"></p>
+						<div class="button-group" style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
+							<button type="button" class="calculate-risk-btn" id="save-pe-result-btn-c">保存当前结果</button>
+							<button type="button" class="calculate-risk-btn" id="view-pe-history-btn-c">查看历史记录</button>
 						</div>
 					</div>
 				</div>
+			</div>
 			</div>
 		</section>
 	</div>
@@ -595,6 +704,119 @@
 			
 			// 初始化显示
 			updateAdjustmentDisplay();
+
+			// 绑定保存/历史按钮事件（服务器版，接口与用户给出的脚本一致）
+			// 1) 统一的风险等级函数（跟页面阈值保持一致）
+			function computeRiskLevel(riskValue){
+				if (riskValue >= 0 && riskValue < 3600)  return '低风险';
+				if (riskValue >= 3600 && riskValue < 7800) return '中风险';
+				if (riskValue >= 7800 && riskValue < 12600) return '较高风险';
+				if (riskValue >= 12600 && riskValue <= 15000) return '高风险';
+				return '超出范围';
+			}
+			// 2) 安全取数字的小工具
+			function readNumberById(id){
+				const el = document.getElementById(id);
+				if(!el) return NaN;
+				const m = (el.textContent || '').match(/[\d.]+/);
+				return m ? Number(m[0]) : NaN;
+			}
+			// 3) 采集当前结果（若DOM无分数，调用计算函数现算）
+			function collectCurrentPEResult(){
+				let sScore = readNumberById('likelihood-score');
+				if (!Number.isFinite(sScore) && typeof calculateLikelihoodTotalScore === 'function') {
+					sScore = Number(calculateLikelihoodTotalScore());
+				}
+				let cScore = readNumberById('consequence-score');
+				if (!Number.isFinite(cScore) && typeof calculateConsequenceTotalScore === 'function') {
+					cScore = Number(calculateConsequenceTotalScore());
+				}
+				let riskValue = readNumberById('risk-value');
+				if (!Number.isFinite(riskValue)) riskValue = (Number(sScore) || 0) * (Number(cScore) || 0);
+				let riskLevelText = (document.getElementById('risk-level')?.textContent || '').trim();
+				if (!riskLevelText) riskLevelText = computeRiskLevel(riskValue);
+				return {
+					title: prompt('请输入此条PE评估标题（可选）','某小区支线-8#') || '未命名',
+					createdAt: new Date().toISOString(),
+					sScore: Number(sScore),
+					cScore: Number(cScore),
+					riskValue: Number.isFinite(riskValue) ? Number(riskValue) : null,
+					riskLevel: riskLevelText,
+					payload: { selections: window.l_userSelections || {}, consequenceSelections: window.c_userSelections || {} }
+				};
+			}
+			async function savePEResultToServer(){
+				try{
+					if (typeof syncRiskResultsWithoutDisplay === 'function') {
+						syncRiskResultsWithoutDisplay();
+					}
+					const data = collectCurrentPEResult();
+					console.log('[SAVE DEBUG] going to POST:', data);
+					if (!Number.isFinite(data.sScore) || !Number.isFinite(data.cScore) || !data.riskLevel) {
+						alert('保存前校验失败：S/C 分数或风险等级为空，请先完成评分/计算。');
+						return;
+					}
+					const resp = await fetch('http://localhost:3001/api/pe-scores', {
+						method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+					});
+					if(!resp.ok){ const text = await resp.text(); throw new Error('保存失败，服务器返回：' + resp.status + ' ' + text); }
+					const json = await resp.json();
+					alert('已保存到服务器，ID=' + json.id);
+				}catch(e){ console.error(e); alert('保存失败，请检查后端/网络：' + e.message); }
+			}
+			async function viewPEHistory(){
+				try{
+					const resp = await fetch('http://localhost:3001/api/pe-scores');
+					const list = await resp.json();
+					const modal = document.getElementById('pe-history-modal');
+					const listDiv = document.getElementById('pe-history-list');
+					if(!Array.isArray(list) || list.length===0){
+						listDiv.innerHTML = '<p>暂无历史记录。</p>';
+					}else{
+						listDiv.innerHTML = list.map((rec)=>{
+							const title = rec.title || '未命名评估';
+							const time = rec.created_at || rec.createdAt || '';
+							const s = rec.s_score ?? rec.sScore ?? '-';
+							const c = rec.c_score ?? rec.cScore ?? '-';
+							const r = rec.risk_value ?? rec.riskValue ?? '-';
+							const level = rec.risk_level ?? rec.riskLevel ?? '';
+							return `
+								<div class="pe-history-item">
+									<div class="pe-history-item-header">
+										<div>
+											<div>${title}</div>
+											<div style="font-size:12px;color:#6c757d;">${time}</div>
+										</div>
+										<button class="pe-delete-history-btn" data-id="${rec.id || ''}" title="删除此记录">×</button>
+									</div>
+
+									<div>S=${s}，C=${c}，R=${r}，风险等级：${level}</div>
+								</div>`;
+						}).join('');
+						// 绑定删除按钮（可选：若后端实现DELETE）
+						Array.from(listDiv.getElementsByClassName('pe-delete-history-btn')).forEach(btn=>{
+							btn.addEventListener('click', async (e)=>{
+								e.stopPropagation();
+								const id = btn.getAttribute('data-id');
+								if(!id) return;
+								if(!confirm('确定删除此记录吗？')) return;
+								try{
+									await fetch('http://localhost:3001/api/pe-scores/'+id, { method:'DELETE' });
+									viewPEHistory();
+								}catch(err){ alert('删除失败：'+err.message); }
+							});
+						});
+					}
+					modal.style.display = 'block';
+					const closeBtn = document.getElementById('pe-history-close');
+					if(closeBtn){ closeBtn.onclick = ()=> modal.style.display='none'; }
+					modal.onclick = (e)=>{ if(e.target === modal) modal.style.display='none'; };
+				}catch(e){ console.error(e); alert('获取历史失败：' + e.message); }
+			}
+			const savePeBtn = document.getElementById('save-pe-result-btn');
+			const viewPeBtn = document.getElementById('view-pe-history-btn');
+			if(savePeBtn){ savePeBtn.addEventListener('click', savePEResultToServer); }
+			if(viewPeBtn){ viewPeBtn.addEventListener('click', viewPEHistory); }
 		});
 		
 		// 计算失效可能性总分
@@ -627,6 +849,74 @@
 				}
 			}
 			return total;
+		}
+		
+		// 统计两个页面所有小项中，总得分为0的项目数（0分项目总数）
+		function calculateZeroScoreItems() {
+			let zeroCount = 0;
+			// 失效可能性页面
+			if (window.l_userSelections) {
+				for (const categoryId in window.l_userSelections) {
+					const categoryItems = window.l_userSelections[categoryId];
+					for (const itemIndex in categoryItems) {
+						let itemSum = 0;
+						for (const optionIndex in categoryItems[itemIndex]) {
+							itemSum += categoryItems[itemIndex][optionIndex].score;
+						}
+						if (itemSum === 0) zeroCount++;
+					}
+				}
+			}
+			// 失效后果页面
+			if (window.c_userSelections) {
+				for (const categoryId in window.c_userSelections) {
+					const categoryItems = window.c_userSelections[categoryId];
+					for (const itemIndex in categoryItems) {
+						let itemSum = 0;
+						for (const optionIndex in categoryItems[itemIndex]) {
+							itemSum += categoryItems[itemIndex][optionIndex].score;
+						}
+						if (itemSum === 0) zeroCount++;
+					}
+				}
+			}
+			return zeroCount;
+		}
+
+		// 计算指定类别在给定选择集中的总分
+		function getCategoryScoreFromSelections(selections, categoryId) {
+			if (!selections || !selections[categoryId]) return 0;
+			let score = 0;
+			for (const itemIndex in selections[categoryId]) {
+				for (const optionIndex in selections[categoryId][itemIndex]) {
+					score += selections[categoryId][itemIndex][optionIndex].score;
+				}
+			}
+			return score;
+		}
+
+		// 生成合计+分项紧凑行：第一行 S总分 + S1-S8；第二行 C总分 + C1-C8
+		function buildTotalsAndDetailsHTML(lTotal, cTotal) {
+			const lCats = ['S1','S2','S3','S4','S5','S6','S7','S8'];
+			const cCats = ['C1','C2','C3','C4','C5','C6','C7','C8'];
+			let html = '';
+			// S 行
+			html += '<div class="risk-info s-row">';
+			html += `<div class="risk-item"><span class="risk-label">S总分:</span><span class="risk-value total-red">${lTotal}</span></div>`;
+			lCats.forEach(id => {
+				const sc = getCategoryScoreFromSelections(window.l_userSelections, id);
+				html += `<div class=\"risk-item\"><span class=\"risk-label\">${id}:</span><span class=\"risk-value\">${sc}</span></div>`;
+			});
+			html += '</div>';
+			// C 行
+			html += '<div class="risk-info c-row" style="margin-top:6px;">';
+			html += `<div class="risk-item"><span class="risk-label">C总分:</span><span class="risk-value total-red">${cTotal}</span></div>`;
+			cCats.forEach(id => {
+				const sc = getCategoryScoreFromSelections(window.c_userSelections, id);
+				html += `<div class=\"risk-item\"><span class=\"risk-label\">${id}:</span><span class=\"risk-value\">${sc}</span></div>`;
+			});
+			html += '</div>';
+			return html;
 		}
 		
 		// 同步风险结果显示（不显示结果区域）
@@ -682,6 +972,28 @@
 			if(riskLevelCElement) {
 				riskLevelCElement.textContent = riskLevel;
 				riskLevelCElement.className = `risk-level ${riskClass}`;
+			}
+			// 同步“评估结果”两处容器（若存在）
+			const peResults = document.getElementById('pe-results');
+			const peResultsC = document.getElementById('pe-results-c');
+			const detailsHTML = buildTotalsAndDetailsHTML(likelihoodScore, consequenceScore);
+			if (peResults) {
+				const peSummary = document.getElementById('pe-summary');
+				const peScore = document.getElementById('pe-score');
+				const peLevel = document.getElementById('pe-level');
+				if (peSummary) peSummary.innerHTML = detailsHTML;
+				if (peScore) peScore.innerHTML = `<b>风险值 (R = S × C):</b> ${riskValue}`;
+				if (peLevel) peLevel.innerHTML = `<b>风险等级:</b> <span class="risk-level ${riskClass}">${riskLevel}</span>`;
+				peResults.style.display = 'block';
+			}
+			if (peResultsC) {
+				const peSummaryC = document.getElementById('pe-summary-c');
+				const peScoreC = document.getElementById('pe-score-c');
+				const peLevelC = document.getElementById('pe-level-c');
+				if (peSummaryC) peSummaryC.innerHTML = detailsHTML;
+				if (peScoreC) peScoreC.innerHTML = `<b>风险值 (R = S × C):</b> ${riskValue}`;
+				if (peLevelC) peLevelC.innerHTML = `<b>风险等级:</b> <span class="risk-level ${riskClass}">${riskLevel}</span>`;
+				peResultsC.style.display = 'block';
 			}
 		}
 		
@@ -746,12 +1058,36 @@
 				riskLevelCElement.className = `risk-level ${riskClass}`;
 			}
 			
-			// 显示风险结果（如果已经计算过）
-			if(riskResultElement) {
-				riskResultElement.style.display = 'block';
-			}
-			if(riskResultCElement) {
-				riskResultCElement.style.display = 'block';
+			// 统一使用下方“评估结果”区块
+
+			// 组装“评估结果”内容，风格对齐电梯评估
+			const zeroItems = calculateZeroScoreItems();
+			const peResultsDiv = document.getElementById('pe-results');
+			if (peResultsDiv) {
+				const peSummary = document.getElementById('pe-summary');
+				const peScore = document.getElementById('pe-score');
+				const peLevel = document.getElementById('pe-level');
+				// const peConclusion = document.getElementById('pe-conclusion'); // 已移除
+				// 统计所有项目的总数（两个页面内的所有.scoring-item）
+				const totalItems = (document.querySelectorAll('#likelihood-app .scoring-item').length || 0) + (document.querySelectorAll('#consequence-app .scoring-item').length || 0);
+				const scoredItems = Math.max(0, totalItems - zeroItems);
+				const detailsHTML = buildTotalsAndDetailsHTML(likelihoodScore, consequenceScore);
+				if (peSummary) peSummary.innerHTML = detailsHTML;
+				if (peScore) peScore.innerHTML = `<b>风险值 (R = S × C):</b> ${riskValue}`;
+				if (peLevel) peLevel.innerHTML = `<b>风险等级:</b> <span class="risk-level ${riskClass}">${riskLevel}</span>`;
+				peResultsDiv.style.display = 'block';
+				peResultsDiv.scrollIntoView({ behavior: 'smooth' });
+				// 同步后果页容器
+				const peResultsC = document.getElementById('pe-results-c');
+				if (peResultsC) {
+					const peSummaryC = document.getElementById('pe-summary-c');
+					const peScoreC = document.getElementById('pe-score-c');
+					const peLevelC = document.getElementById('pe-level-c');
+					if (peSummaryC) peSummaryC.innerHTML = detailsHTML;
+					if (peScoreC) peScoreC.innerHTML = `<b>风险值 (R = S × C):</b> ${riskValue}`;
+					if (peLevelC) peLevelC.innerHTML = `<b>风险等级:</b> <span class="risk-level ${riskClass}">${riskLevel}</span>`;
+					peResultsC.style.display = 'block';
+				}
 			}
 		}
 		
@@ -1329,6 +1665,16 @@
 						} else {
 							header.classList.add('active');
 							content.style.display = 'block';
+							
+							// 展开该类别下的所有二级标题
+							content.querySelectorAll('.item-header').forEach(itemHeader => {
+								itemHeader.classList.add('active');
+								const itemContent = root.querySelector(`#item-content-${categoryId}-${itemHeader.getAttribute('data-item')}`);
+								if(itemContent) {
+									itemContent.classList.add('expanded');
+									itemContent.style.display = 'block';
+								}
+							});
 						}
                 });
             });
@@ -1555,6 +1901,16 @@
 						} else {
 							header.classList.add('active');
 							content.style.display = 'block';
+							
+							// 展开该类别下的所有二级标题
+							content.querySelectorAll('.item-header').forEach(itemHeader => {
+								itemHeader.classList.add('active');
+								const itemContent = root.querySelector(`#item-content-${categoryId}-${itemHeader.getAttribute('data-item')}`);
+								if(itemContent) {
+									itemContent.classList.add('expanded');
+									itemContent.style.display = 'block';
+								}
+							});
 						}
 					});
 				});
@@ -2169,6 +2525,18 @@
 					</div>
 				</div>
 			</div>
+		</div>
+	</div>
+
+	<!-- 历史记录弹窗（PE） -->
+	<div id="pe-history-modal" class="pe-modal" style="display:none;">
+		<div class="pe-modal-content">
+			<span class="close" id="pe-history-close">×</span>
+			<h2>历史评估记录</h2>
+			<div class="pe-history-controls">
+				<button type="button" id="pe-clear-all-history-btn">清空所有历史记录</button>
+			</div>
+			<div id="pe-history-list"></div>
 		</div>
 	</div>
 <script>

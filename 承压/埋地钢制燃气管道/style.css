@@ -1,5 +1,76 @@
 /* ================== 埋地钢制燃气管道风险评估系统 - 移动端优化蓝白风格 ================== */
 
+/* ================== 移动端蓝色边框和高亮完全移除 ================== */
+* {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+input, select, button, textarea, a, div, span {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-appearance: none !important;
+  outline: none !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
+/* 强制移除所有聚焦效果 */
+input:focus, select:focus, button:focus, textarea:focus, 
+input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible,
+input:active, select:active, button:active, textarea:active {
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  outline-offset: 0 !important;
+  border: 1px solid #d1d5db !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
+/* 专门针对选项框和输入框 */
+.option-select, .option-input, 
+.option-select:focus, .option-input:focus,
+.option-select:focus-visible, .option-input:focus-visible,
+.option-select:active, .option-input:active {
+  border: 1px solid #d1d5db !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
+/* 移除数字输入框的箭头 */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield !important;
+}
+
+/* 移除按钮的默认样式 */
+button, input[type="button"], input[type="submit"], input[type="reset"] {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  outline: none !important;
+  border: none !important;
+}
+
+button:focus, input[type="button"]:focus, input[type="submit"]:focus, input[type="reset"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
 /* ================== 全局文本强调样式 ================== */
 /* 确保strong标签在所有环境下都能正确显示加黑效果 */
 strong {
@@ -333,8 +404,18 @@ input, textarea, select {
 .default-notice strong,
 .notification-dialog strong {
     font-weight: bold !important;
-    color: var(--gray-900) !important;
+    color: inherit !important; /* 恢复为初始颜色 */
     font-family: inherit !important;
+    text-shadow: none !important;
+}
+
+/* 移动端：默认提示框中“最低值/最高值”高亮为蓝色（提高选择器优先级覆盖 strong 的 color: inherit !important） */
+@media (max-width: 767px) {
+    .default-notice-content .notice-main-text strong.extreme-highlight,
+    .default-notice-content .notice-sub-text strong.extreme-highlight,
+    .default-notice-content strong.extreme-highlight {
+        color: #2563eb !important;
+    }
 }
 
 .notice-sub-text {
@@ -400,14 +481,14 @@ input, textarea, select {
         font-size: 13px;
     }
     
-    /* 移动端强化加黑效果 */
+    /* 移动端强制还原“特别说明”等加黑和颜色为初始样式 */
     .default-notice-content .notice-main-text strong,
     .default-notice-content .notice-sub-text strong,
     .default-notice strong,
     .notification-dialog strong {
-        font-weight: 900 !important; /* 更粗的字体 */
-        color: var(--primary-blue-dark) !important; /* 深蓝色突出显示 */
-        text-shadow: 0 0 1px rgba(29, 78, 216, 0.3) !important; /* 轻微阴影增强可见性 */
+        font-weight: bold !important;
+        color: inherit !important;
+        text-shadow: none !important;
     }
     
     .notice-close-btn {
@@ -568,6 +649,24 @@ input, textarea, select {
         width: 100%;
         padding: 12px 24px;
         font-size: 15px;
+    }
+}
+
+/* 移动端：去除提示/确认弹窗关闭时的渐隐效果，直接消失 */
+@media (max-width: 768px) {
+    .default-notice-overlay,
+    .default-notice-modal,
+    .confirm-dialog-overlay,
+    .confirm-dialog-modal,
+    .notification-modal,
+    .notification-dialog {
+        animation: none !important;
+        transition: none !important;
+    }
+    .notice-close-btn,
+    .confirm-dialog-btn,
+    .tab-confirm-btn {
+        transition: none !important;
     }
 }
 
@@ -839,6 +938,22 @@ body {
         margin-left: 2px;
     }
     
+    /* 关闭移动端导航项点击的系统高亮，避免蓝色闪烁 */
+    .nav-link,
+    .nav-link * {
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    /* 移除按压动画与任何背景变化 */
+    .nav-link,
+    .nav-link:focus,
+    .nav-link:active {
+        outline: none !important;
+        box-shadow: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+        background: transparent !important;
+    }
+    
     /* 模块内容区域优化 */
     .content-module {
         padding: 1rem;
@@ -1034,6 +1149,35 @@ body {
     flex-shrink: 0;
     line-height: 1.2;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* 移动端按钮点击高亮与焦点优化，防止蓝色闪烁 */
+@media (max-width: 767px) {
+    /* 仅对标题区域内的小圆角按钮和标题按钮自身关闭tap高亮 */
+    .section-title,
+    .section-buttons .section-reset-btn,
+    .section-buttons .section-score {
+        -webkit-tap-highlight-color: transparent !important;
+    }
+
+    /* 移动端聚焦时取消蓝色outline与阴影 */
+    .section-buttons .section-reset-btn:focus,
+    .section-buttons .section-reset-btn:active,
+    .section-buttons .section-score:focus,
+    .section-buttons .section-score:active,
+    .section-title:focus,
+    .section-title:active {
+        outline: none !important;
+        box-shadow: none !important;
+        filter: none !important;
+        background: inherit !important; /* 保持原有背景，不触发系统高亮 */
+    }
+
+    /* 避免点击按钮时触发父级.section-title的active样式造成闪烁 */
+    .section-buttons .section-reset-btn,
+    .section-buttons .section-score {
+        pointer-events: auto;
+    }
 }
 
 .section-content {
@@ -1247,10 +1391,10 @@ body {
     background-position: right var(--spacing-sm) center;
     background-size: 16px;
     padding-right: 24px;
-    /* 确保所有选项框的跳动效果一致 */
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
+    /* 去除可能引起跳动的3D与加速属性 */
+    transform: none !important;
+    backface-visibility: visible !important;
+    perspective: none !important;
     min-height: 40px;
     height: 40px; /* 恢复原来高度 */
 }
@@ -1326,7 +1470,7 @@ body {
     }
     
     .option-input:focus {
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); /* 增大焦点阴影 */
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15); /* 降低阴影厚度，避免视觉跳动 */
         border-color: var(--primary-blue);
     }
     
@@ -1349,7 +1493,7 @@ body {
     }
     
     .option-select:focus {
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); /* 增大焦点阴影 */
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15); /* 降低阴影厚度 */
         border-color: var(--primary-blue);
     }
     
@@ -1516,16 +1660,18 @@ body {
     margin-top: var(--spacing-lg);
 }
 
-.final-score div:first-child {
-    font-size: var(--text-2xl);
-    font-weight: 700;
-    color: var(--primary-blue);
-    margin-bottom: var(--spacing-sm);
+/* 统一最终结果每一行的字号为与“失效后果 C = …”一致，颜色全部黑色 */
+.final-score > * {
+    font-size: var(--text-base) !important;
+    color: var(--gray-900) !important;
+    font-weight: 500;
 }
 
-.final-score div:last-child {
-    font-size: var(--text-base);
-    color: var(--gray-600);
+/* 风险等级行：加大字号并设为蓝色 */
+.final-score .risk-level {
+    color: var(--primary-blue) !important;
+    font-size: var(--text-lg) !important;
+    font-weight: 700 !important;
 }
 
 /* 移动端结果展示优化 */
@@ -1874,6 +2020,17 @@ body {
 
 /* 平板端适配 */
 @media (min-width: 768px) {
+    /* 钢管最大泄漏量计算器：保持输入框聚焦前后尺寸一致（桌面端） */
+    .leakage-calc-input-group input,
+    .leakage-calc-input-group select {
+        border: 2px solid #e9ecef !important; /* 与未聚焦一致 */
+        box-sizing: border-box !important;
+    }
+    .leakage-calc-input-group input:focus,
+    .leakage-calc-input-group select:focus {
+        border: 2px solid #e9ecef !important; /* 防止被全局 input:focus 覆盖为1px导致变小 */
+        box-shadow: 0 0 0 3px rgba(52,152,219,0.1) !important;
+    }
     .container {
         max-width: 768px;
         margin: 20px auto;
@@ -2491,7 +2648,7 @@ body {
         padding: 0.875rem !important;
         min-height: 48px !important;
         border-radius: 8px !important;
-        border-width: 2px !important;
+        border-width: 1px !important; /* 保持与未聚焦状态一致，避免抖动 */
     }
     
     .button-group {
@@ -2584,7 +2741,8 @@ body {
         padding: 0.875rem !important;
         min-height: 48px !important;
         border-radius: 8px !important;
-        border-width: 2px !important;
+        border: 1px solid #e9ecef !important; /* 明确设置边框，避免被全局样式覆盖 */
+        box-sizing: border-box !important;
     }
     
     .leakage-calc-btn {
@@ -2854,6 +3012,14 @@ body {
     color: #1e40af;
 }
 
+/* 触屏设备上禁用hover导致的蓝色闪烁 */
+@media (hover: none) {
+    .tab-button:hover {
+        background: transparent !important;
+        color: inherit !important;
+    }
+}
+
 .tab-button.active {
     background: #ffffff;
     color: #1e40af;
@@ -2989,6 +3155,20 @@ body {
     
     .tab-button:last-child {
         border-right: none; /* 最后一个按钮无右边框 */
+    }
+
+    /* 移动端：关闭触摸高亮与按压时的背景变化，避免蓝色背景闪烁 */
+    .tab-button,
+    .tab-button * {
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    .tab-button,
+    .tab-button:focus,
+    .tab-button:active {
+        outline: none !important;
+        box-shadow: none !important;
+        transform: none !important;
+        background: transparent !important;
     }
     
     .tab-button.active::after {
