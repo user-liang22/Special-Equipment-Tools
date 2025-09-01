@@ -714,10 +714,15 @@ function detectSeverityOptions() {
     const severitySections = document.querySelectorAll('.severity-section');
     severitySections.forEach(section => {
         const labels = section.querySelectorAll('label');
-        if (labels.length === 4) {
+        // 清除所有选项数量相关的类
+        section.classList.remove('two-options', 'four-options');
+        
+        if (labels.length === 2) {
+            section.classList.add('two-options');
+            console.log('Added two-options class to section with 2 labels');
+        } else if (labels.length === 4) {
             section.classList.add('four-options');
-        } else {
-            section.classList.remove('four-options');
+            console.log('Added four-options class to section with 4 labels');
         }
     });
     
@@ -950,8 +955,9 @@ function calculateResults() {
         }
     });
     
-    // 统计C、D项（包含C.1和D.1）
+    // 统计C、D项
     checklistData.forEach(cat => {
+        // C、D项都参与统计，不跳过任何部分
         
         let categoryNotApplicable = true;
         const categoryNotApplicableItems = [];
@@ -1006,7 +1012,7 @@ function calculateResults() {
                         }
                     } else {
                         // C、D项通常都有C级和D级选项，所以需要用户选择
-                        // 检查所有不完整项目（包含C.1和D.1）
+                        // 检查所有C、D项的不完整项目
                         if (!incompleteItem) {
                             incompleteItem = item;
                         }
