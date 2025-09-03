@@ -895,12 +895,13 @@
 			return score;
 		}
 
-		// 生成合计+分项紧凑行：第一行 S总分 + S1-S8；第二行 C总分 + C1-C8
+		// 生成合计+分项紧凑行：第一行 S总分 + S1-S8；第二行 C总分 + C1-C8；第三行 C9-C12
 		function buildTotalsAndDetailsHTML(lTotal, cTotal) {
 			const lCats = ['S1','S2','S3','S4','S5','S6','S7','S8'];
-			const cCats = ['C1','C2','C3','C4','C5','C6','C7','C8'];
+			const cCats1 = ['C1','C2','C3','C4','C5','C6','C7','C8'];
+			const cCats2 = ['C9','C10','C11','C12'];
 			let html = '';
-			// S 行
+			// S 行：S总分 + S1-S8（9个项目）
 			html += '<div class="risk-info s-row">';
 			html += `<div class="risk-item"><span class="risk-label">S总分:</span><span class="risk-value total-red">${lTotal}</span></div>`;
 			lCats.forEach(id => {
@@ -908,10 +909,17 @@
 				html += `<div class=\"risk-item\"><span class=\"risk-label\">${id}:</span><span class=\"risk-value\">${sc}</span></div>`;
 			});
 			html += '</div>';
-			// C 行
+			// C 第一行：C总分 + C1-C8（9个项目，与S行长度一致）
 			html += '<div class="risk-info c-row" style="margin-top:6px;">';
 			html += `<div class="risk-item"><span class="risk-label">C总分:</span><span class="risk-value total-red">${cTotal}</span></div>`;
-			cCats.forEach(id => {
+			cCats1.forEach(id => {
+				const sc = getCategoryScoreFromSelections(window.c_userSelections, id);
+				html += `<div class=\"risk-item\"><span class=\"risk-label\">${id}:</span><span class=\"risk-value\">${sc}</span></div>`;
+			});
+			html += '</div>';
+			// C 第二行：C9-C12（4个项目，换行显示）
+			html += '<div class="risk-info c-row" style="margin-top:6px;">';
+			cCats2.forEach(id => {
 				const sc = getCategoryScoreFromSelections(window.c_userSelections, id);
 				html += `<div class=\"risk-item\"><span class=\"risk-label\">${id}:</span><span class=\"risk-value\">${sc}</span></div>`;
 			});
@@ -1277,8 +1285,49 @@
 				for (let i = 0; i < select.options.length; i++) {
 					if (select.options[i].value === selectedOption) {
 						select.selectedIndex = i;
+						
+						// 手动更新用户选择数据，不依赖change事件
+						const category = select.getAttribute('data-category');
+						const itemIndex = select.getAttribute('data-item');
+						const optionIndex = select.getAttribute('data-option');
+						const selectedOptionEl = select.options[select.selectedIndex];
+						const score = selectedOptionEl.value ? parseInt(selectedOptionEl.getAttribute('data-score')) : 0;
+						
+						// 直接更新全局用户选择数据
+						if (window.c_userSelections && window.c_userSelections[category]) {
+							if (!window.c_userSelections[category][itemIndex]) {
+								window.c_userSelections[category][itemIndex] = {};
+							}
+							window.c_userSelections[category][itemIndex][optionIndex] = {value: selectedOption, score: score};
+							
+							// 手动更新C4得分显示，不依赖c_updateCategoryScore函数
+							const scoreElement = document.querySelector('#consequence-app #score-C4');
+							if (scoreElement) {
+								scoreElement.textContent = score;
+							}
+							
+							// 手动更新导航栏分数
+							try {
+								// 使用全局的setTextAll函数更新所有.c-total-score元素
+								if (typeof setTextAll === 'function') {
+									const totalScore = calculateConsequenceTotalScore();
+									setTextAll('.c-total-score', totalScore);
+								} else {
+									// 备用方法：直接更新所有.c-total-score元素
+									const cTotalScores = document.querySelectorAll('.c-total-score');
+									const totalScore = calculateConsequenceTotalScore();
+									cTotalScores.forEach(el => {
+										el.textContent = totalScore;
+									});
+								}
+							} catch (e) {
+								// 静默处理错误
+							}
+						}
+						
 						// 触发change事件以更新用户选择数据
 						select.dispatchEvent(new Event('change'));
+						
 						break;
 					}
 				}
@@ -1833,9 +1882,23 @@
 				return `<select class="option-select" data-category="${categoryId}" data-item="${itemIndex}" data-option="${optionIndex}" ${isDisabled ? 'disabled' : ''}>${options}</select>`;
 			}
 			function c_updateCategoryScore(categoryId){
-				if(!c_userSelections[categoryId]){ root.querySelector(`#score-${categoryId}`).textContent=0; return; }
-				let score=0; for(const i in c_userSelections[categoryId]){ for(const j in c_userSelections[categoryId][i]){ score+=c_userSelections[categoryId][i][j].score; }}
-				root.querySelector(`#score-${categoryId}`).textContent=score;
+				if(!c_userSelections[categoryId]){ 
+					root.querySelector(`#score-${categoryId}`).textContent=0; 
+					return; 
+				}
+				
+				let score=0; 
+				for(const i in c_userSelections[categoryId]){ 
+					for(const j in c_userSelections[categoryId][i]){ 
+						score+=c_userSelections[categoryId][i][j].score; 
+					}
+				}
+				
+				const scoreElement = root.querySelector(`#score-${categoryId}`);
+				if (scoreElement) {
+					scoreElement.textContent=score;
+				}
+				
 				c_checkAndUpdateTotalScore();
 			}
 			function c_checkAndUpdateTotalScore(){
@@ -1927,6 +1990,7 @@
 						if(!c_userSelections[category]) c_userSelections[category]={};
 						if(!c_userSelections[category][itemIndex]) c_userSelections[category][itemIndex]={};
 						c_userSelections[category][itemIndex][optionIndex]={value,score};
+						
 						c_updateCategoryScore(category);
 					}
 				});

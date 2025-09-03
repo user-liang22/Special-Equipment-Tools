@@ -4,7 +4,55 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>埋地钢制燃气管道风险评估</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	<style>
+		/* 回到主页按钮样式 */
+		.back-home-btn {
+			position: fixed;
+			top: 20px;
+			left: 20px;
+			z-index: 1000;
+			background: linear-gradient(135deg, #2563eb, #1d4ed8);
+			color: white;
+			border: none;
+			border-radius: 50px;
+			padding: 12px 20px;
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+			transition: all 0.3s ease;
+			text-decoration: none;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			font-family: 'Microsoft YaHei', Arial, sans-serif;
+		}
+
+		.back-home-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+			background: linear-gradient(135deg, #1d4ed8, #1e40af);
+		}
+
+		.back-home-btn:active {
+			transform: translateY(0);
+		}
+
+		.back-home-btn i {
+			font-size: 16px;
+		}
+
+		/* 移动端适配 */
+		@media (max-width: 768px) {
+			.back-home-btn {
+				top: 15px;
+				left: 15px;
+				padding: 10px 16px;
+				font-size: 13px;
+			}
+		}
+
 		/* 移动端兜底样式（当外链CSS无法加载时生效） */
 		html { font-size: 16px; -webkit-text-size-adjust: 100%; }
 		body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; line-height: 1.6; color: #ffffff; }
@@ -698,6 +746,12 @@
 	</div>
 
 	<div class="container">
+		<!-- 回到主页按钮 -->
+		<a href="../../index.html" class="back-home-btn">
+			<i class="fas fa-home"></i>
+			回到主页
+		</a>
+		
 		<!-- 页面标题 -->
 		<header class="page-header">
 			<h1>埋地钢制燃气管道风险评估 (RBI)</h1>
